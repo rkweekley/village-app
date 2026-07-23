@@ -18,6 +18,7 @@ final dioProvider = Provider<Dio>((ref) {
   dio.interceptors.add(LogInterceptor(
     requestBody: true,
     responseBody: true,
+    // ignore: avoid_print
     logPrint: (o) => print('[Village API] $o'),
   ));
 

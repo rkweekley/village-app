@@ -3,37 +3,43 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends ConsumerStatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  final _inviteCtrl = TextEditingController();
   bool _obscurePassword = true;
   bool _loading = false;
 
   @override
   void dispose() {
+    _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _inviteCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _loading = true);
     ref.read(authProvider.notifier).clearError();
 
     try {
-      await ref.read(authProvider.notifier).login(
+      await ref.read(authProvider.notifier).register(
             email: _emailCtrl.text.trim(),
+            displayName: _nameCtrl.text.trim(),
             password: _passwordCtrl.text,
+            inviteCode: _inviteCtrl.text.trim().isEmpty ? null : _inviteCtrl.text.trim(),
           );
       if (mounted) context.go('/hub');
     } catch (_) {
@@ -49,6 +55,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/login'),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -58,31 +70,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo / Brand
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(Icons.home_rounded, color: Colors.white, size: 44),
-                  ),
-                  const SizedBox(height: 16),
                   Text(
-                    'Village',
+                    'Join Village',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Text(
-                    'Your family OS',
+                    'Create a new family or join an existing one',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 36),
 
                   // Error
                   if (state.error != null)
@@ -99,6 +100,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         style: TextStyle(color: theme.colorScheme.onErrorContainer),
                       ),
                     ),
+
+                  // Display Name
+                  TextFormField(
+                    controller: _nameCtrl,
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      labelText: 'Your name',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    validator: (v) {
+                      if (v == null || v.trim().length < 2) return 'Enter at least 2 characters';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
                   // Email
                   TextFormField(
@@ -121,7 +137,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   TextFormField(
                     controller: _passwordCtrl,
                     obscureText: _obscurePassword,
-                    textInputAction: TextInputAction.done,
+                    textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       prefixIcon: const Icon(Icons.lock_outlined),
@@ -133,41 +149,51 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Enter your password';
+                      if (v == null || v.length < 8) return 'At least 8 characters';
                       return null;
                     },
-                    onFieldSubmitted: (_) => _handleLogin(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Invite Code (optional)
+                  TextFormField(
+                    controller: _inviteCtrl,
+                    textInputAction: TextInputAction.done,
+                    decoration: const InputDecoration(
+                      labelText: 'Family invite code (optional)',
+                      prefixIcon: Icon(Icons.group_add_outlined),
+                      helperText: 'Leave blank to create a new family',
+                    ),
                   ),
                   const SizedBox(height: 24),
 
-                  // Login button
+                  // Register button
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: FilledButton(
-                      onPressed: _loading ? null : _handleLogin,
+                      onPressed: _loading ? null : _handleRegister,
                       child: _loading
                           ? const SizedBox(
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Sign In', style: TextStyle(fontSize: 16)),
+                          : const Text('Create Account', style: TextStyle(fontSize: 16)),
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        'Already have an account? ',
                         style: theme.textTheme.bodyMedium,
                       ),
                       TextButton(
-                        onPressed: () => context.go('/register'),
-                        child: const Text('Create one'),
+                        onPressed: () => context.go('/login'),
+                        child: const Text('Sign in'),
                       ),
                     ],
                   ),
