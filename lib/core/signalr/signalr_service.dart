@@ -151,17 +151,19 @@ class SignalRMessage {
   });
 }
 
-/// Manages connections to all three hubs.
+/// Manages connections to all four hubs.
 class SignalRService {
   final String baseUrl;
   late final SignalRHubClient familyHub;
   late final SignalRHubClient choresHub;
   late final SignalRHubClient pointsHub;
+  late final SignalRHubClient notificationsHub;
   bool _initialized = false;
 
   Stream<SignalRMessage> get familyMessages => familyHub.messages;
   Stream<SignalRMessage> get choresMessages => choresHub.messages;
   Stream<SignalRMessage> get pointsMessages => pointsHub.messages;
+  Stream<SignalRMessage> get notificationsMessages => notificationsHub.messages;
 
   SignalRService({required this.baseUrl}) {
     familyHub = SignalRHubClient(
@@ -179,15 +181,21 @@ class SignalRService {
       hubPath: '/hubs/points',
       joinMethod: 'JoinPointsGroup',
     );
+    notificationsHub = SignalRHubClient(
+      baseUrl: baseUrl,
+      hubPath: '/hubs/notifications',
+      joinMethod: 'JoinNotificationGroup',
+    );
   }
 
   /// Connect to all hubs and join the family group.
-  Future<void> connectAll(String familyId) async {
+  Future<void> connectAll(String familyId, String userId) async {
     // Connect all hubs in parallel
     await Future.wait([
       familyHub.connect(familyId: familyId),
       choresHub.connect(familyId: familyId),
       pointsHub.connect(familyId: familyId),
+      notificationsHub.connect(familyId: userId), // Notifications use user-scoped group
     ]);
     _initialized = true;
   }
@@ -195,13 +203,15 @@ class SignalRService {
   bool get isConnected =>
       familyHub.isConnected &&
       choresHub.isConnected &&
-      pointsHub.isConnected;
+      pointsHub.isConnected &&
+      notificationsHub.isConnected;
 
   Future<void> disconnectAll() async {
     await Future.wait([
       familyHub.disconnect(),
       choresHub.disconnect(),
       pointsHub.disconnect(),
+      notificationsHub.disconnect(),
     ]);
     _initialized = false;
   }
@@ -210,6 +220,7 @@ class SignalRService {
     familyHub.dispose();
     choresHub.dispose();
     pointsHub.dispose();
+    notificationsHub.dispose();
   }
 }
 

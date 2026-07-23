@@ -49,6 +49,23 @@ class _HubPageState extends ConsumerState<HubPage> {
       appBar: AppBar(
         title: Text(familyState.isLoading ? 'Loading...' : familyName),
         actions: [
+          // Notification bell with badge
+          Consumer(
+            builder: (context, ref, _) {
+              final state = ref.watch(notificationProvider);
+              return Badge(
+                isLabelVisible: state.unreadCount > 0,
+                label: Text(
+                  state.unreadCount > 99 ? '99+' : state.unreadCount.toString(),
+                  style: const TextStyle(fontSize: 10),
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () => context.push('/notifications'),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () => context.go('/family'),

@@ -11,6 +11,7 @@ import 'package:village_app/features/chores/pages/chores_page.dart';
 import 'package:village_app/features/rewards/pages/rewards_page.dart';
 import 'package:village_app/features/calendar/pages/calendar_page.dart';
 import 'package:village_app/features/shopping/pages/shopping_lists_page.dart';
+import 'package:village_app/features/notifications/pages/notifications_page.dart';
 import 'package:village_app/shared/widgets/app_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -66,6 +67,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/family',
         builder: (context, state) => const FamilyPage(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsPage(),
       ),
       // ── App Shell (bottom nav) ──
       ShellRoute(
