@@ -51,9 +51,7 @@ class _HubPageState extends ConsumerState<HubPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () {
-              // TODO: navigate to profile/settings
-            },
+            onPressed: () => context.go('/family'),
           ),
         ],
       ),

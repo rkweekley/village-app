@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/features/auth/pages/login_page.dart';
 import 'package:village_app/features/auth/pages/register_page.dart';
+import 'package:village_app/features/family/pages/family_page.dart';
 import 'package:village_app/features/family/pages/family_setup_page.dart';
 import 'package:village_app/features/hub/pages/hub_page.dart';
 import 'package:village_app/features/chores/pages/chores_page.dart';
@@ -61,6 +62,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/family-setup',
         builder: (context, state) => const FamilySetupPage(),
+      ),
+      GoRoute(
+        path: '/family',
+        builder: (context, state) => const FamilyPage(),
       ),
       // ── App Shell (bottom nav) ──
       ShellRoute(
