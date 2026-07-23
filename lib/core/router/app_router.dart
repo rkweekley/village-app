@@ -6,7 +6,10 @@ import 'package:village_app/features/auth/pages/login_page.dart';
 import 'package:village_app/features/auth/pages/register_page.dart';
 import 'package:village_app/features/family/pages/family_setup_page.dart';
 import 'package:village_app/features/hub/pages/hub_page.dart';
-import 'package:village_app/shared/widgets/placeholders.dart';
+import 'package:village_app/features/chores/pages/chores_page.dart';
+import 'package:village_app/features/rewards/pages/rewards_page.dart';
+import 'package:village_app/features/calendar/pages/calendar_page.dart';
+import 'package:village_app/features/shopping/pages/shopping_lists_page.dart';
 import 'package:village_app/shared/widgets/app_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -69,37 +72,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/chores',
-            builder: (context, state) =>
-                const PlaceholderPage(title: 'Chores', icon: Icons.checklist),
-            routes: [
-              GoRoute(
-                path: ':id',
-                builder: (context, state) => const PlaceholderPage(
-                    title: 'Chore Detail', icon: Icons.checklist),
-              ),
-            ],
+            builder: (context, state) => const ChoresPage(),
           ),
           GoRoute(
             path: '/rewards',
-            builder: (context, state) =>
-                const PlaceholderPage(title: 'Rewards', icon: Icons.stars),
-            routes: [
-              GoRoute(
-                path: ':id',
-                builder: (context, state) => const PlaceholderPage(
-                    title: 'Reward Detail', icon: Icons.stars),
-              ),
-            ],
+            builder: (context, state) => const RewardsPage(),
           ),
           GoRoute(
             path: '/calendar',
-            builder: (context, state) =>
-                const PlaceholderPage(title: 'Calendar', icon: Icons.calendar_month),
+            builder: (context, state) => const CalendarPage(),
           ),
           GoRoute(
             path: '/shopping',
-            builder: (context, state) =>
-                const PlaceholderPage(title: 'Shopping List', icon: Icons.shopping_cart),
+            builder: (context, state) => const ShoppingListsPage(),
           ),
         ],
       ),

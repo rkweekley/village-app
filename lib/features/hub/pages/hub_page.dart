@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class HubPage extends ConsumerWidget {
   const HubPage({super.key});
@@ -86,25 +87,25 @@ class HubPage extends ConsumerWidget {
                     icon: Icons.checklist,
                     label: 'Chores',
                     color: Colors.green,
-                    onTap: () {},
+                    onTap: () => context.go('/chores'),
                   ),
                   _QuickActionCard(
                     icon: Icons.stars,
                     label: 'Rewards',
                     color: Colors.orange,
-                    onTap: () {},
+                    onTap: () => context.go('/rewards'),
                   ),
                   _QuickActionCard(
                     icon: Icons.calendar_month,
                     label: 'Calendar',
                     color: Colors.blue,
-                    onTap: () {},
+                    onTap: () => context.go('/calendar'),
                   ),
                   _QuickActionCard(
                     icon: Icons.shopping_cart,
                     label: 'Shopping',
                     color: Colors.purple,
-                    onTap: () {},
+                    onTap: () => context.go('/shopping'),
                   ),
                 ],
               ),
