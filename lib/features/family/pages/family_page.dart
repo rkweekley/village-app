@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
+import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/family/family_provider.dart';
 import 'package:village_app/features/family/models.dart';
 
@@ -30,6 +31,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(familyState.family?.name ?? 'Family'),
+        centerTitle: true,
         actions: [
           if (familyState.isLoading)
             const Padding(
@@ -50,6 +52,11 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             // Invite code card
             if (familyState.family != null) ...[
               Card(
+                elevation: 0,
+                color: VillageTheme.surfaceWarm,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -57,69 +64,64 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.share,
-                              color: Theme.of(context).colorScheme.primary),
-                          const SizedBox(width: 8),
-                          Text('Invite Members',
-                              style: Theme.of(context).textTheme.titleMedium),
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: VillageTheme.primaryTeal
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.share_rounded,
+                                size: 20, color: VillageTheme.primaryTeal),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text('Invite Members',
+                              style: TextStyle(
+                                  fontSize: 17, fontWeight: FontWeight.w700)),
                         ],
                       ),
                       const SizedBox(height: 12),
                       Text(
                         'Share this code with family members to join:',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                        style: TextStyle(color: Colors.grey[600], fontSize: 13),
                       ),
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(12),
+                          color: VillageTheme.primaryTeal.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withValues(alpha: 0.3),
+                            color: VillageTheme.primaryTeal.withValues(alpha: 0.2),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                            Icon(Icons.tag,
-                                color: Theme.of(context).colorScheme.primary),
+                            const Icon(Icons.tag_rounded,
+                                color: VillageTheme.primaryTeal, size: 20),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 familyState.family!.inviteCode,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 4,
-                                    ),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22,
+                                  letterSpacing: 4,
+                                ),
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.copy),
+                              icon: const Icon(Icons.copy_rounded),
                               tooltip: 'Copy invite code',
+                              color: VillageTheme.primaryTeal,
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(
                                     text: familyState.family!.inviteCode));
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content:
-                                        Text('Invite code copied!'),
+                                    content: Text('Invite code copied!'),
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
@@ -131,11 +133,8 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       const SizedBox(height: 8),
                       Text(
                         'New members enter this code when creating their account.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey[500]),
                       ),
                     ],
                   ),
@@ -144,9 +143,14 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
               const SizedBox(height: 16),
             ],
 
-            // Family info card
+            // Family settings card
             if (familyState.family != null)
               Card(
+                elevation: 0,
+                color: VillageTheme.surfaceWarm,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -154,37 +158,32 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.info_outline,
-                              color: Theme.of(context).colorScheme.primary),
-                          const SizedBox(width: 8),
-                          Text('Family Settings',
-                              style: Theme.of(context).textTheme.titleMedium),
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: VillageTheme.primaryTeal
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.settings_rounded,
+                                size: 20, color: VillageTheme.primaryTeal),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text('Family Settings',
+                              style: TextStyle(
+                                  fontSize: 17, fontWeight: FontWeight.w700)),
                         ],
                       ),
                       const SizedBox(height: 16),
+                      _infoRow('Family Name', familyState.family!.name),
+                      const Divider(height: 20),
+                      _infoRow('Currency', familyState.family!.currencyName),
+                      const Divider(height: 20),
+                      _infoRow('Timezone', familyState.family!.timezone),
+                      const Divider(height: 20),
                       _infoRow(
-                        context,
-                        'Family Name',
-                        familyState.family!.name,
-                      ),
-                      const SizedBox(height: 8),
-                      _infoRow(
-                        context,
-                        'Currency',
-                        familyState.family!.currencyName,
-                      ),
-                      const SizedBox(height: 8),
-                      _infoRow(
-                        context,
-                        'Timezone',
-                        familyState.family!.timezone,
-                      ),
-                      const SizedBox(height: 8),
-                      _infoRow(
-                        context,
-                        'Members',
-                        '${familyState.family!.members.length}',
-                      ),
+                          'Members', '${familyState.family!.members.length}'),
                     ],
                   ),
                 ),
@@ -192,9 +191,28 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             const SizedBox(height: 16),
 
             // Members section
-            Text('Family Members',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: VillageTheme.primaryTeal
+                          .withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.people_rounded,
+                        size: 16, color: VillageTheme.primaryTeal),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text('Family Members',
+                      style:
+                          TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ),
 
             if (familyState.family == null && familyState.isLoading)
               const Center(
@@ -205,8 +223,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
               ),
 
             if (familyState.family != null)
-              ...familyState.family!.members.map((member) =>
-                  _MemberCard(
+              ...familyState.family!.members.map((member) => _MemberCard(
                     member: member,
                     isCurrentUser: member.id == currentUserId,
                     role: authState.userInfo?.role ?? '',
@@ -216,28 +233,28 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             if (familyState.error != null)
               Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: Card(
-                  color: Theme.of(context).colorScheme.errorContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Icon(Icons.error_outline,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onErrorContainer),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            familyState.error!,
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onErrorContainer),
-                          ),
-                        ),
-                      ],
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: VillageTheme.mealsCoral.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: VillageTheme.mealsCoral.withValues(alpha: 0.2),
                     ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline_rounded,
+                          color: VillageTheme.mealsCoral, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          familyState.error!,
+                          style: const TextStyle(
+                              color: VillageTheme.mealsCoral, fontSize: 14),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -247,21 +264,23 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
     );
   }
 
-  Widget _infoRow(BuildContext context, String label, String value) {
+  Widget _infoRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
         ),
         Text(
           value,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
         ),
       ],
     );
@@ -284,91 +303,137 @@ class _MemberCard extends StatelessWidget {
     final isAdmin = role == 'Admin' || role == 'Parent';
     final canManage = isAdmin && !isCurrentUser;
 
+    // Generate avatar color from name
+    final nameHash = member.displayName.hashCode;
+    final avatarColors = [
+      VillageTheme.primaryTeal,
+      VillageTheme.rewardsAmber,
+      VillageTheme.mealsCoral,
+      VillageTheme.calendarCyan,
+      VillageTheme.shoppingPurple,
+    ];
+    final avatarColor = avatarColors[nameHash.abs() % avatarColors.length];
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: isCurrentUser
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: Text(
-            member.displayName.isNotEmpty
-                ? member.displayName[0].toUpperCase()
-                : '?',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isCurrentUser
-                  ? Theme.of(context).colorScheme.onPrimaryContainer
-                  : null,
-            ),
-          ),
-        ),
-        title: Row(
+      elevation: 0,
+      color: VillageTheme.surfaceWarm,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
           children: [
-            Text(
-              member.displayName,
-              style: TextStyle(
-                fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-            if (isCurrentUser)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'You',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
-                        ),
-                  ),
+            // Avatar
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: avatarColor.withValues(alpha: 0.15),
+              child: Text(
+                member.displayName.isNotEmpty
+                    ? member.displayName[0].toUpperCase()
+                    : '?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: avatarColor,
                 ),
               ),
-          ],
-        ),
-        subtitle: Text(
-          member.role,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '${member.pointsBalance} pts',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 14),
+            // Name + role
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        member.displayName,
+                        style: TextStyle(
+                          fontWeight:
+                              isCurrentUser ? FontWeight.bold : FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
+                      if (isCurrentUser) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: VillageTheme.primaryTeal
+                                .withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'You',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: VillageTheme.primaryTeal,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    member.role,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Points
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: VillageTheme.primaryTeal.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${member.pointsBalance} pts',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  color: VillageTheme.primaryTeal,
+                ),
+              ),
             ),
             if (canManage) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               PopupMenuButton<String>(
+                icon: Icon(Icons.more_horiz_rounded,
+                    color: Colors.grey[400]),
                 onSelected: (value) {
                   // TODO: implement role change / remove member
                 },
                 itemBuilder: (context) => [
                   const PopupMenuItem(
                     value: 'promote',
-                    child: ListTile(
-                      leading: Icon(Icons.star),
-                      title: Text('Promote to Admin'),
+                    child: Row(
+                      children: [
+                        Icon(Icons.star_rounded, size: 20),
+                        SizedBox(width: 8),
+                        Text('Promote to Admin'),
+                      ],
                     ),
                   ),
                   const PopupMenuItem(
                     value: 'remove',
-                    child: ListTile(
-                      leading: Icon(Icons.person_remove, color: Colors.red),
-                      title: Text('Remove Member',
-                          style: TextStyle(color: Colors.red)),
+                    child: Row(
+                      children: [
+                        Icon(Icons.person_remove_rounded,
+                            size: 20, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Remove Member',
+                            style: TextStyle(color: Colors.red)),
+                      ],
                     ),
                   ),
                 ],

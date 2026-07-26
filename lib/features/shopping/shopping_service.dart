@@ -93,6 +93,9 @@ class ShoppingListDetail {
             .map((i) => ShoppingItem.fromJson(i))
             .toList(),
       );
+
+  int get itemCount => items.length;
+  int get checkedCount => items.where((i) => i.isChecked).length;
 }
 
 // ── Service ──

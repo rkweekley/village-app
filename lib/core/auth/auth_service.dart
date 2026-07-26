@@ -1,18 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:village_app/core/network/authenticated_client.dart';
 import 'package:village_app/core/auth/models.dart';
-
-/// Secure storage wrapper for auth tokens
-final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
-});
+import 'package:village_app/core/auth/secure_storage.dart';
 
 /// Auth service — makes HTTP calls to the Village API
 class AuthService {
   final Dio _dio;
-  final FlutterSecureStorage _storage;
+  final SecureStorage _storage;
 
   AuthService(this._dio, this._storage);
 
@@ -29,7 +24,7 @@ class AuthService {
       if (inviteCode != null && inviteCode.isNotEmpty) 'inviteCode': inviteCode,
     });
     final data = AuthResponse.fromJson(response.data);
-    await _storage.write(key: 'jwt_token', value: data.token);
+    await _storage.write('jwt_token', data.token);
     return data;
   }
 
@@ -42,7 +37,7 @@ class AuthService {
       'password': password,
     });
     final data = AuthResponse.fromJson(response.data);
-    await _storage.write(key: 'jwt_token', value: data.token);
+    await _storage.write('jwt_token', data.token);
     return data;
   }
 
@@ -56,20 +51,20 @@ class AuthService {
     }
   }
 
-  Future<String?> getToken() => _storage.read(key: 'jwt_token');
+  Future<String?> getToken() async => _storage.read('jwt_token');
 
   Future<void> logout() async {
-    await _storage.delete(key: 'jwt_token');
+    await _storage.delete('jwt_token');
   }
 
   Future<bool> hasToken() async {
-    final token = await _storage.read(key: 'jwt_token');
+    final token = await _storage.read('jwt_token');
     return token != null && token.isNotEmpty;
   }
 }
 
 final authServiceProvider = Provider<AuthService>((ref) {
+  final storage = ref.read(secureStorageProvider);
   final dio = ref.watch(authenticatedDioProvider);
-  final storage = ref.watch(secureStorageProvider);
   return AuthService(dio, storage);
 });

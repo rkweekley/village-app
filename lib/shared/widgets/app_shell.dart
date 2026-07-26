@@ -1,76 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// The root shell with bottom navigation.
+/// Main app shell with stateful bottom navigation.
+/// 5 main tabs, each preserving its own navigation stack.
 class AppShell extends StatelessWidget {
-  final Widget child;
+  final StatefulNavigationShell navigationShell;
 
-  const AppShell({super.key, required this.child});
+  const AppShell({super.key, required this.navigationShell});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _calculateSelectedIndex(context),
-        onDestinationSelected: (index) => _onItemTapped(index, context),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Hub',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.checklist_outlined),
-            selectedIcon: Icon(Icons.checklist),
-            label: 'Chores',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.stars_outlined),
-            selectedIcon: Icon(Icons.stars),
-            label: 'Rewards',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_month_outlined),
-            selectedIcon: Icon(Icons.calendar_month),
-            label: 'Calendar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined),
-            selectedIcon: Icon(Icons.shopping_cart),
-            label: 'List',
-          ),
-        ],
-      ),
+      body: navigationShell,
+      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
-  int _calculateSelectedIndex(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/chores')) return 1;
-    if (location.startsWith('/rewards')) return 2;
-    if (location.startsWith('/calendar')) return 3;
-    if (location.startsWith('/shopping')) return 4;
-    return 0;
-  }
+  Widget _buildBottomNav(BuildContext context) {
+    final currentIndex = navigationShell.currentIndex;
 
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        context.go('/hub');
-        break;
-      case 1:
-        context.go('/chores');
-        break;
-      case 2:
-        context.go('/rewards');
-        break;
-      case 3:
-        context.go('/calendar');
-        break;
-      case 4:
-        context.go('/shopping');
-        break;
-    }
+    return NavigationBar(
+      selectedIndex: currentIndex,
+      onDestinationSelected: (i) {
+        navigationShell.goBranch(
+          i,
+          initialLocation: i == currentIndex,
+        );
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: 'Hub',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.task_alt_outlined),
+          selectedIcon: Icon(Icons.task_alt_rounded),
+          label: 'Tasks',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.people_outline),
+          selectedIcon: Icon(Icons.people_rounded),
+          label: 'Family',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
+          label: 'Calendar',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.shopping_cart_outlined),
+          selectedIcon: Icon(Icons.shopping_cart_rounded),
+          label: 'Shopping',
+        ),
+      ],
+    );
   }
 }

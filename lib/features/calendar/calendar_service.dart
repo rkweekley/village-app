@@ -161,14 +161,24 @@ final calendarServiceProvider = Provider<CalendarService>((ref) {
 });
 
 final calendarEventsProvider =
-    FutureProvider.family<List<CalendarEventModel>, DateTimeRange>((ref, range) {
+    FutureProvider.family<List<CalendarEventModel>, CalendarDateRange>((ref, range) {
   return ref
       .watch(calendarServiceProvider)
       .getEvents(from: range.start, to: range.end);
 });
 
-class DateTimeRange {
+class CalendarDateRange {
   final DateTime start;
   final DateTime end;
-  DateTimeRange({required this.start, required this.end});
+  CalendarDateRange({required this.start, required this.end});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CalendarDateRange &&
+          start == other.start &&
+          end == other.end;
+
+  @override
+  int get hashCode => start.hashCode ^ end.hashCode;
 }

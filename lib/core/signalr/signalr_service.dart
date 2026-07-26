@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:village_app/core/auth/secure_storage.dart';
 
 /// Lightweight SignalR client using the JSON hub protocol over WebSocket.
 ///
@@ -12,12 +12,12 @@ class SignalRHubClient {
   final String baseUrl;
   final String hubPath;
   final String joinMethod;
+  final SecureStorage storage;
   WebSocketChannel? _channel;
   bool _connected = false;
   Timer? _keepAliveTimer;
   Timer? _reconnectTimer;
   final _streamController = StreamController<SignalRMessage>.broadcast();
-  final _storage = const FlutterSecureStorage();
 
   /// Stream of incoming server-side invocations (type: 1).
   Stream<SignalRMessage> get messages => _streamController.stream;
@@ -28,14 +28,15 @@ class SignalRHubClient {
     required this.baseUrl,
     required this.hubPath,
     required this.joinMethod,
+    required this.storage,
   });
 
   /// Build the WebSocket URL with JWT access token.
   Future<Uri> _buildUri() async {
-    final token = await _storage.read(key: 'jwt_token');
+    final token = await storage.read('jwt_token');
     final wsUrl = baseUrl
-        .replace('https://', 'wss://')
-        .replace('http://', 'ws://');
+        .replaceAll('https://', 'wss://')
+        .replaceAll('http://', 'ws://');
     final uri = Uri.parse('$wsUrl$hubPath');
     return uri.replace(queryParameters: {
       if (token != null && token.isNotEmpty) 'access_token': token,
@@ -151,40 +152,60 @@ class SignalRMessage {
   });
 }
 
-/// Manages connections to all four hubs.
+/// Manages connections to all six hubs.
 class SignalRService {
   final String baseUrl;
+  final SecureStorage storage;
   late final SignalRHubClient familyHub;
   late final SignalRHubClient choresHub;
   late final SignalRHubClient pointsHub;
   late final SignalRHubClient notificationsHub;
-  bool _initialized = false;
+  late final SignalRHubClient schoolHub;
+  late final SignalRHubClient mealPlanHub;
 
   Stream<SignalRMessage> get familyMessages => familyHub.messages;
   Stream<SignalRMessage> get choresMessages => choresHub.messages;
   Stream<SignalRMessage> get pointsMessages => pointsHub.messages;
   Stream<SignalRMessage> get notificationsMessages => notificationsHub.messages;
+  Stream<SignalRMessage> get schoolMessages => schoolHub.messages;
+  Stream<SignalRMessage> get mealPlanMessages => mealPlanHub.messages;
 
-  SignalRService({required this.baseUrl}) {
+  SignalRService({required this.baseUrl, required this.storage}) {
     familyHub = SignalRHubClient(
       baseUrl: baseUrl,
       hubPath: '/hubs/family',
       joinMethod: 'JoinFamilyGroup',
+      storage: storage,
     );
     choresHub = SignalRHubClient(
       baseUrl: baseUrl,
       hubPath: '/hubs/chores',
       joinMethod: 'JoinChoreGroup',
+      storage: storage,
     );
     pointsHub = SignalRHubClient(
       baseUrl: baseUrl,
       hubPath: '/hubs/points',
       joinMethod: 'JoinPointsGroup',
+      storage: storage,
     );
     notificationsHub = SignalRHubClient(
       baseUrl: baseUrl,
       hubPath: '/hubs/notifications',
       joinMethod: 'JoinNotificationGroup',
+      storage: storage,
+    );
+    schoolHub = SignalRHubClient(
+      baseUrl: baseUrl,
+      hubPath: '/hubs/school',
+      joinMethod: 'JoinSchoolGroup',
+      storage: storage,
+    );
+    mealPlanHub = SignalRHubClient(
+      baseUrl: baseUrl,
+      hubPath: '/hubs/mealplan',
+      joinMethod: 'JoinMealPlanGroup',
+      storage: storage,
     );
   }
 
@@ -196,15 +217,18 @@ class SignalRService {
       choresHub.connect(familyId: familyId),
       pointsHub.connect(familyId: familyId),
       notificationsHub.connect(familyId: userId), // Notifications use user-scoped group
+      schoolHub.connect(familyId: familyId),
+      mealPlanHub.connect(familyId: familyId),
     ]);
-    _initialized = true;
   }
 
   bool get isConnected =>
       familyHub.isConnected &&
       choresHub.isConnected &&
       pointsHub.isConnected &&
-      notificationsHub.isConnected;
+      notificationsHub.isConnected &&
+      schoolHub.isConnected &&
+      mealPlanHub.isConnected;
 
   Future<void> disconnectAll() async {
     await Future.wait([
@@ -212,8 +236,9 @@ class SignalRService {
       choresHub.disconnect(),
       pointsHub.disconnect(),
       notificationsHub.disconnect(),
+      schoolHub.disconnect(),
+      mealPlanHub.disconnect(),
     ]);
-    _initialized = false;
   }
 
   void dispose() {
@@ -221,14 +246,20 @@ class SignalRService {
     choresHub.dispose();
     pointsHub.dispose();
     notificationsHub.dispose();
+    schoolHub.dispose();
+    mealPlanHub.dispose();
   }
 }
 
 /// Riverpod provider for the SignalR service.
 final signalRServiceProvider = Provider<SignalRService>((ref) {
-  // Base URL matches the Dio client config
-  const baseUrl = 'http://localhost:8080';
-  final service = SignalRService(baseUrl: baseUrl);
+  // Base URL matches the Dio client config — set via --dart-define=API_BASE_URL=
+  const baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:5279',
+  );
+  final storage = ref.read(secureStorageProvider);
+  final service = SignalRService(baseUrl: baseUrl, storage: storage);
 
   ref.onDispose(() {
     service.dispose();

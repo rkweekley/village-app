@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/family/family_provider.dart';
 import 'package:village_app/features/family/family_service.dart';
 import 'package:village_app/features/family/models.dart';
@@ -95,7 +96,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Family Setup'),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        centerTitle: true,
       ),
       body: SafeArea(
         child: Padding(
@@ -125,31 +126,46 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
         Icon(
           Icons.family_restroom,
           size: 80,
-          color: Theme.of(context).colorScheme.primary,
+          color: VillageTheme.primaryTeal,
         ),
         const SizedBox(height: 24),
         Text(
           'Welcome to Village!',
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: VillageTheme.primaryTeal,
+                fontWeight: FontWeight.bold,
+              ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           'Set up your family to get started.',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: Colors.grey[600],
               ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 48),
         FilledButton.icon(
           onPressed: () => setState(() => _step = SetupStep.create),
+          style: FilledButton.styleFrom(
+            minimumSize: const Size(double.infinity, 52),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
           icon: const Icon(Icons.add_home),
           label: const Text('Create a Family'),
         ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           onPressed: () => setState(() => _step = SetupStep.join),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 52),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
           icon: const Icon(Icons.meeting_room),
           label: const Text('Join Existing Family'),
         ),
@@ -170,27 +186,41 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
           const SizedBox(height: 24),
           TextField(
             controller: _createNameCtrl,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Family Name',
               hintText: 'e.g. The Smiths',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.badge),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              prefixIcon: const Icon(Icons.badge),
+              filled: true,
+              fillColor: VillageTheme.backgroundWarm,
             ),
             textCapitalization: TextCapitalization.words,
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _createCurrencyCtrl,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Currency Name',
               hintText: 'Points',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.monetization_on),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              prefixIcon: const Icon(Icons.monetization_on),
+              filled: true,
+              fillColor: VillageTheme.backgroundWarm,
             ),
           ),
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _isCreating ? null : _createFamily,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(double.infinity, 52),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
             child: _isCreating
                 ? const SizedBox(
                     width: 20,
@@ -235,8 +265,12 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
             decoration: InputDecoration(
               labelText: 'Invite Code',
               hintText: 'e.g. VILLAGE1',
-              border: const OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
               prefixIcon: const Icon(Icons.vpn_key),
+              filled: true,
+              fillColor: VillageTheme.backgroundWarm,
               suffixIcon: _joinCodeCtrl.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear),
@@ -259,6 +293,12 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: _isLookingUp ? null : _lookupCode,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
             icon: _isLookingUp
                 ? const SizedBox(
                     width: 18,
@@ -278,6 +318,11 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
           if (_lookedUpFamily != null) ...[
             const SizedBox(height: 24),
             Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+              color: VillageTheme.surfaceWarm,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -285,19 +330,20 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                   children: [
                     Text(
                       _lookedUpFamily!.name,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${_lookedUpFamily!.memberCount} member${_lookedUpFamily!.memberCount == 1 ? '' : 's'}',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[600],
+                          ),
                     ),
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: () {
-                        // TODO: Join family via API endpoint
-                        // The registration already handles joining via invite code.
-                        // For existing users who skipped setup, we'd need a join endpoint.
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
@@ -306,6 +352,12 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                           ),
                         );
                       },
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
                       child: const Text('Join Family'),
                     ),
                   ],

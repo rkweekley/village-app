@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/app.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
+import 'package:village_app/core/auth/secure_storage.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final storage = await SecureStorage.create();
   runApp(
-    const ProviderScope(
-      child: AppBootstrap(),
+    ProviderScope(
+      overrides: [
+        secureStorageProvider.overrideWithValue(storage),
+      ],
+      child: const AppBootstrap(),
     ),
   );
 }
@@ -36,24 +41,15 @@ class _AppBootstrapState extends ConsumerState<AppBootstrap> {
 
     // Show splash while loading
     if (authState.isLoading) {
-      return MaterialApp(
+      return const MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           body: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.home_rounded, color: Colors.white, size: 44),
-                ),
-                const SizedBox(height: 24),
-                const CircularProgressIndicator(),
+                SizedBox(height: 80),
+                CircularProgressIndicator(),
               ],
             ),
           ),

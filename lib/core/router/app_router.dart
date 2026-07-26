@@ -7,10 +7,13 @@ import 'package:village_app/features/auth/pages/register_page.dart';
 import 'package:village_app/features/family/pages/family_page.dart';
 import 'package:village_app/features/family/pages/family_setup_page.dart';
 import 'package:village_app/features/hub/pages/hub_page.dart';
-import 'package:village_app/features/chores/pages/chores_page.dart';
+import 'package:village_app/features/tasks/pages/tasks_page.dart';
 import 'package:village_app/features/rewards/pages/rewards_page.dart';
 import 'package:village_app/features/calendar/pages/calendar_page.dart';
 import 'package:village_app/features/shopping/pages/shopping_lists_page.dart';
+import 'package:village_app/features/meals/pages/meals_page.dart';
+import 'package:village_app/features/chores/pages/chores_page.dart';
+import 'package:village_app/features/school/pages/school_page.dart';
 import 'package:village_app/features/notifications/pages/notifications_page.dart';
 import 'package:village_app/shared/widgets/app_shell.dart';
 
@@ -37,66 +40,117 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // Authenticated
       if (isAuthenticated) {
-        // On auth route → determine destination
         if (isAuthRoute) {
           if (authState.authResponse?.isNewFamily == true) {
             return '/family-setup';
           }
           return '/hub';
         }
-
-        // Already on family-setup page — let it stay
         if (location == '/family-setup') return null;
       }
 
       return null;
     },
     routes: [
+      // ── Public pages (no shell) ──
       GoRoute(
         path: '/login',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
         path: '/register',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
         path: '/family-setup',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const FamilySetupPage(),
       ),
+
+      // ── Shell routes (5 main tabs) ──
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return AppShell(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/hub',
+                builder: (context, state) => const HubPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/tasks',
+                builder: (context, state) => const TasksPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/family',
+                builder: (context, state) => const FamilyPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/calendar',
+                builder: (context, state) => const CalendarPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/shopping',
+                builder: (context, state) => const ShoppingListsPage(),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      // ── Secondary pages (pushed full-screen from shell or overflow) ──
       GoRoute(
-        path: '/family',
-        builder: (context, state) => const FamilyPage(),
+        path: '/chores',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ChoresPage(),
+      ),
+      GoRoute(
+        path: '/school',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SchoolPage(),
+      ),
+      GoRoute(
+        path: '/rewards',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const RewardsPage(),
+      ),
+      GoRoute(
+        path: '/meals',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const MealsPage(),
       ),
       GoRoute(
         path: '/notifications',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const NotificationsPage(),
       ),
-      // ── App Shell (bottom nav) ──
-      ShellRoute(
-        builder: (context, state, child) => AppShell(child: child),
-        routes: [
-          GoRoute(
-            path: '/hub',
-            builder: (context, state) => const HubPage(),
-          ),
-          GoRoute(
-            path: '/chores',
-            builder: (context, state) => const ChoresPage(),
-          ),
-          GoRoute(
-            path: '/rewards',
-            builder: (context, state) => const RewardsPage(),
-          ),
-          GoRoute(
-            path: '/calendar',
-            builder: (context, state) => const CalendarPage(),
-          ),
-          GoRoute(
-            path: '/shopping',
-            builder: (context, state) => const ShoppingListsPage(),
-          ),
-        ],
+      // ── Shopping detail (pushed from shell tab) ──
+      GoRoute(
+        path: '/shopping-detail/:listId',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => ShoppingListDetailPage(
+          listId: state.pathParameters['listId']!,
+        ),
       ),
     ],
   );
