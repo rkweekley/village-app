@@ -1,0 +1,33 @@
+# Git
+.git/
+.gitignore
+
+# GitHub Actions
+.github/
+
+# Flutter/Dart build artifacts
+build/
+.dart_tool/
+.pub-cache/
+.pub/
+*.packages
+.packages
+
+# IDE
+.idea/
+*.iml
+*.swp
+*.swo
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Android Studio artifacts
+android/app/debug/
+android/app/profile/
+android/app/release/
+
+# Code review docs (not needed for production build)
+code-review-report.md
