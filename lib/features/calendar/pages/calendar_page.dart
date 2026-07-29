@@ -365,9 +365,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       ),
                       const SizedBox(height: 20),
                       FilledButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (titleCtrl.text.isEmpty) return;
-                          ref
+                          await ref
                               .read(calendarServiceProvider)
                               .createEvent(
                                 title: titleCtrl.text,
@@ -381,7 +381,17 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                 endTime: end,
                                 isAllDay: allDay,
                               );
-                          Navigator.pop(ctx);
+                          final monthStart = DateTime(
+                            _focusedMonth.year, _focusedMonth.month, 1);
+                          final monthEnd = DateTime(
+                            _focusedMonth.year, _focusedMonth.month + 1,
+                            0, 23, 59);
+                          // ignore: unused_result
+                          ref.refresh(
+                            calendarEventsProvider(
+                              CalendarDateRange(
+                                start: monthStart, end: monthEnd)));
+                          if (ctx.mounted) Navigator.pop(ctx);
                         },
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 52),

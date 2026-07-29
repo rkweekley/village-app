@@ -253,13 +253,9 @@ class SignalRService {
 
 /// Riverpod provider for the SignalR service.
 final signalRServiceProvider = Provider<SignalRService>((ref) {
-  // Base URL matches the Dio client config — set via --dart-define=API_BASE_URL=
-  const baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:5279',
-  );
+  // Empty string = relative to page origin; nginx proxies /hubs/ to the API
   final storage = ref.read(secureStorageProvider);
-  final service = SignalRService(baseUrl: baseUrl, storage: storage);
+  final service = SignalRService(baseUrl: '', storage: storage);
 
   ref.onDispose(() {
     service.dispose();

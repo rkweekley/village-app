@@ -180,8 +180,8 @@ class RewardsPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: () {
-                    ref.read(rewardsServiceProvider).createReward(
+                  onPressed: () async {
+                    await ref.read(rewardsServiceProvider).createReward(
                           name: nameCtrl.text,
                           description: descCtrl.text,
                           pointCost: int.tryParse(costCtrl.text) ?? 0,
@@ -189,10 +189,8 @@ class RewardsPage extends ConsumerWidget {
                           maxRedemptions: maxRedemptions,
                           requiresApproval: requiresApproval,
                         );
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Reward created!')),
-                    );
+                    ref.invalidate(rewardsListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),

@@ -110,172 +110,10 @@ class TasksPage extends ConsumerWidget {
   }
 
   void _showCreateChoreSheet(BuildContext context, WidgetRef ref) {
-    final nameCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    final pointCtrl = TextEditingController(text: '10');
-    String recurrence = 'Once';
-    String difficulty = 'Easy';
-    bool requiresApproval = true;
-    bool requiresPhoto = false;
-
     showAdaptiveModalSheet(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => Padding(
-          padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 24,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: VillageTheme.choresGreen.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.cleaning_services_rounded,
-                          color: VillageTheme.choresGreen, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text('New Chore',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: nameCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Chore name',
-                    prefixIcon: const Icon(Icons.edit_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  autofocus: true,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Description',
-                    prefixIcon: const Icon(Icons.description_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  maxLines: 2,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pointCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Point value',
-                    prefixIcon: const Icon(Icons.stars_rounded),
-                    filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: recurrence,
-                  decoration: InputDecoration(
-                    labelText: 'Recurrence',
-                    prefixIcon: const Icon(Icons.repeat_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  items: ['Once', 'Daily', 'Weekly', 'Monthly']
-                      .map((r) => DropdownMenuItem(value: r, child: Text(r)))
-                      .toList(),
-                  onChanged: (v) => setState(() => recurrence = v!),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: difficulty,
-                  decoration: InputDecoration(
-                    labelText: 'Difficulty',
-                    prefixIcon: const Icon(Icons.speed_rounded),
-                    filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  items: ['Easy', 'Medium', 'Hard']
-                      .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                      .toList(),
-                  onChanged: (v) => setState(() => difficulty = v!),
-                ),
-                const SizedBox(height: 8),
-                SwitchListTile(
-                  title: const Text('Requires approval'),
-                  value: requiresApproval,
-                  onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.choresGreen,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                SwitchListTile(
-                  title: const Text('Requires photo'),
-                  value: requiresPhoto,
-                  onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.choresGreen,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () {
-                    if (nameCtrl.text.trim().isEmpty) return;
-                    ref.read(choresServiceProvider).createChore(
-                          name: nameCtrl.text.trim(),
-                          description: descCtrl.text.trim(),
-                          pointValue: int.tryParse(pointCtrl.text) ?? 10,
-                          recurrence: recurrence,
-                          difficulty: difficulty,
-                          requiresApproval: requiresApproval,
-                          requiresPhoto: requiresPhoto,
-                        );
-                    Navigator.pop(ctx);
-                    ref.invalidate(choresListProvider);
-                  },
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.choresGreen,
-                  ),
-                  child: const Text('Create Chore',
-                      style: TextStyle(fontSize: 16)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      builder: (ctx) => _CreateChoreSheet(ref: ref),
     );
   }
 
@@ -289,210 +127,10 @@ class TasksPage extends ConsumerWidget {
       return;
     }
 
-    final titleCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    final pointsCtrl = TextEditingController(text: '10');
-    MemberInfo? selectedMember = members.first;
-    DateTime selectedDate = DateTime.now();
-
     showAdaptiveModalSheet(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => Padding(
-          padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 24,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.assignment_rounded,
-                          color: VillageTheme.schoolBlue, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text('New Assignment',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: titleCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Title',
-                    prefixIcon: const Icon(Icons.edit_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  autofocus: true,
-                ),
-                const SizedBox(height: 12),
-                if (members.isNotEmpty)
-                  DropdownButtonFormField<MemberInfo>(
-                    value: selectedMember,
-                    decoration: InputDecoration(
-                      labelText: 'Assign to',
-                      filled: true,
-                      fillColor: VillageTheme.backgroundWarm,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    items: members
-                        .map((m) => DropdownMenuItem(
-                              value: m,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    m.role == 'Parent'
-                                        ? Icons.star
-                                        : Icons.person,
-                                    size: 18,
-                                    color: m.role == 'Parent'
-                                        ? Colors.amber
-                                        : Colors.grey,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(m.displayName),
-                                ],
-                              ),
-                            ))
-                        .toList(),
-                    onChanged: (v) => setState(() => selectedMember = v),
-                  )
-                else
-                  const Text('No family members loaded.',
-                      style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Description (optional)',
-                    prefixIcon: const Icon(Icons.description_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  maxLines: 2,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: pointsCtrl,
-                        decoration: InputDecoration(
-                          labelText: 'Points',
-                          prefixIcon: const Icon(Icons.numbers_outlined),
-                          filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: ctx,
-                            initialDate: selectedDate,
-                            firstDate: DateTime.now(),
-                            lastDate:
-                                DateTime.now().add(const Duration(days: 365)),
-                            helpText: 'Select due date',
-                          );
-                          if (date != null) {
-                            setState(() => selectedDate = date);
-                          }
-                        },
-                        child: InputDecorator(
-                          decoration: InputDecoration(
-                            labelText: 'Due date',
-                            filled: true,
-                            fillColor: VillageTheme.backgroundWarm,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide.none,
-                            ),
-                            suffixIcon:
-                                const Icon(Icons.calendar_today, size: 18),
-                          ),
-                          child: Text(
-                            '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: () {
-                    if (titleCtrl.text.trim().isEmpty) return;
-                    if (selectedMember == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Please assign to a family member.')),
-                      );
-                      return;
-                    }
-                    final dueDate =
-                        '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-                    ref.read(schoolServiceProvider).createSchoolWork(
-                          subjectId: '', // user picks subject later
-                          assignedToId: selectedMember!.id,
-                          title: titleCtrl.text.trim(),
-                          description: descCtrl.text.trim().isNotEmpty
-                              ? descCtrl.text.trim()
-                              : null,
-                          dueDate: dueDate,
-                          pointsPossible:
-                              int.tryParse(pointsCtrl.text) ?? 10,
-                        );
-                    Navigator.pop(ctx);
-                    ref.invalidate(schoolWorkListProvider);
-                  },
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.schoolBlue,
-                  ),
-                  child: const Text('Create Assignment',
-                      style: TextStyle(fontSize: 16)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      builder: (ctx) => _CreateAssignmentSheet(members: members, ref: ref),
     );
   }
 }
@@ -1321,5 +959,424 @@ class _AssignmentCard extends ConsumerWidget {
       default:
         return Icons.help_outline;
     }
+  }
+}
+
+// ── Create Chore Sheet ──
+
+/// Extracted StatefulWidget so TextEditingControllers are properly disposed.
+class _CreateChoreSheet extends ConsumerStatefulWidget {
+  final WidgetRef ref;
+  const _CreateChoreSheet({required this.ref});
+
+  @override
+  ConsumerState<_CreateChoreSheet> createState() => _CreateChoreSheetState();
+}
+
+class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
+  final _nameCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  final _pointCtrl = TextEditingController(text: '10');
+  String _recurrence = 'Once';
+  String _difficulty = 'Easy';
+  bool _requiresApproval = true;
+  bool _requiresPhoto = false;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _descCtrl.dispose();
+    _pointCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: VillageTheme.choresGreen.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.cleaning_services_rounded,
+                      color: VillageTheme.choresGreen, size: 22),
+                ),
+                const SizedBox(width: 12),
+                const Text('New Chore',
+                    style: TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.w700)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _nameCtrl,
+              decoration: InputDecoration(
+                labelText: 'Chore name',
+                prefixIcon: const Icon(Icons.edit_outlined),
+                filled: true,
+                fillColor: VillageTheme.backgroundWarm,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _descCtrl,
+              decoration: InputDecoration(
+                labelText: 'Description',
+                prefixIcon: const Icon(Icons.description_outlined),
+                filled: true,
+                fillColor: VillageTheme.backgroundWarm,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              maxLines: 2,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _pointCtrl,
+              decoration: InputDecoration(
+                labelText: 'Point value',
+                prefixIcon: const Icon(Icons.stars_rounded),
+                filled: true,
+                fillColor: VillageTheme.backgroundWarm,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _recurrence,
+              decoration: InputDecoration(
+                labelText: 'Recurrence',
+                prefixIcon: const Icon(Icons.repeat_outlined),
+                filled: true,
+                fillColor: VillageTheme.backgroundWarm,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              items: ['Once', 'Daily', 'Weekly', 'Monthly']
+                  .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                  .toList(),
+              onChanged: (v) => setState(() => _recurrence = v!),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _difficulty,
+              decoration: InputDecoration(
+                labelText: 'Difficulty',
+                prefixIcon: const Icon(Icons.speed_rounded),
+                filled: true,
+                fillColor: VillageTheme.backgroundWarm,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              items: ['Easy', 'Medium', 'Hard']
+                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                  .toList(),
+              onChanged: (v) => setState(() => _difficulty = v!),
+            ),
+            const SizedBox(height: 8),
+            SwitchListTile(
+              title: const Text('Requires approval'),
+              value: _requiresApproval,
+              onChanged: (v) => setState(() => _requiresApproval = v),
+              activeColor: VillageTheme.choresGreen,
+              contentPadding: EdgeInsets.zero,
+            ),
+            SwitchListTile(
+              title: const Text('Requires photo'),
+              value: _requiresPhoto,
+              onChanged: (v) => setState(() => _requiresPhoto = v),
+              activeColor: VillageTheme.choresGreen,
+              contentPadding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () async {
+                if (_nameCtrl.text.trim().isEmpty) return;
+                await widget.ref.read(choresServiceProvider).createChore(
+                      name: _nameCtrl.text.trim(),
+                      description: _descCtrl.text.trim(),
+                      pointValue: int.tryParse(_pointCtrl.text) ?? 10,
+                      recurrence: _recurrence,
+                      difficulty: _difficulty,
+                      requiresApproval: _requiresApproval,
+                      requiresPhoto: _requiresPhoto,
+                    );
+                widget.ref.invalidate(choresListProvider);
+                if (context.mounted) Navigator.pop(context);
+              },
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+                backgroundColor: VillageTheme.choresGreen,
+              ),
+              child: const Text('Create Chore',
+                  style: TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Create Assignment Sheet ──
+
+/// Extracted StatefulWidget so TextEditingControllers are properly disposed.
+class _CreateAssignmentSheet extends ConsumerStatefulWidget {
+  final List<MemberInfo> members;
+  final WidgetRef ref;
+  const _CreateAssignmentSheet({required this.members, required this.ref});
+
+  @override
+  ConsumerState<_CreateAssignmentSheet> createState() =>
+      _CreateAssignmentSheetState();
+}
+
+class _CreateAssignmentSheetState
+    extends ConsumerState<_CreateAssignmentSheet> {
+  final _titleCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  final _pointsCtrl = TextEditingController(text: '10');
+  MemberInfo? _selectedMember;
+  DateTime _selectedDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMember = widget.members.first;
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _descCtrl.dispose();
+    _pointsCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.assignment_rounded,
+                      color: VillageTheme.schoolBlue, size: 22),
+                ),
+                const SizedBox(width: 12),
+                const Text('New Assignment',
+                    style: TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.w700)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _titleCtrl,
+              decoration: InputDecoration(
+                labelText: 'Title',
+                prefixIcon: const Icon(Icons.edit_outlined),
+                filled: true,
+                fillColor: VillageTheme.backgroundWarm,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 12),
+            if (widget.members.isNotEmpty)
+              DropdownButtonFormField<MemberInfo>(
+                value: _selectedMember,
+                decoration: InputDecoration(
+                  labelText: 'Assign to',
+                  filled: true,
+                  fillColor: VillageTheme.backgroundWarm,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                items: widget.members
+                    .map((m) => DropdownMenuItem(
+                          value: m,
+                          child: Row(
+                            children: [
+                              Icon(
+                                m.role == 'Parent'
+                                    ? Icons.star
+                                    : Icons.person,
+                                size: 18,
+                                color: m.role == 'Parent'
+                                    ? Colors.amber
+                                    : Colors.grey,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(m.displayName),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (v) => setState(() => _selectedMember = v),
+              )
+            else
+              const Text('No family members loaded.',
+                  style: TextStyle(color: Colors.grey)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _descCtrl,
+              decoration: InputDecoration(
+                labelText: 'Description (optional)',
+                prefixIcon: const Icon(Icons.description_outlined),
+                filled: true,
+                fillColor: VillageTheme.backgroundWarm,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              maxLines: 2,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _pointsCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'Points',
+                      prefixIcon: const Icon(Icons.numbers_outlined),
+                      filled: true,
+                      fillColor: VillageTheme.backgroundWarm,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: InkWell(
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedDate,
+                        firstDate: DateTime.now(),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 365)),
+                        helpText: 'Select due date',
+                      );
+                      if (date != null) {
+                        setState(() => _selectedDate = date);
+                      }
+                    },
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Due date',
+                        filled: true,
+                        fillColor: VillageTheme.backgroundWarm,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon:
+                            const Icon(Icons.calendar_today, size: 18),
+                      ),
+                      child: Text(
+                        '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: () async {
+                if (_titleCtrl.text.trim().isEmpty) return;
+                if (_selectedMember == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Please assign to a family member.')),
+                  );
+                  return;
+                }
+                final dueDate =
+                    '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
+                await widget.ref.read(schoolServiceProvider).createSchoolWork(
+                      subjectId: '', // user picks subject later
+                      assignedToId: _selectedMember!.id,
+                      title: _titleCtrl.text.trim(),
+                      description: _descCtrl.text.trim().isNotEmpty
+                          ? _descCtrl.text.trim()
+                          : null,
+                      dueDate: dueDate,
+                      pointsPossible:
+                          int.tryParse(_pointsCtrl.text) ?? 10,
+                    );
+                widget.ref.invalidate(schoolWorkListProvider);
+                if (context.mounted) Navigator.pop(context);
+              },
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+                backgroundColor: VillageTheme.schoolBlue,
+              ),
+              child: const Text('Create Assignment',
+                  style: TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

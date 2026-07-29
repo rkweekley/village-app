@@ -602,9 +602,9 @@ class _HubPageState extends ConsumerState<HubPage> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (nameCtrl.text.trim().isEmpty) return;
-                    ref.read(choresServiceProvider).createChore(
+                    await ref.read(choresServiceProvider).createChore(
                           name: nameCtrl.text.trim(),
                           description: descCtrl.text.trim(),
                           pointValue: int.tryParse(pointCtrl.text) ?? 10,
@@ -613,8 +613,8 @@ class _HubPageState extends ConsumerState<HubPage> {
                           requiresApproval: requiresApproval,
                           requiresPhoto: requiresPhoto,
                         );
-                    Navigator.pop(ctx);
                     ref.invalidate(choresListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
@@ -807,7 +807,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 ),
                 const SizedBox(height: 20),
                 FilledButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (titleCtrl.text.trim().isEmpty) return;
                     if (selectedMember == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -819,7 +819,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     }
                     final dueDate =
                         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-                    ref.read(schoolServiceProvider).createSchoolWork(
+                    await ref.read(schoolServiceProvider).createSchoolWork(
                           subjectId: '', // user picks subject later
                           assignedToId: selectedMember!.id,
                           title: titleCtrl.text.trim(),
@@ -830,8 +830,8 @@ class _HubPageState extends ConsumerState<HubPage> {
                           pointsPossible:
                               int.tryParse(pointsCtrl.text) ?? 10,
                         );
-                    Navigator.pop(ctx);
                     ref.invalidate(schoolWorkListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),

@@ -404,7 +404,7 @@ class SchoolPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 FilledButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (titleCtrl.text.isEmpty) return;
                     if (selectedMember == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -416,7 +416,7 @@ class SchoolPage extends ConsumerWidget {
                     }
                     final dueDate =
                         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-                    ref.read(schoolServiceProvider).createSchoolWork(
+                    await ref.read(schoolServiceProvider).createSchoolWork(
                           subjectId: selectedSubjectId,
                           assignedToId: selectedMember!.id,
                           title: titleCtrl.text,
@@ -427,7 +427,8 @@ class SchoolPage extends ConsumerWidget {
                           pointsPossible:
                               int.tryParse(pointsCtrl.text) ?? 10,
                         );
-                    Navigator.pop(ctx);
+                    ref.invalidate(schoolWorkListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),

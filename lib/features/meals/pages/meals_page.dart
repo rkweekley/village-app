@@ -1298,9 +1298,9 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
               ),
               const SizedBox(height: 12),
               FilledButton(
-                onPressed: () {
+                onPressed: () async {
                   if (titleCtrl.text.isEmpty) return;
-                  ref.read(mealsServiceProvider).createRecipe(
+                  await ref.read(mealsServiceProvider).createRecipe(
                         title: titleCtrl.text,
                         description: descCtrl.text.isNotEmpty
                             ? descCtrl.text
@@ -1314,8 +1314,8 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                         tags: tagsCtrl.text.isNotEmpty ? tagsCtrl.text : null,
                         isFamilyFavorite: isFamilyFavorite,
                       );
-                  Navigator.pop(ctx);
                   ref.invalidate(recipesListProvider);
+                  if (ctx.mounted) Navigator.pop(ctx);
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
