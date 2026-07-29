@@ -27,13 +27,22 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
   final _joinCodeCtrl = TextEditingController();
   InviteCodeLookup? _lookedUpFamily;
   bool _isLookingUp = false;
+  bool _isJoining = false;
   String? _lookupError;
+
+  // Tracks whether setup was completed (navigated away to hub).
+  // If false on dispose, the orphaned skeleton family will be cleaned up.
+  bool _setupCompleted = false;
 
   @override
   void dispose() {
     _createNameCtrl.dispose();
     _createCurrencyCtrl.dispose();
     _joinCodeCtrl.dispose();
+    // Issue #14: clean up orphaned family skeleton if setup was abandoned
+    if (!_setupCompleted) {
+      ref.read(familyServiceProvider).deleteFamily();
+    }
     super.dispose();
   }
 
@@ -49,6 +58,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
             name: name,
             currencyName: _createCurrencyCtrl.text.trim(),
           );
+      _setupCompleted = true;
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Family created!')),
@@ -88,6 +98,31 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
       setState(() => _lookupError = 'Lookup failed: $e');
     } finally {
       setState(() => _isLookingUp = false);
+    }
+  }
+
+  Future<void> _joinFamily() async {
+    final code = _joinCodeCtrl.text.trim().toUpperCase();
+    if (code.isEmpty) return;
+
+    setState(() => _isJoining = true);
+    try {
+      await ref.read(familyProvider.notifier).joinFamily(code);
+      _setupCompleted = true;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Joined family!')),
+        );
+        context.go('/hub');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to join family: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isJoining = false);
     }
   }
 
@@ -343,22 +378,20 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                     ),
                     const SizedBox(height: 16),
                     FilledButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Joining is handled during registration for now.',
-                            ),
-                          ),
-                        );
-                      },
+                      onPressed: _isJoining ? null : _joinFamily,
                       style: FilledButton.styleFrom(
                         minimumSize: const Size(double.infinity, 48),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text('Join Family'),
+                      child: _isJoining
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Join Family'),
                     ),
                   ],
                 ),

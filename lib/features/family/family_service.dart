@@ -41,6 +41,19 @@ class FamilyService {
       rethrow;
     }
   }
+
+  /// Join a family by invite code.
+  Future<Map<String, dynamic>> joinFamily(String inviteCode) async {
+    final response = await _dio.post('/api/families/join', data: {
+      'inviteCode': inviteCode,
+    });
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// Delete / abandon the current family (cleanup for orphaned families).
+  Future<void> deleteFamily() async {
+    await _dio.delete('/api/families/mine');
+  }
 }
 
 final familyServiceProvider = Provider<FamilyService>((ref) {
