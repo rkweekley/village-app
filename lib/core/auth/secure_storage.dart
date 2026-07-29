@@ -1,49 +1,50 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Wraps FlutterSecureStorage on native and SharedPreferences on web.
 ///
-/// On web, FlutterSecureStorage crashes with MissingPluginException.
-/// This type lets the rest of the app use a single storage interface.
+/// On web, FlutterSecureStorage throws MissingPluginException, so we use
+/// SharedPreferences (localStorage) for web and FlutterSecureStorage (Keychain
+/// / EncryptedSharedPreferences) for Android/iOS native.
 class SecureStorage {
-  // Non-null on web, null on native.
   final SharedPreferences? _web;
+  final FlutterSecureStorage? _native;
 
-  // Null on web, used on native (initialized lazily).
-  // We just use SharedPreferences for everything in dev.
-  SecureStorage(this._web);
+  SecureStorage(this._web, this._native);
 
   static Future<SecureStorage> create() async {
     if (kIsWeb) {
-      return SecureStorage(await SharedPreferences.getInstance());
+      return SecureStorage(await SharedPreferences.getInstance(), null);
     }
-    return SecureStorage(null);
+    return SecureStorage(null, const FlutterSecureStorage());
   }
 
   Future<String?> read(String key) async {
     if (_web != null) return _web!.getString(key);
-    // Native — token won't persist across server restarts in dev,
-    // but this avoids the MissingPluginException crash on web.
-    // For production, wire up FlutterSecureStorage here.
-    return null;
+    return await _native?.read(key: key);
   }
 
   Future<void> write(String key, String value) async {
     if (_web != null) {
       await _web!.setString(key, value);
+    } else {
+      await _native?.write(key: key, value: value);
     }
   }
 
   Future<void> delete(String key) async {
     if (_web != null) {
       await _web!.remove(key);
+    } else {
+      await _native?.delete(key: key);
     }
   }
 
   Future<bool> containsKey(String key) async {
     if (_web != null) return _web!.containsKey(key);
-    return false;
+    return await _native?.containsKey(key: key) ?? false;
   }
 }
 
