@@ -154,8 +154,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             prefixIcon: Icon(Icons.person_outline),
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().length < 2)
+                            if (v == null || v.trim().length < 2) {
                               return 'Enter at least 2 characters';
+                            }
                             return null;
                           },
                         ),
@@ -171,9 +172,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().isEmpty)
+                            if (v == null || v.trim().isEmpty) {
                               return 'Enter your email';
-                            if (!v.contains('@')) return 'Enter a valid email';
+                            }
+                            if (!v.contains('@')) {
+                              return 'Enter a valid email';
+                            }
                             return null;
                           },
                         ),
@@ -196,8 +200,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             ),
                           ),
                           validator: (v) {
-                            if (v == null || v.length < 8)
+                            if (v == null || v.length < 8) {
                               return 'At least 8 characters';
+                            }
                             return null;
                           },
                         ),

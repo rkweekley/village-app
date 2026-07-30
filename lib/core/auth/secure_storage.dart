@@ -22,13 +22,13 @@ class SecureStorage {
   }
 
   Future<String?> read(String key) async {
-    if (_web != null) return _web!.getString(key);
+    if (_web != null) return _web.getString(key);
     return await _native?.read(key: key);
   }
 
   Future<void> write(String key, String value) async {
     if (_web != null) {
-      await _web!.setString(key, value);
+      await _web.setString(key, value);
     } else {
       await _native?.write(key: key, value: value);
     }
@@ -36,14 +36,14 @@ class SecureStorage {
 
   Future<void> delete(String key) async {
     if (_web != null) {
-      await _web!.remove(key);
+      await _web.remove(key);
     } else {
       await _native?.delete(key: key);
     }
   }
 
   Future<bool> containsKey(String key) async {
-    if (_web != null) return _web!.containsKey(key);
+    if (_web != null) return _web.containsKey(key);
     return await _native?.containsKey(key: key) ?? false;
   }
 }

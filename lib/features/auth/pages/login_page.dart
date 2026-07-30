@@ -161,9 +161,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().isEmpty)
+                            if (v == null || v.trim().isEmpty) {
                               return 'Enter your email';
-                            if (!v.contains('@')) return 'Enter a valid email';
+                            }
+                            if (!v.contains('@')) {
+                              return 'Enter a valid email';
+                            }
                             return null;
                           },
                         ),
@@ -186,8 +189,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                           ),
                           validator: (v) {
-                            if (v == null || v.isEmpty)
+                            if (v == null || v.isEmpty) {
                               return 'Enter your password';
+                            }
                             return null;
                           },
                           onFieldSubmitted: (_) => _handleLogin(),
