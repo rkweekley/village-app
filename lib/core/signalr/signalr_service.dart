@@ -102,7 +102,7 @@ class SignalRHubClient {
       'type': 1,
       'target': method,
       'arguments': args,
-      ?'invocationId': invocationId,
+      if (invocationId != null) 'invocationId': invocationId,
     }));
   }
 

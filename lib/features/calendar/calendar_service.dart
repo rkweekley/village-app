@@ -130,13 +130,13 @@ class CalendarService {
       String? recurrenceRule,
       List<String>? attendeeIds}) async {
     final res = await _dio.put('/api/calendar/$id', data: {
-      ?'title': title,
+      if (title != null) 'title': title,
       'description': description,
       'location': location,
       'color': color,
-      ?'startTime': startTime?.toIso8601String(),
-      ?'endTime': endTime?.toIso8601String(),
-      ?'isAllDay': isAllDay,
+      if (startTime != null) 'startTime': startTime.toIso8601String(),
+      if (endTime != null) 'endTime': endTime.toIso8601String(),
+      if (isAllDay != null) 'isAllDay': isAllDay,
       'recurrenceRule': recurrenceRule,
       'attendeeIds': attendeeIds,
     });

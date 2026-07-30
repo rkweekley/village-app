@@ -573,7 +573,7 @@ class _ItemTile extends StatelessWidget {
       child: ListTile(
         leading: Checkbox(
           value: item.isChecked,
-          activeThumbColor: VillageTheme.positive,
+          activeColor: VillageTheme.positive,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6),
           ),

@@ -355,7 +355,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                         child: SwitchListTile(
                           title: const Text('All day event'),
                           value: allDay,
-                          activeThumbColor: VillageTheme.primaryLight,
+                          activeColor: VillageTheme.primaryLight,
                           onChanged: (v) => setDialogState(() => allDay = v),
                           dense: true,
                           contentPadding: const EdgeInsets.symmetric(

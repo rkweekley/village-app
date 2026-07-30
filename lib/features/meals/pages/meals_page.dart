@@ -523,7 +523,7 @@ class _MealSlot extends StatelessWidget {
                             value: r.id,
                             groupValue: selectedRecipeId,
                             dense: true,
-                            activeThumbColor: VillageTheme.danger,
+                            activeColor: VillageTheme.danger,
                             onChanged: (v) =>
                                 setDialogState(() => selectedRecipeId = v),
                           );
@@ -1291,7 +1291,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
               SwitchListTile(
                 title: const Text('Family favorite'),
                 value: isFamilyFavorite,
-                activeThumbColor: VillageTheme.danger,
+                activeColor: VillageTheme.danger,
                 onChanged: (v) =>
                     setDialogState(() => isFamilyFavorite = v),
                 contentPadding: EdgeInsets.zero,
