@@ -152,7 +152,7 @@ class SignalRMessage {
   });
 }
 
-/// Manages connections to all six hubs.
+/// Manages connections to all four hubs.
 class SignalRService {
   final String baseUrl;
   final SecureStorage storage;
@@ -160,15 +160,11 @@ class SignalRService {
   late final SignalRHubClient choresHub;
   late final SignalRHubClient pointsHub;
   late final SignalRHubClient notificationsHub;
-  late final SignalRHubClient schoolHub;
-  late final SignalRHubClient mealPlanHub;
 
   Stream<SignalRMessage> get familyMessages => familyHub.messages;
   Stream<SignalRMessage> get choresMessages => choresHub.messages;
   Stream<SignalRMessage> get pointsMessages => pointsHub.messages;
   Stream<SignalRMessage> get notificationsMessages => notificationsHub.messages;
-  Stream<SignalRMessage> get schoolMessages => schoolHub.messages;
-  Stream<SignalRMessage> get mealPlanMessages => mealPlanHub.messages;
 
   SignalRService({required this.baseUrl, required this.storage}) {
     familyHub = SignalRHubClient(
@@ -195,21 +191,9 @@ class SignalRService {
       joinMethod: 'JoinNotificationGroup',
       storage: storage,
     );
-    schoolHub = SignalRHubClient(
-      baseUrl: baseUrl,
-      hubPath: '/hubs/school',
-      joinMethod: 'JoinSchoolGroup',
-      storage: storage,
-    );
-    mealPlanHub = SignalRHubClient(
-      baseUrl: baseUrl,
-      hubPath: '/hubs/mealplan',
-      joinMethod: 'JoinMealPlanGroup',
-      storage: storage,
-    );
   }
 
-  /// Connect to all hubs and join the family group.
+  /// Connect to all hubs and join the family/notification groups.
   Future<void> connectAll(String familyId, String userId) async {
     // Connect all hubs in parallel
     await Future.wait([
@@ -217,8 +201,6 @@ class SignalRService {
       choresHub.connect(familyId: familyId),
       pointsHub.connect(familyId: familyId),
       notificationsHub.connect(familyId: userId), // Notifications use user-scoped group
-      schoolHub.connect(familyId: familyId),
-      mealPlanHub.connect(familyId: familyId),
     ]);
   }
 
@@ -226,9 +208,7 @@ class SignalRService {
       familyHub.isConnected &&
       choresHub.isConnected &&
       pointsHub.isConnected &&
-      notificationsHub.isConnected &&
-      schoolHub.isConnected &&
-      mealPlanHub.isConnected;
+      notificationsHub.isConnected;
 
   Future<void> disconnectAll() async {
     await Future.wait([
@@ -236,8 +216,6 @@ class SignalRService {
       choresHub.disconnect(),
       pointsHub.disconnect(),
       notificationsHub.disconnect(),
-      schoolHub.disconnect(),
-      mealPlanHub.disconnect(),
     ]);
   }
 
@@ -246,8 +224,6 @@ class SignalRService {
     choresHub.dispose();
     pointsHub.dispose();
     notificationsHub.dispose();
-    schoolHub.dispose();
-    mealPlanHub.dispose();
   }
 }
 

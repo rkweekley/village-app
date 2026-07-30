@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/app.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/auth/secure_storage.dart';
+import 'package:village_app/core/signalr/signalr_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,7 @@ class _AppBootstrapState extends ConsumerState<AppBootstrap> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(authProvider.notifier).tryAutoLogin();
+      ref.read(signalRConnectorProvider).initialize();
     });
   }
 

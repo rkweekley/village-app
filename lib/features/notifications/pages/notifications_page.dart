@@ -45,14 +45,14 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
 
   Color _colorForNotification(String type, String priority) {
     // Use priority-based coloring
-    if (priority == 'High') return VillageTheme.mealsCoral;
+    if (priority == 'High') return VillageTheme.danger;
     if (priority == 'Low') return Colors.grey;
     // Type-based fallback
-    if (type.startsWith('Chore')) return VillageTheme.choresGreen;
-    if (type.startsWith('Reward')) return VillageTheme.rewardsAmber;
-    if (type == 'PointsChanged') return VillageTheme.rewardsAmber;
-    if (type == 'FamilyMemberJoined') return VillageTheme.primaryTeal;
-    return VillageTheme.primaryTeal;
+    if (type.startsWith('Chore')) return VillageTheme.positive;
+    if (type.startsWith('Reward')) return VillageTheme.warning;
+    if (type == 'PointsChanged') return VillageTheme.warning;
+    if (type == 'FamilyMemberJoined') return VillageTheme.primary;
+    return VillageTheme.primary;
   }
 
   @override
@@ -83,8 +83,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               ? const EmptyState(
                   icon: Icons.notifications_off_rounded,
                   title: 'No notifications yet',
-                  iconBgColor: VillageTheme.primaryTeal,
-                  iconColor: VillageTheme.primaryTeal,
+                  iconBgColor: VillageTheme.primary,
+                  iconColor: VillageTheme.primary,
                 )
               : NotificationListener<ScrollNotification>(
                   onNotification: (scrollInfo) {
@@ -106,8 +106,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                         margin: const EdgeInsets.only(bottom: 8),
                         elevation: 0,
                         color: n.isRead
-                            ? VillageTheme.surfaceWarm
-                            : VillageTheme.backgroundWarm,
+                            ? VillageTheme.surfaceCard
+                            : VillageTheme.surfaceBase,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),

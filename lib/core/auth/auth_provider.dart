@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:village_app/core/auth/auth_service.dart';
 import 'package:village_app/core/auth/models.dart';
+import 'package:village_app/core/network/authenticated_client.dart';
 
 /// Auth state exposed by the notifier
 enum AuthStatus { unknown, authenticated, unauthenticated }
@@ -40,7 +41,12 @@ class AuthState {
 
 class AuthNotifier extends Notifier<AuthState> {
   @override
-  AuthState build() => const AuthState();
+  AuthState build() {
+    // Register the global 401 callback so the interceptor can trigger logout
+    AuthInterceptorLogoutCallback.logout = () => logout();
+    ref.onDispose(() => AuthInterceptorLogoutCallback.logout = null);
+    return const AuthState();
+  }
 
   AuthService get _authService => ref.read(authServiceProvider);
 
@@ -63,9 +69,26 @@ class AuthNotifier extends Notifier<AuthState> {
         await _authService.logout();
         state = state.copyWith(status: AuthStatus.unauthenticated);
       }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        // Network error — stay authenticated with cached token
+        state = state.copyWith(status: AuthStatus.authenticated);
+      } else if (e.response?.statusCode == 401) {
+        // Token expired or invalid
+        await _authService.logout();
+        state = state.copyWith(status: AuthStatus.unauthenticated);
+      } else {
+        // Unexpected server error — stay authenticated but flag it
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          error: 'Could not load profile. Pull to refresh.',
+        );
+      }
     } catch (_) {
-      // Network error — still consider authenticated if we have a token
-      state = state.copyWith(status: AuthStatus.authenticated);
+      // Unexpected error — safest to logout
+      await _authService.logout();
+      state = state.copyWith(status: AuthStatus.unauthenticated);
     }
   }
 

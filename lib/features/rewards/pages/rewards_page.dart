@@ -81,11 +81,11 @@ class RewardsPage extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.rewardsAmber.withValues(alpha: 0.12),
+                        color: VillageTheme.warning.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.card_giftcard_rounded,
-                          color: VillageTheme.rewardsAmber, size: 22),
+                          color: VillageTheme.warning, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Reward',
@@ -100,7 +100,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Reward name',
                     prefixIcon: const Icon(Icons.emoji_events_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -114,7 +114,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Description',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -129,7 +129,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Point cost',
                     prefixIcon: const Icon(Icons.stars_rounded),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -144,7 +144,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Category',
                     prefixIcon: const Icon(Icons.category_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -162,7 +162,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Max redemptions (optional)',
                     prefixIcon: const Icon(Icons.repeat_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -194,7 +194,7 @@ class RewardsPage extends ConsumerWidget {
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.rewardsAmber,
+                    backgroundColor: VillageTheme.warning,
                   ),
                   child: const Text('Create Reward',
                       style: TextStyle(fontSize: 16)),
@@ -225,8 +225,8 @@ class _AvailableTab extends StatelessWidget {
             icon: Icons.card_giftcard_rounded,
             title: 'No rewards yet',
             subtitle: 'Tap + to create one',
-            iconBgColor: VillageTheme.rewardsAmber,
-            iconColor: VillageTheme.rewardsAmber,
+            iconBgColor: VillageTheme.warning,
+            iconColor: VillageTheme.warning,
           );
         }
         return RefreshIndicator(
@@ -248,7 +248,7 @@ class _AvailableTab extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 0,
-                  color: VillageTheme.surfaceWarm,
+                  color: VillageTheme.surfaceCard,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -285,7 +285,7 @@ class _AvailableTab extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: VillageTheme.rewardsAmber
+                            color: VillageTheme.warning
                                 .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -293,14 +293,14 @@ class _AvailableTab extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(Icons.stars_rounded,
-                                  size: 14, color: VillageTheme.rewardsAmber),
+                                  size: 14, color: VillageTheme.warning),
                               const SizedBox(width: 4),
                               Text(
                                 '${reward.pointCost} pts',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: VillageTheme.rewardsAmber,
+                                  color: VillageTheme.warning,
                                 ),
                               ),
                             ],
@@ -315,7 +315,7 @@ class _AvailableTab extends StatelessWidget {
                                 .read(rewardsServiceProvider)
                                 .redeemReward(reward.id),
                             style: FilledButton.styleFrom(
-                              backgroundColor: VillageTheme.rewardsAmber,
+                              backgroundColor: VillageTheme.warning,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -339,15 +339,15 @@ class _AvailableTab extends StatelessWidget {
   Color _categoryColor(String category) {
     switch (category) {
       case 'Screen Time':
-        return VillageTheme.schoolBlue;
+        return VillageTheme.info;
       case 'Treat':
-        return VillageTheme.mealsCoral;
+        return VillageTheme.danger;
       case 'Outing':
-        return VillageTheme.calendarCyan;
+        return VillageTheme.primaryLight;
       case 'Toy':
-        return VillageTheme.shoppingPurple;
+        return VillageTheme.primary;
       default:
-        return VillageTheme.rewardsAmber;
+        return VillageTheme.warning;
     }
   }
 
@@ -383,8 +383,8 @@ class _RedemptionsTab extends StatelessWidget {
           return const EmptyState(
             icon: Icons.history_rounded,
             title: 'No redemptions yet',
-            iconBgColor: VillageTheme.rewardsAmber,
-            iconColor: VillageTheme.rewardsAmber,
+            iconBgColor: VillageTheme.warning,
+            iconColor: VillageTheme.warning,
           );
         }
         return RefreshIndicator(
@@ -403,7 +403,7 @@ class _RedemptionsTab extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
-                color: VillageTheme.surfaceWarm,
+                color: VillageTheme.surfaceCard,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -413,11 +413,11 @@ class _RedemptionsTab extends StatelessWidget {
                         height: 48,
                         decoration: BoxDecoration(
                           color: isPending
-                              ? VillageTheme.rewardsAmber.withValues(alpha: 0.12)
+                              ? VillageTheme.warning.withValues(alpha: 0.12)
                               : isApproved
-                                  ? VillageTheme.choresGreen
+                                  ? VillageTheme.positive
                                       .withValues(alpha: 0.12)
-                                  : VillageTheme.mealsCoral
+                                  : VillageTheme.danger
                                       .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -428,10 +428,10 @@ class _RedemptionsTab extends StatelessWidget {
                                   ? Icons.check_circle_rounded
                                   : Icons.cancel_rounded,
                           color: isPending
-                              ? VillageTheme.rewardsAmber
+                              ? VillageTheme.warning
                               : isApproved
-                                  ? VillageTheme.choresGreen
-                                  : VillageTheme.mealsCoral,
+                                  ? VillageTheme.positive
+                                  : VillageTheme.danger,
                           size: 24,
                         ),
                       ),
@@ -462,7 +462,7 @@ class _RedemptionsTab extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: VillageTheme.rewardsAmber
+                          color: VillageTheme.warning
                               .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -471,7 +471,7 @@ class _RedemptionsTab extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: VillageTheme.rewardsAmber,
+                            color: VillageTheme.warning,
                           ),
                         ),
                       ),
@@ -479,7 +479,7 @@ class _RedemptionsTab extends StatelessWidget {
                       if (isPending)
                         IconButton(
                           icon: const Icon(Icons.check_circle_rounded,
-                              color: VillageTheme.choresGreen),
+                              color: VillageTheme.positive),
                           onPressed: () async {
                             try {
                               await ref
@@ -508,7 +508,7 @@ class _RedemptionsTab extends StatelessWidget {
                       if (isPending)
                         IconButton(
                           icon: const Icon(Icons.cancel_rounded,
-                              color: VillageTheme.mealsCoral),
+                              color: VillageTheme.danger),
                           onPressed: () async {
                             try {
                               await ref

@@ -89,7 +89,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: VillageTheme.calendarCyan.withValues(
+                        color: VillageTheme.primaryLight.withValues(
                           alpha: 0.12,
                         ),
                         borderRadius: BorderRadius.circular(10),
@@ -97,7 +97,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       child: const Icon(
                         Icons.event_rounded,
                         size: 18,
-                        color: VillageTheme.calendarCyan,
+                        color: VillageTheme.primaryLight,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -150,14 +150,14 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: VillageTheme.calendarCyan.withValues(
+                              color: VillageTheme.primaryLight.withValues(
                                 alpha: 0.12,
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.calendar_month_rounded,
-                              color: VillageTheme.calendarCyan,
+                              color: VillageTheme.primaryLight,
                               size: 22,
                             ),
                           ),
@@ -177,7 +177,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                         decoration: InputDecoration(
                           labelText: 'Title',
                           filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
+                          fillColor: VillageTheme.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -191,7 +191,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                         decoration: InputDecoration(
                           labelText: 'Description (optional)',
                           filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
+                          fillColor: VillageTheme.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -209,7 +209,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                             size: 20,
                           ),
                           filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
+                          fillColor: VillageTheme.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -235,7 +235,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                     data: Theme.of(context).copyWith(
                                       colorScheme: Theme.of(context).colorScheme
                                           .copyWith(
-                                            primary: VillageTheme.calendarCyan,
+                                            primary: VillageTheme.primaryLight,
                                           ),
                                     ),
                                     child: child!,
@@ -256,7 +256,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: VillageTheme.backgroundWarm,
+                                  color: VillageTheme.surfaceBase,
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: Column(
@@ -298,7 +298,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                     data: Theme.of(context).copyWith(
                                       colorScheme: Theme.of(context).colorScheme
                                           .copyWith(
-                                            primary: VillageTheme.calendarCyan,
+                                            primary: VillageTheme.primaryLight,
                                           ),
                                     ),
                                     child: child!,
@@ -319,7 +319,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: VillageTheme.backgroundWarm,
+                                  color: VillageTheme.surfaceBase,
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: Column(
@@ -349,13 +349,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       const SizedBox(height: 8),
                       Container(
                         decoration: BoxDecoration(
-                          color: VillageTheme.backgroundWarm,
+                          color: VillageTheme.surfaceBase,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: SwitchListTile(
                           title: const Text('All day event'),
                           value: allDay,
-                          activeColor: VillageTheme.calendarCyan,
+                          activeColor: VillageTheme.primaryLight,
                           onChanged: (v) => setDialogState(() => allDay = v),
                           dense: true,
                           contentPadding: const EdgeInsets.symmetric(
@@ -395,7 +395,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                         },
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 52),
-                          backgroundColor: VillageTheme.calendarCyan,
+                          backgroundColor: VillageTheme.primaryLight,
                         ),
                         child: const Text(
                           'Create Event',
@@ -479,7 +479,7 @@ class _CalendarGrid extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             decoration: BoxDecoration(
-              color: VillageTheme.backgroundWarm,
+              color: VillageTheme.surfaceBase,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -535,14 +535,14 @@ class _CalendarGrid extends StatelessWidget {
                         margin: const EdgeInsets.all(1),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? VillageTheme.calendarCyan
+                              ? VillageTheme.primaryLight
                               : isToday
-                              ? VillageTheme.calendarCyan.withValues(alpha: 0.1)
+                              ? VillageTheme.primaryLight.withValues(alpha: 0.1)
                               : null,
                           borderRadius: BorderRadius.circular(12),
                           border: isToday && !isSelected
                               ? Border.all(
-                                  color: VillageTheme.calendarCyan.withValues(
+                                  color: VillageTheme.primaryLight.withValues(
                                     alpha: 0.3,
                                   ),
                                   width: 1.5,
@@ -562,7 +562,7 @@ class _CalendarGrid extends StatelessWidget {
                                 color: isSelected
                                     ? Colors.white
                                     : isToday
-                                    ? VillageTheme.calendarCyan
+                                    ? VillageTheme.primaryLight
                                     : null,
                               ),
                             ),
@@ -575,7 +575,7 @@ class _CalendarGrid extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? Colors.white
-                                        : VillageTheme.calendarCyan,
+                                        : VillageTheme.primaryLight,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -620,13 +620,13 @@ class _DayEventsList extends ConsumerWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: VillageTheme.calendarCyan.withValues(alpha: 0.1),
+                color: VillageTheme.primaryLight.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
                 Icons.event_busy_rounded,
                 size: 28,
-                color: VillageTheme.calendarCyan,
+                color: VillageTheme.primaryLight,
               ),
             ),
             const SizedBox(height: 12),
@@ -650,7 +650,7 @@ class _DayEventsList extends ConsumerWidget {
           final e = dayEvents[i];
           final evColor = e.color != null
               ? _parseHexColor(e.color!)
-              : VillageTheme.calendarCyan;
+              : VillageTheme.primaryLight;
 
           return Card(
             margin: const EdgeInsets.only(bottom: 8),
@@ -658,7 +658,7 @@ class _DayEventsList extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             elevation: 0,
-            color: VillageTheme.surfaceWarm,
+            color: VillageTheme.surfaceCard,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -724,7 +724,7 @@ class _DayEventsList extends ConsumerWidget {
                           isSelected: e.attendees.any(
                             (a) => a.userId == userId && a.status == 'Accepted',
                           ),
-                          selectedColor: VillageTheme.choresGreen,
+                          selectedColor: VillageTheme.positive,
                           onPressed: () => ref
                               .read(calendarServiceProvider)
                               .rsvp(e.id, 'Accepted'),
@@ -737,7 +737,7 @@ class _DayEventsList extends ConsumerWidget {
                             (a) =>
                                 a.userId == userId && a.status == 'Tentative',
                           ),
-                          selectedColor: VillageTheme.rewardsAmber,
+                          selectedColor: VillageTheme.warning,
                           onPressed: () => ref
                               .read(calendarServiceProvider)
                               .rsvp(e.id, 'Tentative'),
@@ -749,7 +749,7 @@ class _DayEventsList extends ConsumerWidget {
                           isSelected: e.attendees.any(
                             (a) => a.userId == userId && a.status == 'Declined',
                           ),
-                          selectedColor: VillageTheme.mealsCoral,
+                          selectedColor: VillageTheme.danger,
                           onPressed: () => ref
                               .read(calendarServiceProvider)
                               .rsvp(e.id, 'Declined'),
@@ -797,7 +797,7 @@ class _RsvpButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? selectedColor.withValues(alpha: 0.12)
-              : VillageTheme.backgroundWarm,
+              : VillageTheme.surfaceBase,
           borderRadius: BorderRadius.circular(10),
           border: !isSelected
               ? Border.all(color: Colors.grey.withValues(alpha: 0.15))

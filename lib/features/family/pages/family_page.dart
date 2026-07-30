@@ -53,7 +53,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             if (familyState.family != null) ...[
               Card(
                 elevation: 0,
-                color: VillageTheme.surfaceWarm,
+                color: VillageTheme.surfaceCard,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -68,12 +68,12 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: VillageTheme.primaryTeal
+                              color: VillageTheme.primary
                                   .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(Icons.share_rounded,
-                                size: 20, color: VillageTheme.primaryTeal),
+                                size: 20, color: VillageTheme.primary),
                           ),
                           const SizedBox(width: 10),
                           const Text('Invite Members',
@@ -89,10 +89,10 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: VillageTheme.primaryTeal.withValues(alpha: 0.08),
+                          color: VillageTheme.primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: VillageTheme.primaryTeal.withValues(alpha: 0.2),
+                            color: VillageTheme.primary.withValues(alpha: 0.2),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -100,7 +100,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                         child: Row(
                           children: [
                             const Icon(Icons.tag_rounded,
-                                color: VillageTheme.primaryTeal, size: 20),
+                                color: VillageTheme.primary, size: 20),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -115,7 +115,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             IconButton(
                               icon: const Icon(Icons.copy_rounded),
                               tooltip: 'Copy invite code',
-                              color: VillageTheme.primaryTeal,
+                              color: VillageTheme.primary,
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(
                                     text: familyState.family!.inviteCode));
@@ -147,7 +147,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             if (familyState.family != null)
               Card(
                 elevation: 0,
-                color: VillageTheme.surfaceWarm,
+                color: VillageTheme.surfaceCard,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -162,12 +162,12 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: VillageTheme.primaryTeal
+                              color: VillageTheme.primary
                                   .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(Icons.settings_rounded,
-                                size: 20, color: VillageTheme.primaryTeal),
+                                size: 20, color: VillageTheme.primary),
                           ),
                           const SizedBox(width: 10),
                           const Text('Family Settings',
@@ -199,12 +199,12 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: VillageTheme.primaryTeal
+                      color: VillageTheme.primary
                           .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.people_rounded,
-                        size: 16, color: VillageTheme.primaryTeal),
+                        size: 16, color: VillageTheme.primary),
                   ),
                   const SizedBox(width: 10),
                   const Text('Family Members',
@@ -236,22 +236,22 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: VillageTheme.mealsCoral.withValues(alpha: 0.1),
+                    color: VillageTheme.danger.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: VillageTheme.mealsCoral.withValues(alpha: 0.2),
+                      color: VillageTheme.danger.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
                     children: [
                       const Icon(Icons.error_outline_rounded,
-                          color: VillageTheme.mealsCoral, size: 20),
+                          color: VillageTheme.danger, size: 20),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           familyState.error!,
                           style: const TextStyle(
-                              color: VillageTheme.mealsCoral, fontSize: 14),
+                              color: VillageTheme.danger, fontSize: 14),
                         ),
                       ),
                     ],
@@ -306,18 +306,18 @@ class _MemberCard extends StatelessWidget {
     // Generate avatar color from name
     final nameHash = member.displayName.hashCode;
     final avatarColors = [
-      VillageTheme.primaryTeal,
-      VillageTheme.rewardsAmber,
-      VillageTheme.mealsCoral,
-      VillageTheme.calendarCyan,
-      VillageTheme.shoppingPurple,
+      VillageTheme.primary,
+      VillageTheme.warning,
+      VillageTheme.danger,
+      VillageTheme.primaryLight,
+      VillageTheme.primary,
     ];
     final avatarColor = avatarColors[nameHash.abs() % avatarColors.length];
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
-      color: VillageTheme.surfaceWarm,
+      color: VillageTheme.surfaceCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -362,7 +362,7 @@ class _MemberCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
-                            color: VillageTheme.primaryTeal
+                            color: VillageTheme.primary
                                 .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -371,7 +371,7 @@ class _MemberCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
-                              color: VillageTheme.primaryTeal,
+                              color: VillageTheme.primary,
                             ),
                           ),
                         ),
@@ -393,7 +393,7 @@ class _MemberCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: VillageTheme.primaryTeal.withValues(alpha: 0.08),
+                color: VillageTheme.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -401,7 +401,7 @@ class _MemberCard extends StatelessWidget {
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
-                  color: VillageTheme.primaryTeal,
+                  color: VillageTheme.primary,
                 ),
               ),
             ),

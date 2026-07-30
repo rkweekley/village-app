@@ -19,8 +19,10 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
     },
     onError: (error, handler) {
       if (error.response?.statusCode == 401) {
-        // Clear expired token and trigger re-auth
+        // Token expired — clear it so auto-login doesn't reuse it
         storage.delete('jwt_token');
+        // Trigger auth state change via a global callback
+        AuthInterceptorLogoutCallback.logout?.call();
       }
       handler.next(error);
     },
@@ -28,3 +30,9 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
 
   return dio;
 });
+
+/// Global callback for the 401 interceptor to trigger logout.
+/// Set by AuthNotifier during initialization.
+class AuthInterceptorLogoutCallback {
+  static void Function()? logout;
+}

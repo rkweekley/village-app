@@ -21,7 +21,6 @@ class SignalRConnector {
   StreamSubscription? _choresSub;
   StreamSubscription? _pointsSub;
   StreamSubscription? _notificationsSub;
-  StreamSubscription? _schoolSub;
 
   SignalRConnector(this._ref)
       : _signalR = _ref.read(signalRServiceProvider);
@@ -81,20 +80,6 @@ class SignalRConnector {
               _ref.read(notificationProvider.notifier).prepend(notification);
             }
           });
-
-          // Listen for real-time school updates
-          _schoolSub ??= _signalR.schoolMessages.listen((msg) {
-            switch (msg.target) {
-              case 'SchoolWorkCreated':
-              case 'SchoolWorkUpdated':
-              case 'SchoolWorkSubmitted':
-              case 'SchoolWorkGraded':
-              case 'SubjectCreated':
-              case 'SubjectUpdated':
-                _ref.invalidate(familyProvider);
-                break;
-            }
-          });
         }
       } else if (next.status == AuthStatus.unauthenticated) {
         _signalR.disconnectAll();
@@ -107,7 +92,6 @@ class SignalRConnector {
     _choresSub?.cancel();
     _pointsSub?.cancel();
     _notificationsSub?.cancel();
-    _schoolSub?.cancel();
     _signalR.dispose();
   }
 }

@@ -35,8 +35,8 @@ class ShoppingListsPage extends ConsumerWidget {
               icon: Icons.shopping_cart_rounded,
               title: 'No shopping lists yet',
               subtitle: 'Tap + to create one',
-              iconBgColor: VillageTheme.shoppingPurple,
-              iconColor: VillageTheme.shoppingPurple,
+              iconBgColor: VillageTheme.primary,
+              iconColor: VillageTheme.primary,
             );
           }
           return RefreshIndicator(
@@ -56,7 +56,7 @@ class ShoppingListsPage extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 0,
-                  color: VillageTheme.surfaceWarm,
+                  color: VillageTheme.surfaceCard,
                   child: InkWell(
                     onTap: () => context.push('/shopping-detail/${list.id}'),
                     borderRadius: BorderRadius.circular(20),
@@ -78,12 +78,12 @@ class ShoppingListsPage extends ConsumerWidget {
                                     value: progress,
                                     strokeWidth: 4,
                                     backgroundColor:
-                                        VillageTheme.shoppingPurple
+                                        VillageTheme.primary
                                             .withValues(alpha: 0.1),
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                       isComplete
-                                          ? VillageTheme.choresGreen
-                                          : VillageTheme.shoppingPurple,
+                                          ? VillageTheme.positive
+                                          : VillageTheme.primary,
                                     ),
                                   ),
                                 ),
@@ -93,8 +93,8 @@ class ShoppingListsPage extends ConsumerWidget {
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     color: isComplete
-                                        ? VillageTheme.choresGreen
-                                        : VillageTheme.shoppingPurple,
+                                        ? VillageTheme.positive
+                                        : VillageTheme.primary,
                                   ),
                                 ),
                               ],
@@ -119,7 +119,7 @@ class ShoppingListsPage extends ConsumerWidget {
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: isComplete
-                                        ? VillageTheme.choresGreen
+                                        ? VillageTheme.positive
                                         : Colors.grey[600],
                                   ),
                                 ),
@@ -139,7 +139,7 @@ class ShoppingListsPage extends ConsumerWidget {
                                   child: Row(
                                     children: [
                                       Icon(Icons.delete_outline,
-                                          color: VillageTheme.mealsCoral,
+                                          color: VillageTheme.danger,
                                           size: 20),
                                       SizedBox(width: 8),
                                       Text('Delete'),
@@ -192,11 +192,11 @@ class ShoppingListsPage extends ConsumerWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.shoppingPurple.withValues(alpha: 0.12),
+                    color: VillageTheme.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.shopping_cart_rounded,
-                      color: VillageTheme.shoppingPurple, size: 22),
+                      color: VillageTheme.primary, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('New Shopping List',
@@ -211,7 +211,7 @@ class ShoppingListsPage extends ConsumerWidget {
                 labelText: 'List name',
                 prefixIcon: const Icon(Icons.edit_outlined),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -239,7 +239,7 @@ class ShoppingListsPage extends ConsumerWidget {
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.shoppingPurple,
+                backgroundColor: VillageTheme.primary,
               ),
               child: const Text('Create List',
                   style: TextStyle(fontSize: 16)),
@@ -294,8 +294,8 @@ class _ShoppingListDetailPageState
               icon: Icons.receipt_long_rounded,
               title: 'List is empty',
               subtitle: 'Tap the FAB to add items',
-              iconBgColor: VillageTheme.shoppingPurple,
-              iconColor: VillageTheme.shoppingPurple,
+              iconBgColor: VillageTheme.primary,
+              iconColor: VillageTheme.primary,
             );
           }
 
@@ -315,7 +315,7 @@ class _ShoppingListDetailPageState
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 0,
-                  color: VillageTheme.surfaceWarm,
+                  color: VillageTheme.surfaceCard,
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Row(
@@ -332,10 +332,10 @@ class _ShoppingListDetailPageState
                                     : 0.0,
                                 strokeWidth: 4,
                                 backgroundColor:
-                                    VillageTheme.shoppingPurple
+                                    VillageTheme.primary
                                         .withValues(alpha: 0.1),
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  VillageTheme.shoppingPurple,
+                                  VillageTheme.primary,
                                 ),
                               ),
                               Text(
@@ -343,7 +343,7 @@ class _ShoppingListDetailPageState
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: VillageTheme.shoppingPurple,
+                                  color: VillageTheme.primary,
                                 ),
                               ),
                             ],
@@ -445,11 +445,11 @@ class _ShoppingListDetailPageState
                       height: 40,
                       decoration: BoxDecoration(
                         color:
-                            VillageTheme.shoppingPurple.withValues(alpha: 0.12),
+                            VillageTheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.add_shopping_cart_rounded,
-                          color: VillageTheme.shoppingPurple, size: 22),
+                          color: VillageTheme.primary, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('Add Item',
@@ -464,7 +464,7 @@ class _ShoppingListDetailPageState
                     labelText: 'Item name',
                     prefixIcon: const Icon(Icons.shopping_bag_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -482,7 +482,7 @@ class _ShoppingListDetailPageState
                           labelText: 'Quantity',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
+                          fillColor: VillageTheme.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -498,7 +498,7 @@ class _ShoppingListDetailPageState
                         decoration: InputDecoration(
                           labelText: 'Category',
                           filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
+                          fillColor: VillageTheme.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -536,7 +536,7 @@ class _ShoppingListDetailPageState
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.shoppingPurple,
+                    backgroundColor: VillageTheme.primary,
                   ),
                   child: const Text('Add to List',
                       style: TextStyle(fontSize: 16)),
@@ -569,11 +569,11 @@ class _ItemTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       elevation: 0,
-      color: VillageTheme.surfaceWarm,
+      color: VillageTheme.surfaceCard,
       child: ListTile(
         leading: Checkbox(
           value: item.isChecked,
-          activeColor: VillageTheme.choresGreen,
+          activeColor: VillageTheme.positive,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6),
           ),
@@ -615,7 +615,7 @@ class _ItemTile extends StatelessWidget {
             const SizedBox(width: 4),
             IconButton(
               icon: const Icon(Icons.delete_outline, size: 18),
-              color: VillageTheme.mealsCoral.withValues(alpha: 0.7),
+              color: VillageTheme.danger.withValues(alpha: 0.7),
               onPressed: () {
                 ref
                     .read(shoppingServiceProvider)
@@ -631,15 +631,15 @@ class _ItemTile extends StatelessWidget {
   Color _categoryColor(String category) {
     switch (category) {
       case 'Produce':
-        return VillageTheme.choresGreen;
+        return VillageTheme.positive;
       case 'Dairy':
-        return VillageTheme.schoolBlue;
+        return VillageTheme.info;
       case 'Meat':
-        return VillageTheme.mealsCoral;
+        return VillageTheme.danger;
       case 'Bakery':
-        return VillageTheme.rewardsAmber;
+        return VillageTheme.warning;
       case 'Pantry':
-        return VillageTheme.shoppingPurple;
+        return VillageTheme.primary;
       default:
         return Colors.grey;
     }

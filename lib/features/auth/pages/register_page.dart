@@ -46,7 +46,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           );
       if (mounted) context.go('/hub');
     } catch (_) {
-      // error is handled in auth state
+      // error handled in auth state
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -55,68 +55,61 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [VillageTheme.primaryTeal, Color(0xFF095F4E)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: VillageTheme.surfaceBase,
+      body: SafeArea(
+        child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
-                // ── Back button ──
+                const SizedBox(height: 32),
+
+                // Back
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back_rounded,
-                        color: Colors.white),
+                  child: TextButton.icon(
                     onPressed: () => context.go('/login'),
+                    icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                    label: const Text('Back'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: VillageTheme.textSecondary,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
-                // ── Header ──
-                const Text(
+                // Header
+                Text(
                   'Join Village',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    color: VillageTheme.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   'Create a new family or join an existing one',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white.withValues(alpha: 0.8),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: VillageTheme.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 32),
 
-                // ── Card container ──
+                // Card
                 Container(
                   width: double.infinity,
+                  constraints: const BoxConstraints(maxWidth: 420),
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    color: VillageTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(VillageTheme.radiusXl),
+                    border: Border.all(
+                      color: VillageTheme.borderSubtle,
+                      width: 0.5,
+                    ),
                   ),
                   child: Form(
                     key: _formKey,
@@ -128,25 +121,22 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: VillageTheme.mealsCoral
-                                  .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: VillageTheme.mealsCoral
-                                    .withValues(alpha: 0.3),
-                              ),
+                              color: VillageTheme.danger
+                                  .withValues(alpha: 0.08),
+                              borderRadius:
+                                  BorderRadius.circular(VillageTheme.radiusSm),
                             ),
                             child: Row(
                               children: [
                                 Icon(Icons.error_outline,
-                                    size: 20, color: VillageTheme.mealsCoral),
+                                    size: 18, color: VillageTheme.danger),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     state.error!,
-                                    style: TextStyle(
-                                        color: VillageTheme.mealsCoral,
-                                        fontSize: 13),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: VillageTheme.danger,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -155,7 +145,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           const SizedBox(height: 16),
                         ],
 
-                        // Display Name
+                        // Name
                         TextFormField(
                           controller: _nameCtrl,
                           textInputAction: TextInputAction.next,
@@ -164,9 +154,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             prefixIcon: Icon(Icons.person_outline),
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().length < 2) {
+                            if (v == null || v.trim().length < 2)
                               return 'Enter at least 2 characters';
-                            }
                             return null;
                           },
                         ),
@@ -182,9 +171,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
+                            if (v == null || v.trim().isEmpty)
                               return 'Enter your email';
-                            }
                             if (!v.contains('@')) return 'Enter a valid email';
                             return null;
                           },
@@ -200,50 +188,49 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock_outlined),
                             suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
+                              icon: Icon(_obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility),
                               onPressed: () => setState(
                                   () => _obscurePassword = !_obscurePassword),
                             ),
                           ),
                           validator: (v) {
-                            if (v == null || v.length < 8) {
+                            if (v == null || v.length < 8)
                               return 'At least 8 characters';
-                            }
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
 
-                        // Invite Code (optional)
+                        // Invite code
                         TextFormField(
                           controller: _inviteCtrl,
                           textInputAction: TextInputAction.done,
                           decoration: const InputDecoration(
                             labelText: 'Family invite code (optional)',
                             prefixIcon: Icon(Icons.group_add_outlined),
-                            helperText: 'Leave blank to create a new family',
+                            helperText:
+                                'Leave blank to create a new family',
                           ),
                         ),
                         const SizedBox(height: 28),
 
                         // Register button
                         SizedBox(
-                          height: 52,
+                          height: 48,
                           child: FilledButton(
                             onPressed: _loading ? null : _handleRegister,
                             child: _loading
                                 ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
+                                    width: 22,
+                                    height: 22,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: Colors.white),
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
-                                : const Text('Create Account',
-                                    style: TextStyle(fontSize: 16)),
+                                : const Text('Create account'),
                           ),
                         ),
                       ],
@@ -259,19 +246,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   children: [
                     Text(
                       'Already have an account? ',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: VillageTheme.textTertiary,
                       ),
                     ),
                     TextButton(
                       onPressed: () => context.go('/login'),
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: VillageTheme.primary,
                       ),
+                      child: const Text('Sign in'),
                     ),
                   ],
                 ),

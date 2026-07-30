@@ -31,7 +31,7 @@ class TasksPage extends ConsumerWidget {
                   children: [
                     Icon(Icons.cleaning_services_outlined,
                         size: 18,
-                        color: VillageTheme.choresGreen),
+                        color: VillageTheme.positive),
                     const SizedBox(width: 6),
                     const Text('Chores'),
                   ],
@@ -43,7 +43,7 @@ class TasksPage extends ConsumerWidget {
                   children: [
                     Icon(Icons.school_outlined,
                         size: 18,
-                        color: VillageTheme.schoolBlue),
+                        color: VillageTheme.info),
                     const SizedBox(width: 6),
                     const Text('School'),
                   ],
@@ -87,7 +87,7 @@ class TasksPage extends ConsumerWidget {
               label: const Text('New Chore'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.choresGreen,
+                backgroundColor: VillageTheme.positive,
               ),
             ),
             const SizedBox(height: 12),
@@ -100,7 +100,7 @@ class TasksPage extends ConsumerWidget {
               label: const Text('New Assignment'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.schoolBlue,
+                backgroundColor: VillageTheme.info,
               ),
             ),
           ],
@@ -233,11 +233,11 @@ class _ChoreCard extends ConsumerWidget {
                         const SizedBox(width: 8),
                         _Tag(
                           chore.recurrence,
-                          VillageTheme.primaryTeal,
+                          VillageTheme.primary,
                         ),
                         if (chore.requiresApproval) ...[
                           const SizedBox(width: 8),
-                          _Tag('Needs approval', VillageTheme.tertiaryCoral),
+                          _Tag('Needs approval', VillageTheme.danger),
                         ],
                       ],
                     ),
@@ -270,11 +270,11 @@ class _ChoreCard extends ConsumerWidget {
   Color _difficultyColor(String d) {
     switch (d) {
       case 'Easy':
-        return VillageTheme.choresGreen;
+        return VillageTheme.positive;
       case 'Medium':
-        return VillageTheme.secondaryAmber;
+        return VillageTheme.warning;
       case 'Hard':
-        return VillageTheme.tertiaryCoral;
+        return VillageTheme.danger;
       default:
         return Colors.grey;
     }
@@ -294,11 +294,11 @@ class _ChoreCard extends ConsumerWidget {
             if (chore.description != null && chore.description!.isNotEmpty)
               Text(chore.description!, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 16),
-            _detailChip('${chore.pointValue} pts', VillageTheme.rewardsAmber),
+            _detailChip('${chore.pointValue} pts', VillageTheme.warning),
             const SizedBox(width: 8),
             _detailChip(chore.difficulty, _difficultyColor(chore.difficulty)),
             const SizedBox(width: 8),
-            _detailChip(chore.recurrence, VillageTheme.primaryTeal),
+            _detailChip(chore.recurrence, VillageTheme.primary),
           ],
         ),
       ),
@@ -335,11 +335,11 @@ class _ChoreCard extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.choresGreen.withValues(alpha: 0.12),
+                        color: VillageTheme.positive.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.check_circle_outline,
-                          color: VillageTheme.choresGreen, size: 22),
+                          color: VillageTheme.positive, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Text('Complete "${chore.name}"',
@@ -352,7 +352,7 @@ class _ChoreCard extends ConsumerWidget {
                   decoration: InputDecoration(
                     labelText: 'Assign to',
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -366,7 +366,7 @@ class _ChoreCard extends ConsumerWidget {
                           m.role == 'Parent' ? Icons.star : Icons.person,
                           size: 18,
                           color: m.role == 'Parent'
-                              ? VillageTheme.rewardsAmber
+                              ? VillageTheme.warning
                               : Colors.grey,
                         ),
                         const SizedBox(width: 8),
@@ -395,7 +395,7 @@ class _ChoreCard extends ConsumerWidget {
                     decoration: InputDecoration(
                       labelText: 'Due date',
                       filled: true,
-                      fillColor: VillageTheme.backgroundWarm,
+                      fillColor: VillageTheme.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -439,7 +439,7 @@ class _ChoreCard extends ConsumerWidget {
                     },
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(double.infinity, 52),
-                      backgroundColor: VillageTheme.choresGreen,
+                      backgroundColor: VillageTheme.positive,
                     ),
                     child: const Text('Assign & Complete'),
                   ),
@@ -492,7 +492,7 @@ class _ChoreCard extends ConsumerWidget {
                           m.role == 'Parent' ? Icons.star : Icons.person,
                           size: 18,
                           color: m.role == 'Parent'
-                              ? VillageTheme.rewardsAmber
+                              ? VillageTheme.warning
                               : Colors.grey,
                         ),
                         const SizedBox(width: 8),
@@ -685,7 +685,7 @@ class _AssignmentCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: VillageTheme.schoolBlue.withValues(alpha: 0.1),
+                      color: VillageTheme.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -694,8 +694,8 @@ class _AssignmentCard extends ConsumerWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: assignment.gradePointsEarned != null
-                            ? VillageTheme.choresGreen
-                            : VillageTheme.schoolBlue,
+                            ? VillageTheme.positive
+                            : VillageTheme.info,
                       ),
                     ),
                   ),
@@ -707,10 +707,10 @@ class _AssignmentCard extends ConsumerWidget {
                       child: IconButton(
                         onPressed: () => _submitAssignment(context),
                         icon: Icon(Icons.send_rounded,
-                            color: VillageTheme.schoolBlue, size: 20),
+                            color: VillageTheme.info, size: 20),
                         tooltip: 'Mark Submitted',
                         style: IconButton.styleFrom(
-                          backgroundColor: VillageTheme.schoolBlue.withValues(alpha: 0.1),
+                          backgroundColor: VillageTheme.info.withValues(alpha: 0.1),
                         ),
                       ),
                     ),
@@ -777,7 +777,7 @@ class _AssignmentCard extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: VillageTheme.choresGreen,
+                    color: VillageTheme.positive,
                   ),
                 ),
               ),
@@ -793,7 +793,7 @@ class _AssignmentCard extends ConsumerWidget {
                   icon: const Icon(Icons.send_rounded),
                   label: const Text('Mark Submitted'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: VillageTheme.schoolBlue,
+                    backgroundColor: VillageTheme.info,
                   ),
                 ),
               ),
@@ -872,11 +872,11 @@ class _AssignmentCard extends ConsumerWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                      color: VillageTheme.info.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.grading_rounded,
-                        color: VillageTheme.schoolBlue, size: 22),
+                        color: VillageTheme.info, size: 22),
                   ),
                   const SizedBox(width: 12),
                   const Text('Grade Assignment',
@@ -896,7 +896,7 @@ class _AssignmentCard extends ConsumerWidget {
                   labelText: 'Points',
                   prefixIcon: const Icon(Icons.stars_rounded),
                   filled: true,
-                  fillColor: VillageTheme.backgroundWarm,
+                  fillColor: VillageTheme.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -919,7 +919,7 @@ class _AssignmentCard extends ConsumerWidget {
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
-                  backgroundColor: VillageTheme.schoolBlue,
+                  backgroundColor: VillageTheme.info,
                 ),
                 child: const Text('Submit Grade',
                     style: TextStyle(fontSize: 16)),
@@ -934,11 +934,11 @@ class _AssignmentCard extends ConsumerWidget {
   Color _statusColor(String status) {
     switch (status) {
       case 'Pending':
-        return VillageTheme.secondaryAmber;
+        return VillageTheme.warning;
       case 'Submitted':
-        return VillageTheme.schoolBlue;
+        return VillageTheme.info;
       case 'Graded':
-        return VillageTheme.choresGreen;
+        return VillageTheme.positive;
       case 'Excused':
         return Colors.grey;
       default:
@@ -1010,11 +1010,11 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.choresGreen.withValues(alpha: 0.12),
+                    color: VillageTheme.positive.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.cleaning_services_rounded,
-                      color: VillageTheme.choresGreen, size: 22),
+                      color: VillageTheme.positive, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('New Chore',
@@ -1029,7 +1029,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Chore name',
                 prefixIcon: const Icon(Icons.edit_outlined),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1044,7 +1044,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Description',
                 prefixIcon: const Icon(Icons.description_outlined),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1059,7 +1059,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Point value',
                 prefixIcon: const Icon(Icons.stars_rounded),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1074,7 +1074,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Recurrence',
                 prefixIcon: const Icon(Icons.repeat_outlined),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1092,7 +1092,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Difficulty',
                 prefixIcon: const Icon(Icons.speed_rounded),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1108,14 +1108,14 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
               title: const Text('Requires approval'),
               value: _requiresApproval,
               onChanged: (v) => setState(() => _requiresApproval = v),
-              activeColor: VillageTheme.choresGreen,
+              activeColor: VillageTheme.positive,
               contentPadding: EdgeInsets.zero,
             ),
             SwitchListTile(
               title: const Text('Requires photo'),
               value: _requiresPhoto,
               onChanged: (v) => setState(() => _requiresPhoto = v),
-              activeColor: VillageTheme.choresGreen,
+              activeColor: VillageTheme.positive,
               contentPadding: EdgeInsets.zero,
             ),
             const SizedBox(height: 16),
@@ -1136,7 +1136,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.choresGreen,
+                backgroundColor: VillageTheme.positive,
               ),
               child: const Text('Create Chore',
                   style: TextStyle(fontSize: 16)),
@@ -1203,11 +1203,11 @@ class _CreateAssignmentSheetState
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                    color: VillageTheme.info.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.assignment_rounded,
-                      color: VillageTheme.schoolBlue, size: 22),
+                      color: VillageTheme.info, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('New Assignment',
@@ -1222,7 +1222,7 @@ class _CreateAssignmentSheetState
                 labelText: 'Title',
                 prefixIcon: const Icon(Icons.edit_outlined),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1237,7 +1237,7 @@ class _CreateAssignmentSheetState
                 decoration: InputDecoration(
                   labelText: 'Assign to',
                   filled: true,
-                  fillColor: VillageTheme.backgroundWarm,
+                  fillColor: VillageTheme.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1275,7 +1275,7 @@ class _CreateAssignmentSheetState
                 labelText: 'Description (optional)',
                 prefixIcon: const Icon(Icons.description_outlined),
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1293,7 +1293,7 @@ class _CreateAssignmentSheetState
                       labelText: 'Points',
                       prefixIcon: const Icon(Icons.numbers_outlined),
                       filled: true,
-                      fillColor: VillageTheme.backgroundWarm,
+                      fillColor: VillageTheme.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -1322,7 +1322,7 @@ class _CreateAssignmentSheetState
                       decoration: InputDecoration(
                         labelText: 'Due date',
                         filled: true,
-                        fillColor: VillageTheme.backgroundWarm,
+                        fillColor: VillageTheme.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1369,7 +1369,7 @@ class _CreateAssignmentSheetState
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.schoolBlue,
+                backgroundColor: VillageTheme.info,
               ),
               child: const Text('Create Assignment',
                   style: TextStyle(fontSize: 16)),

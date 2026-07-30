@@ -90,11 +90,11 @@ class SchoolPage extends ConsumerWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                      color: VillageTheme.info.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.book_rounded,
-                        color: VillageTheme.schoolBlue, size: 22),
+                        color: VillageTheme.info, size: 22),
                   ),
                   const SizedBox(width: 12),
                   const Text('New Subject',
@@ -110,7 +110,7 @@ class SchoolPage extends ConsumerWidget {
                   hintText: 'e.g. Math, Reading',
                   prefixIcon: const Icon(Icons.abc_outlined),
                   filled: true,
-                  fillColor: VillageTheme.backgroundWarm,
+                  fillColor: VillageTheme.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -125,7 +125,7 @@ class SchoolPage extends ConsumerWidget {
                   labelText: 'Description (optional)',
                   prefixIcon: const Icon(Icons.description_outlined),
                   filled: true,
-                  fillColor: VillageTheme.backgroundWarm,
+                  fillColor: VillageTheme.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -138,7 +138,7 @@ class SchoolPage extends ConsumerWidget {
                 decoration: InputDecoration(
                   labelText: 'Color',
                   filled: true,
-                  fillColor: VillageTheme.backgroundWarm,
+                  fillColor: VillageTheme.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -180,7 +180,7 @@ class SchoolPage extends ConsumerWidget {
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
-                  backgroundColor: VillageTheme.schoolBlue,
+                  backgroundColor: VillageTheme.info,
                 ),
                 child: const Text('Create Subject',
                     style: TextStyle(fontSize: 16)),
@@ -237,11 +237,11 @@ class SchoolPage extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                        color: VillageTheme.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.assignment_rounded,
-                          color: VillageTheme.schoolBlue, size: 22),
+                          color: VillageTheme.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Assignment',
@@ -256,7 +256,7 @@ class SchoolPage extends ConsumerWidget {
                     labelText: 'Title',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -270,7 +270,7 @@ class SchoolPage extends ConsumerWidget {
                   decoration: InputDecoration(
                     labelText: 'Subject',
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -300,7 +300,7 @@ class SchoolPage extends ConsumerWidget {
                     decoration: InputDecoration(
                       labelText: 'Assign to',
                       filled: true,
-                      fillColor: VillageTheme.backgroundWarm,
+                      fillColor: VillageTheme.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -338,7 +338,7 @@ class SchoolPage extends ConsumerWidget {
                     labelText: 'Description (optional)',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -356,7 +356,7 @@ class SchoolPage extends ConsumerWidget {
                           labelText: 'Points',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
+                          fillColor: VillageTheme.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -385,7 +385,7 @@ class SchoolPage extends ConsumerWidget {
                           decoration: InputDecoration(
                             labelText: 'Due date',
                             filled: true,
-                            fillColor: VillageTheme.backgroundWarm,
+                            fillColor: VillageTheme.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -432,7 +432,7 @@ class SchoolPage extends ConsumerWidget {
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.schoolBlue,
+                    backgroundColor: VillageTheme.info,
                   ),
                   child: const Text('Create Assignment',
                       style: TextStyle(fontSize: 16)),
@@ -446,14 +446,14 @@ class SchoolPage extends ConsumerWidget {
   }
 
   Color _parseColor(String? color) {
-    if (color == null || color.isEmpty) return VillageTheme.schoolBlue;
+    if (color == null || color.isEmpty) return VillageTheme.info;
     try {
       if (color.startsWith('#')) {
         final hex = color.replaceAll('#', '');
         return Color(int.parse('FF$hex', radix: 16));
       }
     } catch (_) {}
-    return VillageTheme.schoolBlue;
+    return VillageTheme.info;
   }
 }
 
@@ -480,11 +480,11 @@ class _SubjectsTab extends ConsumerWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: VillageTheme.schoolBlue.withValues(alpha: 0.1),
+                    color: VillageTheme.info.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: const Icon(Icons.book_rounded,
-                      size: 40, color: VillageTheme.schoolBlue),
+                      size: 40, color: VillageTheme.info),
                 ),
                 const SizedBox(height: 16),
                 const Text('No subjects yet.',
@@ -512,7 +512,7 @@ class _SubjectsTab extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
-                color: VillageTheme.surfaceWarm,
+                color: VillageTheme.surfaceCard,
                 child: ListTile(
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -547,12 +547,12 @@ class _SubjectsTab extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 11,
                             color: subject.isActive
-                                ? VillageTheme.choresGreen
+                                ? VillageTheme.positive
                                 : Colors.grey,
                           ),
                         ),
                         backgroundColor: subject.isActive
-                            ? VillageTheme.choresGreen.withValues(alpha: 0.1)
+                            ? VillageTheme.positive.withValues(alpha: 0.1)
                             : Colors.grey.withValues(alpha: 0.1),
                         padding: EdgeInsets.zero,
                         labelPadding:
@@ -591,7 +591,7 @@ class _SubjectsTab extends ConsumerWidget {
   }
 
   Color _subjectColor(String? color) {
-    if (color == null || color.isEmpty) return VillageTheme.schoolBlue;
+    if (color == null || color.isEmpty) return VillageTheme.info;
     switch (color.toLowerCase()) {
       case 'red':
         return Colors.red;
@@ -610,9 +610,9 @@ class _SubjectsTab extends ConsumerWidget {
       case 'cyan':
         return Colors.cyan;
       case 'teal':
-        return VillageTheme.choresGreen;
+        return VillageTheme.positive;
       case 'green':
-        return VillageTheme.choresGreen;
+        return VillageTheme.positive;
       case 'light_green':
         return Colors.lightGreen;
       case 'lime':
@@ -620,7 +620,7 @@ class _SubjectsTab extends ConsumerWidget {
       case 'yellow':
         return Colors.yellow;
       case 'amber':
-        return VillageTheme.rewardsAmber;
+        return VillageTheme.warning;
       case 'orange':
         return Colors.orange;
       case 'deep_orange':
@@ -639,7 +639,7 @@ class _SubjectsTab extends ConsumerWidget {
             return Color(int.parse('FF$hex', radix: 16));
           }
         } catch (_) {}
-        return VillageTheme.schoolBlue;
+        return VillageTheme.info;
     }
   }
 }
@@ -672,11 +672,11 @@ class _AssignmentsTab extends ConsumerWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: VillageTheme.schoolBlue.withValues(alpha: 0.1),
+                    color: VillageTheme.info.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: const Icon(Icons.assignment_rounded,
-                      size: 40, color: VillageTheme.schoolBlue),
+                      size: 40, color: VillageTheme.info),
                 ),
                 const SizedBox(height: 16),
                 const Text('No assignments yet.',
@@ -704,7 +704,7 @@ class _AssignmentsTab extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
-                color: VillageTheme.surfaceWarm,
+                color: VillageTheme.surfaceCard,
                 child: InkWell(
                   onTap: () => _showDetailSheet(context, a),
                   borderRadius: BorderRadius.circular(16),
@@ -769,7 +769,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                         horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: a.gradePointsEarned != null
-                                          ? VillageTheme.choresGreen
+                                          ? VillageTheme.positive
                                               .withValues(alpha: 0.1)
                                           : Colors.grey.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
@@ -782,7 +782,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                         fontSize: 11,
                                         fontWeight: FontWeight.w500,
                                         color: a.gradePointsEarned != null
-                                            ? VillageTheme.choresGreen
+                                            ? VillageTheme.positive
                                             : Colors.grey[600],
                                       ),
                                     ),
@@ -798,7 +798,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                           style: TextStyle(fontSize: 12)),
                                       style: TextButton.styleFrom(
                                         foregroundColor:
-                                            VillageTheme.schoolBlue,
+                                            VillageTheme.info,
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8),
                                         visualDensity: VisualDensity.compact,
@@ -876,11 +876,11 @@ class _AssignmentsTab extends ConsumerWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                    color: VillageTheme.info.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.send_rounded,
-                      color: VillageTheme.schoolBlue, size: 22),
+                      color: VillageTheme.info, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('Submit Assignment',
@@ -894,7 +894,7 @@ class _AssignmentsTab extends ConsumerWidget {
               decoration: InputDecoration(
                 labelText: 'Submission note (optional)',
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -915,7 +915,7 @@ class _AssignmentsTab extends ConsumerWidget {
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.schoolBlue,
+                backgroundColor: VillageTheme.info,
               ),
               child: const Text('Submit', style: TextStyle(fontSize: 16)),
             ),
@@ -949,11 +949,11 @@ class _AssignmentsTab extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                        color: VillageTheme.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.assignment_rounded,
-                          color: VillageTheme.schoolBlue, size: 22),
+                          color: VillageTheme.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -986,7 +986,7 @@ class _AssignmentsTab extends ConsumerWidget {
                     icon: const Icon(Icons.grading),
                     label: const Text('Grade'),
                     style: FilledButton.styleFrom(
-                      backgroundColor: VillageTheme.schoolBlue,
+                      backgroundColor: VillageTheme.info,
                       minimumSize: const Size(double.infinity, 48),
                     ),
                   ),
@@ -1050,11 +1050,11 @@ class _AssignmentsTab extends ConsumerWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.choresGreen.withValues(alpha: 0.12),
+                    color: VillageTheme.positive.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.grading,
-                      color: VillageTheme.choresGreen, size: 22),
+                      color: VillageTheme.positive, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('Grade Assignment',
@@ -1070,7 +1070,7 @@ class _AssignmentsTab extends ConsumerWidget {
               controller: pointsCtrl,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: VillageTheme.backgroundWarm,
+                fillColor: VillageTheme.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1099,7 +1099,7 @@ class _AssignmentsTab extends ConsumerWidget {
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.choresGreen,
+                backgroundColor: VillageTheme.positive,
               ),
               child: const Text('Submit Grade',
                   style: TextStyle(fontSize: 16)),
@@ -1113,11 +1113,11 @@ class _AssignmentsTab extends ConsumerWidget {
   Color _statusColor(String status) {
     switch (status) {
       case 'Pending':
-        return VillageTheme.rewardsAmber;
+        return VillageTheme.warning;
       case 'Submitted':
-        return VillageTheme.schoolBlue;
+        return VillageTheme.info;
       case 'Graded':
-        return VillageTheme.choresGreen;
+        return VillageTheme.positive;
       case 'Excused':
         return Colors.grey;
       default:

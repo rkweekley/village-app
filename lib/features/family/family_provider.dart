@@ -73,20 +73,6 @@ class FamilyNotifier extends Notifier<FamilyState> {
   void clearError() {
     state = state.copyWith(error: null);
   }
-
-  /// Join a family by invite code.
-  Future<void> joinFamily(String inviteCode) async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      await _familyService.joinFamily(inviteCode);
-      await loadFamily();
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to join family: $e',
-      );
-    }
-  }
 }
 
 final familyProvider = NotifierProvider<FamilyNotifier, FamilyState>(

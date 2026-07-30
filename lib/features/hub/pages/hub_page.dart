@@ -91,8 +91,8 @@ class _HubPageState extends ConsumerState<HubPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    VillageTheme.primaryTeal,
-                    VillageTheme.primaryTeal.withValues(alpha: 0.85),
+                    VillageTheme.primary,
+                    VillageTheme.primary.withValues(alpha: 0.85),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -130,7 +130,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               elevation: 0,
-              color: VillageTheme.surfaceWarm,
+              color: VillageTheme.surfaceCard,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
@@ -139,13 +139,13 @@ class _HubPageState extends ConsumerState<HubPage> {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: VillageTheme.rewardsAmber.withValues(alpha: 0.15),
+                        color: VillageTheme.warning.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
                         Icons.stars_rounded,
                         size: 32,
-                        color: VillageTheme.rewardsAmber,
+                        color: VillageTheme.warning,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -164,7 +164,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                             familyState.isLoading ? '...' : myPoints.toString(),
                             style: theme.textTheme.displaySmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: VillageTheme.primaryTeal,
+                              color: VillageTheme.primary,
                             ),
                           ),
                         ],
@@ -199,7 +199,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               Row(
                 children: [
                   Icon(Icons.leaderboard_rounded,
-                      size: 22, color: VillageTheme.rewardsAmber),
+                      size: 22, color: VillageTheme.warning),
                   const SizedBox(width: 8),
                   Text(
                     'Family Leaderboard',
@@ -277,7 +277,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.checklist_rounded,
                 label: 'Chores',
-                color: VillageTheme.choresGreen,
+                color: VillageTheme.positive,
                 onTap: () => context.push('/chores'),
                 tall: false,
               ),
@@ -288,7 +288,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.stars_rounded,
                 label: 'Rewards',
-                color: VillageTheme.rewardsAmber,
+                color: VillageTheme.warning,
                 onTap: () => context.push('/rewards'),
                 tall: false,
               ),
@@ -304,7 +304,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.calendar_month_rounded,
                 label: 'Calendar',
-                color: VillageTheme.calendarCyan,
+                color: VillageTheme.primaryLight,
                 onTap: () => context.go('/calendar'),
                 tall: false,
               ),
@@ -315,7 +315,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.shopping_cart_rounded,
                 label: 'Shopping',
-                color: VillageTheme.shoppingPurple,
+                color: VillageTheme.primary,
                 onTap: () => context.go('/shopping'),
                 tall: false,
               ),
@@ -326,7 +326,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.school_rounded,
                 label: 'School',
-                color: VillageTheme.schoolBlue,
+                color: VillageTheme.info,
                 onTap: () => context.push('/school'),
                 tall: false,
               ),
@@ -338,7 +338,7 @@ class _HubPageState extends ConsumerState<HubPage> {
         _BentoActionCard(
           icon: Icons.restaurant_rounded,
           label: 'Meals',
-          color: VillageTheme.mealsCoral,
+          color: VillageTheme.danger,
           onTap: () => context.push('/meals'),
           tall: false,
           fullWidth: true,
@@ -360,7 +360,7 @@ class _HubPageState extends ConsumerState<HubPage> {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,
-      color: VillageTheme.surfaceWarm,
+      color: VillageTheme.surfaceCard,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
@@ -370,7 +370,7 @@ class _HubPageState extends ConsumerState<HubPage> {
             return Container(
               decoration: BoxDecoration(
                 color: isMe
-                    ? VillageTheme.primaryTeal.withValues(alpha: 0.08)
+                    ? VillageTheme.primary.withValues(alpha: 0.08)
                     : null,
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -397,14 +397,14 @@ class _HubPageState extends ConsumerState<HubPage> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: VillageTheme.rewardsAmber.withValues(alpha: 0.12),
+                    color: VillageTheme.warning.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${member.pointsBalance} pts',
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: VillageTheme.rewardsAmber,
+                      color: VillageTheme.warning,
                     ),
                   ),
                 ),
@@ -439,7 +439,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               label: const Text('New Chore'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.choresGreen,
+                backgroundColor: VillageTheme.positive,
               ),
             ),
             const SizedBox(height: 12),
@@ -452,7 +452,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               label: const Text('New Assignment'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.schoolBlue,
+                backgroundColor: VillageTheme.info,
               ),
             ),
           ],
@@ -492,11 +492,11 @@ class _HubPageState extends ConsumerState<HubPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.choresGreen.withValues(alpha: 0.12),
+                        color: VillageTheme.positive.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.cleaning_services_rounded,
-                          color: VillageTheme.choresGreen, size: 22),
+                          color: VillageTheme.positive, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Chore',
@@ -511,7 +511,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Chore name',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -526,7 +526,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Description',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -541,7 +541,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Point value',
                     prefixIcon: const Icon(Icons.stars_rounded),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -556,7 +556,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -574,7 +574,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -590,14 +590,14 @@ class _HubPageState extends ConsumerState<HubPage> {
                   title: const Text('Requires approval'),
                   value: requiresApproval,
                   onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.choresGreen,
+                  activeColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 SwitchListTile(
                   title: const Text('Requires photo'),
                   value: requiresPhoto,
                   onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.choresGreen,
+                  activeColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 16),
@@ -618,7 +618,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.choresGreen,
+                    backgroundColor: VillageTheme.positive,
                   ),
                   child: const Text('Create Chore',
                       style: TextStyle(fontSize: 16)),
@@ -669,11 +669,11 @@ class _HubPageState extends ConsumerState<HubPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.schoolBlue.withValues(alpha: 0.12),
+                        color: VillageTheme.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.assignment_rounded,
-                          color: VillageTheme.schoolBlue, size: 22),
+                          color: VillageTheme.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Assignment',
@@ -688,7 +688,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Title',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -703,7 +703,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     decoration: InputDecoration(
                       labelText: 'Assign to',
                       filled: true,
-                      fillColor: VillageTheme.backgroundWarm,
+                      fillColor: VillageTheme.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -741,7 +741,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Description (optional)',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.backgroundWarm,
+                    fillColor: VillageTheme.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -759,7 +759,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                           labelText: 'Points',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.backgroundWarm,
+                          fillColor: VillageTheme.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -788,7 +788,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                           decoration: InputDecoration(
                             labelText: 'Due date',
                             filled: true,
-                            fillColor: VillageTheme.backgroundWarm,
+                            fillColor: VillageTheme.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -835,7 +835,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.schoolBlue,
+                    backgroundColor: VillageTheme.info,
                   ),
                   child: const Text('Create Assignment',
                       style: TextStyle(fontSize: 16)),
@@ -849,7 +849,7 @@ class _HubPageState extends ConsumerState<HubPage> {
   }
 }
 
-class _BentoActionCard extends StatelessWidget {
+class _BentoActionCard extends StatefulWidget {
   final IconData icon;
   final String label;
   final Color color;
@@ -867,52 +867,79 @@ class _BentoActionCard extends StatelessWidget {
   });
 
   @override
+  State<_BentoActionCard> createState() => _BentoActionCardState();
+}
+
+class _BentoActionCardState extends State<_BentoActionCard> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final color = widget.color;
+    final hoverAlpha = _hovered ? 0.18 : 0.12;
+    final hoverBorderAlpha = _hovered ? 0.35 : 0.2;
+    final hoverElevation = _hovered ? 0.0 : 0.0;
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 0,
-      color: VillageTheme.surfaceWarm,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          height: tall ? 140 : 88,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: color.withValues(alpha: 0.2),
-              width: 1.5,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: tall ? 48 : 40,
-                height: tall ? 48 : 40,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, size: tall ? 24 : 20, color: color),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0,
+        color: VillageTheme.surfaceCard,
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            height: widget.tall ? 140 : 88,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: color.withValues(alpha: hoverBorderAlpha),
+                width: 1.5,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+            ),
+            child: Row(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                  width: widget.tall ? 48 : 40,
+                  height: widget.tall ? 48 : 40,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: hoverAlpha),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    widget.icon,
+                    size: widget.tall ? 24 : 20,
+                    color: color,
                   ),
                 ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 20,
-                color: Colors.grey[400],
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.label,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: _hovered ? 1.0 : 0.4,
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    size: 20,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

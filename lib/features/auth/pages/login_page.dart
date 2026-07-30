@@ -38,7 +38,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           );
       if (mounted) context.go('/hub');
     } catch (_) {
-      // error is handled in auth state
+      // error handled in auth state
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -47,91 +47,78 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [VillageTheme.primaryTeal, Color(0xFF095F4E)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: VillageTheme.surfaceBase,
+      body: SafeArea(
+        child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 60),
-                // ── Logo / Brand ──
+                const SizedBox(height: 48),
+
+                // ── Brand (subtle, no gradient) ──
                 Container(
-                  width: 88,
-                  height: 88,
+                  width: 72,
+                  height: 72,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(24),
+                    color: VillageTheme.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(
                     Icons.home_rounded,
-                    color: Colors.white,
-                    size: 48,
+                    color: VillageTheme.primary,
+                    size: 36,
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Village',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 16),
                 Text(
-                  'Your family OS',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withValues(alpha: 0.8),
+                  'Village',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    color: VillageTheme.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 4),
+                Text(
+                  'Your family os',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: VillageTheme.textTertiary,
+                  ),
+                ),
+                const SizedBox(height: 40),
 
-                // ── Card container ──
+                // ── Card ──
                 Container(
                   width: double.infinity,
+                  constraints: const BoxConstraints(maxWidth: 420),
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    color: VillageTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(VillageTheme.radiusXl),
+                    border: Border.all(
+                      color: VillageTheme.borderSubtle,
+                      width: 0.5,
+                    ),
                   ),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
+                        Text(
                           'Welcome back',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: VillageTheme.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Sign in to your family account',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: VillageTheme.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -141,23 +128,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: VillageTheme.mealsCoral.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: VillageTheme.mealsCoral.withValues(alpha: 0.3),
-                              ),
+                              color: VillageTheme.danger.withValues(alpha: 0.08),
+                              borderRadius:
+                                  BorderRadius.circular(VillageTheme.radiusSm),
                             ),
                             child: Row(
                               children: [
                                 Icon(Icons.error_outline,
-                                    size: 20, color: VillageTheme.mealsCoral),
+                                    size: 18, color: VillageTheme.danger),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     state.error!,
-                                    style: TextStyle(
-                                        color: VillageTheme.mealsCoral,
-                                        fontSize: 13),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: VillageTheme.danger,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -176,9 +161,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
                           validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
+                            if (v == null || v.trim().isEmpty)
                               return 'Enter your email';
-                            }
                             if (!v.contains('@')) return 'Enter a valid email';
                             return null;
                           },
@@ -194,17 +178,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock_outlined),
                             suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
+                              icon: Icon(_obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility),
                               onPressed: () =>
                                   setState(() => _obscurePassword = !_obscurePassword),
                             ),
                           ),
                           validator: (v) {
-                            if (v == null || v.isEmpty) return 'Enter your password';
+                            if (v == null || v.isEmpty)
+                              return 'Enter your password';
                             return null;
                           },
                           onFieldSubmitted: (_) => _handleLogin(),
@@ -213,18 +196,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                         // Login button
                         SizedBox(
-                          height: 52,
+                          height: 48,
                           child: FilledButton(
                             onPressed: _loading ? null : _handleLogin,
                             child: _loading
                                 ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
+                                    width: 22,
+                                    height: 22,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: Colors.white),
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
-                                : const Text('Sign In',
-                                    style: TextStyle(fontSize: 16)),
+                                : const Text('Sign in'),
                           ),
                         ),
                       ],
@@ -240,19 +224,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   children: [
                     Text(
                       "Don't have an account? ",
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: VillageTheme.textTertiary,
                       ),
                     ),
                     TextButton(
                       onPressed: () => context.go('/register'),
-                      child: const Text(
-                        'Create one',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: VillageTheme.primary,
                       ),
+                      child: const Text('Create one'),
                     ),
                   ],
                 ),

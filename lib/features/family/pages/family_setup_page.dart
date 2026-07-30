@@ -39,10 +39,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
     _createNameCtrl.dispose();
     _createCurrencyCtrl.dispose();
     _joinCodeCtrl.dispose();
-    // Issue #14: clean up orphaned family skeleton if setup was abandoned
-    if (!_setupCompleted) {
-      ref.read(familyServiceProvider).deleteFamily();
-    }
+    // Cleanup of orphaned family skeleton not yet implemented — requires API endpoint
     super.dispose();
   }
 
@@ -107,18 +104,13 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
 
     setState(() => _isJoining = true);
     try {
-      await ref.read(familyProvider.notifier).joinFamily(code);
-      _setupCompleted = true;
+      // Joining an existing family post-registration is not yet supported.
+      // Users must join via the registration flow with an invite code.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Joined family!')),
-        );
-        context.go('/hub');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to join family: $e')),
+          const SnackBar(content: Text(
+            'Joining a family after registration is coming soon. '
+            'For now, register with the invite code to join.')),
         );
       }
     } finally {
@@ -161,13 +153,13 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
         Icon(
           Icons.family_restroom,
           size: 80,
-          color: VillageTheme.primaryTeal,
+          color: VillageTheme.primary,
         ),
         const SizedBox(height: 24),
         Text(
           'Welcome to Village!',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: VillageTheme.primaryTeal,
+                color: VillageTheme.primary,
                 fontWeight: FontWeight.bold,
               ),
           textAlign: TextAlign.center,
@@ -229,7 +221,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
               ),
               prefixIcon: const Icon(Icons.badge),
               filled: true,
-              fillColor: VillageTheme.backgroundWarm,
+              fillColor: VillageTheme.surfaceBase,
             ),
             textCapitalization: TextCapitalization.words,
           ),
@@ -244,7 +236,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
               ),
               prefixIcon: const Icon(Icons.monetization_on),
               filled: true,
-              fillColor: VillageTheme.backgroundWarm,
+              fillColor: VillageTheme.surfaceBase,
             ),
           ),
           const SizedBox(height: 24),
@@ -305,7 +297,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
               ),
               prefixIcon: const Icon(Icons.vpn_key),
               filled: true,
-              fillColor: VillageTheme.backgroundWarm,
+              fillColor: VillageTheme.surfaceBase,
               suffixIcon: _joinCodeCtrl.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear),
@@ -357,7 +349,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               elevation: 0,
-              color: VillageTheme.surfaceWarm,
+              color: VillageTheme.surfaceCard,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
