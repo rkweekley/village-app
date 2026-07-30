@@ -513,7 +513,7 @@ class _ShoppingListDetailPageState
                           'Other'
                         ]
                             .map((c) => DropdownMenuItem(
-                                value: c, child: Text(c)))
+                                initialValue: c, child: Text(c)))
                             .toList(),
                         onChanged: (v) => setState(() => category = v),
                       ),
@@ -573,7 +573,7 @@ class _ItemTile extends StatelessWidget {
       child: ListTile(
         leading: Checkbox(
           value: item.isChecked,
-          activeColor: VillageTheme.positive,
+          activeThumbColor: VillageTheme.positive,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6),
           ),

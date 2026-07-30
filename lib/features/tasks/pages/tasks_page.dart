@@ -348,7 +348,7 @@ class _ChoreCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<MemberInfo>(
-                  value: selectedMember,
+                  initialValue: selectedMember,
                   decoration: InputDecoration(
                     labelText: 'Assign to',
                     filled: true,
@@ -485,7 +485,7 @@ class _ChoreCard extends ConsumerWidget {
                     labelText: 'Assign to',
                   ),
                   items: members.map((m) => DropdownMenuItem(
-                    value: m,
+                    initialValue: m,
                     child: Row(
                       children: [
                         Icon(
@@ -1069,7 +1069,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: _recurrence,
+              initialValue: _recurrence,
               decoration: InputDecoration(
                 labelText: 'Recurrence',
                 prefixIcon: const Icon(Icons.repeat_outlined),
@@ -1087,7 +1087,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: _difficulty,
+              initialValue: _difficulty,
               decoration: InputDecoration(
                 labelText: 'Difficulty',
                 prefixIcon: const Icon(Icons.speed_rounded),
@@ -1108,14 +1108,14 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
               title: const Text('Requires approval'),
               value: _requiresApproval,
               onChanged: (v) => setState(() => _requiresApproval = v),
-              activeColor: VillageTheme.positive,
+              activeThumbColor: VillageTheme.positive,
               contentPadding: EdgeInsets.zero,
             ),
             SwitchListTile(
               title: const Text('Requires photo'),
               value: _requiresPhoto,
               onChanged: (v) => setState(() => _requiresPhoto = v),
-              activeColor: VillageTheme.positive,
+              activeThumbColor: VillageTheme.positive,
               contentPadding: EdgeInsets.zero,
             ),
             const SizedBox(height: 16),
@@ -1233,7 +1233,7 @@ class _CreateAssignmentSheetState
             const SizedBox(height: 12),
             if (widget.members.isNotEmpty)
               DropdownButtonFormField<MemberInfo>(
-                value: _selectedMember,
+                initialValue: _selectedMember,
                 decoration: InputDecoration(
                   labelText: 'Assign to',
                   filled: true,

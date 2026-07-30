@@ -152,7 +152,7 @@ class RewardsPage extends ConsumerWidget {
                   ),
                   items: ['Screen Time', 'Treat', 'Outing', 'Toy', 'Custom']
                       .map((c) =>
-                          DropdownMenuItem(value: c, child: Text(c)))
+                          DropdownMenuItem(initialValue: c, child: Text(c)))
                       .toList(),
                   onChanged: (v) => setState(() => category = v!),
                 ),

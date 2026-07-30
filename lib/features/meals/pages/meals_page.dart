@@ -509,7 +509,7 @@ class _MealSlot extends StatelessWidget {
                       }
                       return ListView.separated(
                         itemCount: favs.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (_, _) =>
                             const Divider(height: 1, indent: 16),
                         itemBuilder: (_, i) {
                           final r = favs[i];
@@ -523,7 +523,7 @@ class _MealSlot extends StatelessWidget {
                             value: r.id,
                             groupValue: selectedRecipeId,
                             dense: true,
-                            activeColor: VillageTheme.danger,
+                            activeThumbColor: VillageTheme.danger,
                             onChanged: (v) =>
                                 setDialogState(() => selectedRecipeId = v),
                           );
@@ -1000,7 +1000,7 @@ class _RecipeCard extends StatelessWidget {
                           ),
                           items: plans
                               .map((p) => DropdownMenuItem(
-                                    value: p.id,
+                                    initialValue: p.id,
                                     child: Text(
                                         'Week of ${_formatIsoDate(p.weekStart)}'),
                                   ))
@@ -1026,7 +1026,7 @@ class _RecipeCard extends StatelessWidget {
                                 items: List.generate(
                                     7,
                                     (i) => DropdownMenuItem(
-                                          value: i,
+                                          initialValue: i,
                                           child: Text(_dayNames[i]),
                                         )),
                                 onChanged: (v) => setDialogState(
@@ -1048,7 +1048,7 @@ class _RecipeCard extends StatelessWidget {
                                 ),
                                 items: _mealTypes
                                     .map((m) => DropdownMenuItem(
-                                        value: m, child: Text(m)))
+                                        initialValue: m, child: Text(m)))
                                     .toList(),
                                 onChanged: (v) => setDialogState(
                                     () => selectedMealType = v!),
@@ -1269,7 +1269,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   ),
                 ),
                 items: ['Easy', 'Medium', 'Hard']
-                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                    .map((d) => DropdownMenuItem(initialValue: d, child: Text(d)))
                     .toList(),
                 onChanged: (v) => setDialogState(() => difficulty = v!),
               ),

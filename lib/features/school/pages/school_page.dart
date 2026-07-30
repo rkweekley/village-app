@@ -145,7 +145,7 @@ class SchoolPage extends ConsumerWidget {
                   ),
                 ),
                 items: const [
-                  DropdownMenuItem(value: null, child: Text('None')),
+                  DropdownMenuItem(initialValue: null, child: Text('None')),
                   DropdownMenuItem(value: '#4CAF50', child: Text('Green')),
                   DropdownMenuItem(value: '#2196F3', child: Text('Blue')),
                   DropdownMenuItem(value: '#FF9800', child: Text('Orange')),
@@ -278,7 +278,7 @@ class SchoolPage extends ConsumerWidget {
                   ),
                   items: subjectsAvailable
                       .map((s) => DropdownMenuItem(
-                            value: s.id,
+                            initialValue: s.id,
                             child: Row(
                               children: [
                                 CircleAvatar(
@@ -308,7 +308,7 @@ class SchoolPage extends ConsumerWidget {
                     ),
                     items: members
                         .map((m) => DropdownMenuItem(
-                              value: m,
+                              initialValue: m,
                               child: Row(
                                 children: [
                                   Icon(

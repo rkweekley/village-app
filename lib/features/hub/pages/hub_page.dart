@@ -598,7 +598,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: recurrence,
+                  initialValue: recurrence,
                   decoration: InputDecoration(
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
@@ -616,7 +616,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: difficulty,
+                  initialValue: difficulty,
                   decoration: InputDecoration(
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
@@ -637,14 +637,14 @@ class _HubPageState extends ConsumerState<HubPage> {
                   title: const Text('Requires approval'),
                   value: requiresApproval,
                   onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.positive,
+                  activeThumbColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 SwitchListTile(
                   title: const Text('Requires photo'),
                   value: requiresPhoto,
                   onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.positive,
+                  activeThumbColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 16),
@@ -746,7 +746,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 const SizedBox(height: 12),
                 if (members.isNotEmpty)
                   DropdownButtonFormField<MemberInfo>(
-                    value: selectedMember,
+                    initialValue: selectedMember,
                     decoration: InputDecoration(
                       labelText: 'Assign to',
                       filled: true,
@@ -901,16 +901,12 @@ class _BentoActionCard extends StatefulWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
-  final bool tall;
-  final bool fullWidth;
 
   const _BentoActionCard({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
-    this.tall = false,
-    this.fullWidth = false,
   });
 
   @override
@@ -926,7 +922,6 @@ class _BentoActionCardState extends State<_BentoActionCard> {
     final color = widget.color;
     final hoverAlpha = _hovered ? 0.18 : 0.12;
     final hoverBorderAlpha = _hovered ? 0.35 : 0.2;
-    final hoverElevation = _hovered ? 0.0 : 0.0;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -941,7 +936,7 @@ class _BentoActionCardState extends State<_BentoActionCard> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOut,
-            height: widget.tall ? 140 : 88,
+            height: 88,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -955,17 +950,13 @@ class _BentoActionCardState extends State<_BentoActionCard> {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOut,
-                  width: widget.tall ? 48 : 40,
-                  height: widget.tall ? 48 : 40,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: hoverAlpha),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    widget.icon,
-                    size: widget.tall ? 24 : 20,
-                    color: color,
-                  ),
+                  child: Icon(widget.icon, size: 20, color: color),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -979,11 +970,7 @@ class _BentoActionCardState extends State<_BentoActionCard> {
                 AnimatedOpacity(
                   duration: const Duration(milliseconds: 200),
                   opacity: _hovered ? 1.0 : 0.4,
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    size: 20,
-                    color: color,
-                  ),
+                  child: Icon(Icons.chevron_right_rounded, size: 20, color: color),
                 ),
               ],
             ),

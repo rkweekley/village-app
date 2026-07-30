@@ -191,7 +191,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: recurrence,
+                  initialValue: recurrence,
                   decoration: InputDecoration(
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
@@ -209,7 +209,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: difficulty,
+                  initialValue: difficulty,
                   decoration: InputDecoration(
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
@@ -230,14 +230,14 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
                   title: const Text('Requires approval'),
                   value: requiresApproval,
                   onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.positive,
+                  activeThumbColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 SwitchListTile(
                   title: const Text('Requires photo'),
                   value: requiresPhoto,
                   onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.positive,
+                  activeThumbColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 16),
@@ -476,7 +476,7 @@ class _CreateAssignmentSheetState extends State<_CreateAssignmentSheet> {
 
               // Member picker
               DropdownButtonFormField<MemberInfo>(
-                value: _selectedMember,
+                initialValue: _selectedMember,
                 decoration: InputDecoration(
                   labelText: 'Assign to',
                   prefixIcon: const Icon(Icons.person_outline),
@@ -711,7 +711,7 @@ class _ChoresTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<MemberInfo>(
-                  value: selectedMember,
+                  initialValue: selectedMember,
                   decoration: InputDecoration(
                     labelText: 'Assign to',
                     prefixIcon: const Icon(Icons.person_outline),
@@ -907,7 +907,7 @@ class _ChoresTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: recurrence,
+                  initialValue: recurrence,
                   decoration: InputDecoration(
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
@@ -925,7 +925,7 @@ class _ChoresTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: difficulty,
+                  initialValue: difficulty,
                   decoration: InputDecoration(
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
@@ -946,14 +946,14 @@ class _ChoresTab extends StatelessWidget {
                   title: const Text('Requires approval'),
                   value: requiresApproval,
                   onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.positive,
+                  activeThumbColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 SwitchListTile(
                   title: const Text('Requires photo'),
                   value: requiresPhoto,
                   onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.positive,
+                  activeThumbColor: VillageTheme.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 16),
