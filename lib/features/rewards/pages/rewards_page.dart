@@ -139,7 +139,7 @@ class RewardsPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: category,
+                  value: category,
                   decoration: InputDecoration(
                     labelText: 'Category',
                     prefixIcon: const Icon(Icons.category_outlined),
@@ -152,7 +152,7 @@ class RewardsPage extends ConsumerWidget {
                   ),
                   items: ['Screen Time', 'Treat', 'Outing', 'Toy', 'Custom']
                       .map((c) =>
-                          DropdownMenuItem(initialValue: c, child: Text(c)))
+                          DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
                   onChanged: (v) => setState(() => category = v!),
                 ),

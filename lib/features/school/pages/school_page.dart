@@ -134,7 +134,7 @@ class SchoolPage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: selectedColor,
+                value: selectedColor,
                 decoration: InputDecoration(
                   labelText: 'Color',
                   filled: true,
@@ -145,7 +145,7 @@ class SchoolPage extends ConsumerWidget {
                   ),
                 ),
                 items: const [
-                  DropdownMenuItem(initialValue: null, child: Text('None')),
+                  DropdownMenuItem(value: null, child: Text('None')),
                   DropdownMenuItem(value: '#4CAF50', child: Text('Green')),
                   DropdownMenuItem(value: '#2196F3', child: Text('Blue')),
                   DropdownMenuItem(value: '#FF9800', child: Text('Orange')),
@@ -266,7 +266,7 @@ class SchoolPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: selectedSubjectId,
+                  value: selectedSubjectId,
                   decoration: InputDecoration(
                     labelText: 'Subject',
                     filled: true,
@@ -278,7 +278,7 @@ class SchoolPage extends ConsumerWidget {
                   ),
                   items: subjectsAvailable
                       .map((s) => DropdownMenuItem(
-                            initialValue: s.id,
+                            value: s.id,
                             child: Row(
                               children: [
                                 CircleAvatar(
@@ -296,7 +296,7 @@ class SchoolPage extends ConsumerWidget {
                 const SizedBox(height: 12),
                 if (members.isNotEmpty)
                   DropdownButtonFormField<MemberInfo>(
-                    initialValue: selectedMember,
+                    value: selectedMember,
                     decoration: InputDecoration(
                       labelText: 'Assign to',
                       filled: true,
@@ -308,7 +308,7 @@ class SchoolPage extends ConsumerWidget {
                     ),
                     items: members
                         .map((m) => DropdownMenuItem(
-                              initialValue: m,
+                              value: m,
                               child: Row(
                                 children: [
                                   Icon(

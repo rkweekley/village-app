@@ -191,7 +191,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: recurrence,
+                  value: recurrence,
                   decoration: InputDecoration(
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
@@ -209,7 +209,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: difficulty,
+                  value: difficulty,
                   decoration: InputDecoration(
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
@@ -476,7 +476,7 @@ class _CreateAssignmentSheetState extends State<_CreateAssignmentSheet> {
 
               // Member picker
               DropdownButtonFormField<MemberInfo>(
-                initialValue: _selectedMember,
+                value: _selectedMember,
                 decoration: InputDecoration(
                   labelText: 'Assign to',
                   prefixIcon: const Icon(Icons.person_outline),
@@ -711,7 +711,7 @@ class _ChoresTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<MemberInfo>(
-                  initialValue: selectedMember,
+                  value: selectedMember,
                   decoration: InputDecoration(
                     labelText: 'Assign to',
                     prefixIcon: const Icon(Icons.person_outline),
@@ -907,7 +907,7 @@ class _ChoresTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: recurrence,
+                  value: recurrence,
                   decoration: InputDecoration(
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
@@ -925,7 +925,7 @@ class _ChoresTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: difficulty,
+                  value: difficulty,
                   decoration: InputDecoration(
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),

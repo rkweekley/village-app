@@ -598,7 +598,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: recurrence,
+                  value: recurrence,
                   decoration: InputDecoration(
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
@@ -616,7 +616,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: difficulty,
+                  value: difficulty,
                   decoration: InputDecoration(
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
@@ -746,7 +746,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 const SizedBox(height: 12),
                 if (members.isNotEmpty)
                   DropdownButtonFormField<MemberInfo>(
-                    initialValue: selectedMember,
+                    value: selectedMember,
                     decoration: InputDecoration(
                       labelText: 'Assign to',
                       filled: true,

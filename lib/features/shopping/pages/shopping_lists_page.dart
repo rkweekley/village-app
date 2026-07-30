@@ -494,7 +494,7 @@ class _ShoppingListDetailPageState
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        initialValue: category,
+                        value: category,
                         decoration: InputDecoration(
                           labelText: 'Category',
                           filled: true,
@@ -513,7 +513,7 @@ class _ShoppingListDetailPageState
                           'Other'
                         ]
                             .map((c) => DropdownMenuItem(
-                                initialValue: c, child: Text(c)))
+                                value: c, child: Text(c)))
                             .toList(),
                         onChanged: (v) => setState(() => category = v),
                       ),

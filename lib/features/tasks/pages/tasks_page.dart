@@ -348,7 +348,7 @@ class _ChoreCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<MemberInfo>(
-                  initialValue: selectedMember,
+                  value: selectedMember,
                   decoration: InputDecoration(
                     labelText: 'Assign to',
                     filled: true,
@@ -480,12 +480,12 @@ class _ChoreCard extends ConsumerWidget {
                     style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<MemberInfo>(
-                  initialValue: selectedMember,
+                  value: selectedMember,
                   decoration: const InputDecoration(
                     labelText: 'Assign to',
                   ),
                   items: members.map((m) => DropdownMenuItem(
-                    initialValue: m,
+                    value: m,
                     child: Row(
                       children: [
                         Icon(
@@ -1069,7 +1069,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              initialValue: _recurrence,
+              value: _recurrence,
               decoration: InputDecoration(
                 labelText: 'Recurrence',
                 prefixIcon: const Icon(Icons.repeat_outlined),
@@ -1087,7 +1087,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              initialValue: _difficulty,
+              value: _difficulty,
               decoration: InputDecoration(
                 labelText: 'Difficulty',
                 prefixIcon: const Icon(Icons.speed_rounded),
@@ -1233,7 +1233,7 @@ class _CreateAssignmentSheetState
             const SizedBox(height: 12),
             if (widget.members.isNotEmpty)
               DropdownButtonFormField<MemberInfo>(
-                initialValue: _selectedMember,
+                value: _selectedMember,
                 decoration: InputDecoration(
                   labelText: 'Assign to',
                   filled: true,

@@ -988,7 +988,7 @@ class _RecipeCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         DropdownButtonFormField<String>(
-                          initialValue: selectedPlanId,
+                          value: selectedPlanId,
                           decoration: InputDecoration(
                             labelText: 'Meal Plan',
                             filled: true,
@@ -1000,7 +1000,7 @@ class _RecipeCard extends StatelessWidget {
                           ),
                           items: plans
                               .map((p) => DropdownMenuItem(
-                                    initialValue: p.id,
+                                    value: p.id,
                                     child: Text(
                                         'Week of ${_formatIsoDate(p.weekStart)}'),
                                   ))
@@ -1013,7 +1013,7 @@ class _RecipeCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: DropdownButtonFormField<int>(
-                                initialValue: selectedDay,
+                                value: selectedDay,
                                 decoration: InputDecoration(
                                   labelText: 'Day',
                                   filled: true,
@@ -1026,7 +1026,7 @@ class _RecipeCard extends StatelessWidget {
                                 items: List.generate(
                                     7,
                                     (i) => DropdownMenuItem(
-                                          initialValue: i,
+                                          value: i,
                                           child: Text(_dayNames[i]),
                                         )),
                                 onChanged: (v) => setDialogState(
@@ -1036,7 +1036,7 @@ class _RecipeCard extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                initialValue: selectedMealType,
+                                value: selectedMealType,
                                 decoration: InputDecoration(
                                   labelText: 'Meal',
                                   filled: true,
@@ -1048,7 +1048,7 @@ class _RecipeCard extends StatelessWidget {
                                 ),
                                 items: _mealTypes
                                     .map((m) => DropdownMenuItem(
-                                        initialValue: m, child: Text(m)))
+                                        value: m, child: Text(m)))
                                     .toList(),
                                 onChanged: (v) => setDialogState(
                                     () => selectedMealType = v!),
@@ -1258,7 +1258,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: difficulty,
+                value: difficulty,
                 decoration: InputDecoration(
                   labelText: 'Difficulty',
                   filled: true,
@@ -1269,7 +1269,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   ),
                 ),
                 items: ['Easy', 'Medium', 'Hard']
-                    .map((d) => DropdownMenuItem(initialValue: d, child: Text(d)))
+                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
                     .toList(),
                 onChanged: (v) => setDialogState(() => difficulty = v!),
               ),
