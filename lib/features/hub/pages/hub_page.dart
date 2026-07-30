@@ -263,10 +263,64 @@ class _HubPageState extends ConsumerState<HubPage> {
   }
 
   Widget _buildBentoGrid(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 480;
 
-    // Define bento items: each has icon, label, color, route
-    // Layout: 2 columns, first row has a 2-col-wide item + 1-col item,
-    // second row has 1-col + 1-col + 2-col-wide item
+        if (!isWide) {
+          // Mobile: simple 2-column equal grid
+          return _buildMobileGrid(context);
+        }
+        // Desktop/tablet: asymmetric bento layout
+        return _buildDesktopBento(context);
+      },
+    );
+  }
+
+  Widget _buildMobileGrid(BuildContext context) {
+    final items = [
+      (Icons.checklist_rounded, 'Chores', VillageTheme.positive, () => context.push('/chores')),
+      (Icons.stars_rounded, 'Rewards', VillageTheme.warning, () => context.push('/rewards')),
+      (Icons.calendar_month_rounded, 'Calendar', VillageTheme.primaryLight, () => context.go('/calendar')),
+      (Icons.shopping_cart_rounded, 'Shopping', VillageTheme.primary, () => context.go('/shopping')),
+      (Icons.school_rounded, 'School', VillageTheme.info, () => context.push('/school')),
+      (Icons.restaurant_rounded, 'Meals', VillageTheme.danger, () => context.push('/meals')),
+    ];
+
+    return Column(
+      children: [
+        for (var i = 0; i < items.length; i += 2)
+          Padding(
+            padding: EdgeInsets.only(bottom: i + 2 < items.length ? 10 : 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _BentoActionCard(
+                    icon: items[i].$1,
+                    label: items[i].$2,
+                    color: items[i].$3,
+                    onTap: items[i].$4,
+                  ),
+                ),
+                if (i + 1 < items.length) ...[
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _BentoActionCard(
+                      icon: items[i + 1].$1,
+                      label: items[i + 1].$2,
+                      color: items[i + 1].$3,
+                      onTap: items[i + 1].$4,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopBento(BuildContext context) {
     return Column(
       children: [
         // Row 1: Chores (2 cols) + Rewards (1 col)
@@ -279,7 +333,6 @@ class _HubPageState extends ConsumerState<HubPage> {
                 label: 'Chores',
                 color: VillageTheme.positive,
                 onTap: () => context.push('/chores'),
-                tall: false,
               ),
             ),
             const SizedBox(width: 12),
@@ -290,13 +343,12 @@ class _HubPageState extends ConsumerState<HubPage> {
                 label: 'Rewards',
                 color: VillageTheme.warning,
                 onTap: () => context.push('/rewards'),
-                tall: false,
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        // Row 2: Calendar (1 col) + Shopping (1 col) + School (2 cols)
+        // Row 2: Calendar (1) + Shopping (1) + School (2)
         Row(
           children: [
             Expanded(
@@ -306,7 +358,6 @@ class _HubPageState extends ConsumerState<HubPage> {
                 label: 'Calendar',
                 color: VillageTheme.primaryLight,
                 onTap: () => context.go('/calendar'),
-                tall: false,
               ),
             ),
             const SizedBox(width: 12),
@@ -317,7 +368,6 @@ class _HubPageState extends ConsumerState<HubPage> {
                 label: 'Shopping',
                 color: VillageTheme.primary,
                 onTap: () => context.go('/shopping'),
-                tall: false,
               ),
             ),
             const SizedBox(width: 12),
@@ -328,7 +378,6 @@ class _HubPageState extends ConsumerState<HubPage> {
                 label: 'School',
                 color: VillageTheme.info,
                 onTap: () => context.push('/school'),
-                tall: false,
               ),
             ),
           ],
@@ -340,8 +389,6 @@ class _HubPageState extends ConsumerState<HubPage> {
           label: 'Meals',
           color: VillageTheme.danger,
           onTap: () => context.push('/meals'),
-          tall: false,
-          fullWidth: true,
         ),
       ],
     );
