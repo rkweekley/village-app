@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/features/auth/pages/login_page.dart';
 import 'package:village_app/features/auth/pages/register_page.dart';
+import 'package:village_app/features/auth/pages/forgot_password_page.dart';
 import 'package:village_app/features/family/pages/family_page.dart';
 import 'package:village_app/features/family/pages/family_setup_page.dart';
 import 'package:village_app/features/hub/pages/hub_page.dart';
@@ -29,7 +30,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final isAuthenticated = authState.isAuthenticated;
       final location = state.matchedLocation;
-      final isAuthRoute = location == '/login' || location == '/register';
+      final isAuthRoute = location == '/login' || location == '/register' ||
+          location.startsWith('/forgot-password') || location.startsWith('/reset-password');
       final isUnknown = authState.isLoading;
 
       // Still checking token — stay put
@@ -62,6 +64,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/register',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
+      GoRoute(
+        path: '/reset-password/:token',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => ResetPasswordPage(
+          token: state.pathParameters['token'],
+        ),
       ),
       GoRoute(
         path: '/family-setup',

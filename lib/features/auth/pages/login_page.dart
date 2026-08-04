@@ -222,6 +222,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 const SizedBox(height: 24),
 
+                // Forgot password
+                Center(
+                  child: TextButton(
+                    onPressed: () => context.go('/forgot-password'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: VillageTheme.textSecondary,
+                    ),
+                    child: const Text('Forgot password?'),
+                  ),
+                ),
+
                 // Register link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

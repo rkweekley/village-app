@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/family/family_provider.dart';
+import 'package:village_app/features/family/family_service.dart';
 import 'package:village_app/features/family/models.dart';
 
 class FamilyPage extends ConsumerStatefulWidget {
@@ -227,6 +228,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     member: member,
                     isCurrentUser: member.id == currentUserId,
                     role: authState.userInfo?.role ?? '',
+                    onChanged: () => ref.invalidate(familyProvider),
                   )),
 
             // Error
@@ -287,19 +289,21 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
   }
 }
 
-class _MemberCard extends StatelessWidget {
+class _MemberCard extends ConsumerWidget {
   final MemberInfo member;
   final bool isCurrentUser;
   final String role;
+  final VoidCallback onChanged;
 
   const _MemberCard({
     required this.member,
     required this.isCurrentUser,
     required this.role,
+    required this.onChanged,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isAdmin = role == 'Admin' || role == 'Parent';
     final canManage = isAdmin && !isCurrentUser;
 
@@ -410,8 +414,42 @@ class _MemberCard extends StatelessWidget {
               PopupMenuButton<String>(
                 icon: Icon(Icons.more_horiz_rounded,
                     color: Colors.grey[400]),
-                onSelected: (value) {
-                  // TODO: implement role change / remove member
+                onSelected: (value) async {
+                  final service = ref.read(familyServiceProvider);
+                  try {
+                    if (value == 'promote') {
+                      final newRole =
+                          member.role == 'Parent' ? 'Child' : 'Parent';
+                      await service.changeMemberRole(member.id, newRole);
+                    } else if (value == 'remove') {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Remove Member'),
+                          content: Text(
+                              'Remove ${member.displayName} from the family?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              style: TextButton.styleFrom(
+                                  foregroundColor: Colors.red),
+                              child: const Text('Remove'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) {
+                        await service.removeMember(member.id);
+                      } else {
+                        return;
+                      }
+                    }
+                    onChanged();
+                  } catch (_) {}
                 },
                 itemBuilder: (context) => [
                   const PopupMenuItem(

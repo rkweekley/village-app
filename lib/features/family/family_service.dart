@@ -41,6 +41,17 @@ class FamilyService {
       rethrow;
     }
   }
+
+  /// Change a member's role (Parent only).
+  Future<void> changeMemberRole(String userId, String role) async {
+    await _dio.put('/api/families/mine/members/$userId/role',
+        data: {'role': role});
+  }
+
+  /// Remove a member from the family (Parent only).
+  Future<void> removeMember(String userId) async {
+    await _dio.delete('/api/families/mine/members/$userId');
+  }
 }
 
 final familyServiceProvider = Provider<FamilyService>((ref) {
