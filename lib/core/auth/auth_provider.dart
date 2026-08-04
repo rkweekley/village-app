@@ -42,7 +42,6 @@ class AuthState {
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
-    // Register the global 401 callback so the interceptor can trigger logout
     AuthInterceptorLogoutCallback.logout = () => logout();
     ref.onDispose(() => AuthInterceptorLogoutCallback.logout = null);
     return const AuthState();
@@ -66,6 +65,18 @@ class AuthNotifier extends Notifier<AuthState> {
           userInfo: userInfo,
         );
       } else {
+        // Token rejected — try refresh before giving up
+        final refreshed = await _authService.tryRefresh();
+        if (refreshed) {
+          final retryUserInfo = await _authService.getMe();
+          if (retryUserInfo != null) {
+            state = state.copyWith(
+              status: AuthStatus.authenticated,
+              userInfo: retryUserInfo,
+            );
+            return;
+          }
+        }
         await _authService.logout();
         state = state.copyWith(status: AuthStatus.unauthenticated);
       }
@@ -75,18 +86,21 @@ class AuthNotifier extends Notifier<AuthState> {
         // Network error — stay authenticated with cached token
         state = state.copyWith(status: AuthStatus.authenticated);
       } else if (e.response?.statusCode == 401) {
-        // Token expired or invalid
-        await _authService.logout();
-        state = state.copyWith(status: AuthStatus.unauthenticated);
+        // Try refresh
+        final refreshed = await _authService.tryRefresh();
+        if (refreshed) {
+          state = state.copyWith(status: AuthStatus.authenticated);
+        } else {
+          await _authService.logout();
+          state = state.copyWith(status: AuthStatus.unauthenticated);
+        }
       } else {
-        // Unexpected server error — stay authenticated but flag it
         state = state.copyWith(
           status: AuthStatus.authenticated,
           error: 'Could not load profile. Pull to refresh.',
         );
       }
     } catch (_) {
-      // Unexpected error — safest to logout
       await _authService.logout();
       state = state.copyWith(status: AuthStatus.unauthenticated);
     }
@@ -146,6 +160,34 @@ class AuthNotifier extends Notifier<AuthState> {
           pointsBalance: 0,
           familyId: authResponse.familyId,
         ),
+      );
+    } on DioException catch (e) {
+      final msg = _extractError(e);
+      state = state.copyWith(error: msg);
+      rethrow;
+    }
+  }
+
+  Future<void> forgotPassword({required String email}) async {
+    try {
+      state = state.copyWith(error: null);
+      await _authService.forgotPassword(email: email);
+    } on DioException catch (e) {
+      final msg = _extractError(e);
+      state = state.copyWith(error: msg);
+      rethrow;
+    }
+  }
+
+  Future<void> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    try {
+      state = state.copyWith(error: null);
+      await _authService.resetPassword(
+        token: token,
+        newPassword: newPassword,
       );
     } on DioException catch (e) {
       final msg = _extractError(e);

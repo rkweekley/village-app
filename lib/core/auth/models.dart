@@ -1,6 +1,7 @@
 /// Data models for auth responses
 class AuthResponse {
-  final String token;
+  final String accessToken;
+  final String refreshToken;
   final String userId;
   final String displayName;
   final String email;
@@ -10,7 +11,8 @@ class AuthResponse {
   final bool isNewFamily;
 
   AuthResponse({
-    required this.token,
+    required this.accessToken,
+    required this.refreshToken,
     required this.userId,
     required this.displayName,
     required this.email,
@@ -22,7 +24,8 @@ class AuthResponse {
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
-      token: json['token'] as String,
+      accessToken: json['accessToken'] as String,
+      refreshToken: json['refreshToken'] as String,
       userId: json['userId'] as String,
       displayName: json['displayName'] as String,
       email: json['email'] as String,
@@ -34,7 +37,8 @@ class AuthResponse {
   }
 
   Map<String, dynamic> toJson() => {
-        'token': token,
+        'accessToken': accessToken,
+        'refreshToken': refreshToken,
         'userId': userId,
         'displayName': displayName,
         'email': email,
