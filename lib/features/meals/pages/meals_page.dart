@@ -444,7 +444,6 @@ class _MealSlot extends StatelessWidget {
       ),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) {
-          final recipesAsync = ref.watch(recipesListProvider);
           String? selectedRecipeId;
           String freeTextTitle = '';
           final titleCtrl = TextEditingController();
@@ -483,53 +482,60 @@ class _MealSlot extends StatelessWidget {
                     style:
                         TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 const SizedBox(height: 8),
-                SizedBox(
-                  height: 140,
-                  child: recipesAsync.when(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Text('Error: $e'),
-                    data: (recipes) {
-                      final favs =
-                          recipes.where((r) => r.isFamilyFavorite).toList();
-                      if (favs.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 24),
-                          child: Center(
-                            child: Text(
-                              'No favorites yet — star a recipe below',
-                              style: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 13,
+                Consumer(
+                  builder: (context, ref, child) {
+                    final recipesAsync = ref.watch(recipesListProvider);
+                    return SizedBox(
+                      height: 140,
+                      child: recipesAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => Text('Error: $e'),
+                        data: (recipes) {
+                          final favs = recipes
+                              .where((r) => r.isFamilyFavorite)
+                              .toList();
+                          if (favs.isEmpty) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 24),
+                              child: Center(
+                                child: Text(
+                                  'No favorites yet — star a recipe below',
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 13,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      }
-                      return ListView.separated(
-                        itemCount: favs.length,
-                        separatorBuilder: (_, _) =>
-                            const Divider(height: 1, indent: 16),
-                        itemBuilder: (_, i) {
-                          final r = favs[i];
-                          return RadioListTile<String>(
-                            title: Text(r.title,
-                                style: const TextStyle(fontSize: 14)),
-                            subtitle: Text(
-                              '${r.difficulty} · ${_formatMinutes(r.prepTimeMinutes)}',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            value: r.id,
-                            groupValue: selectedRecipeId,
-                            dense: true,
-                            activeColor: VillageTheme.danger,
-                            onChanged: (v) =>
-                                setDialogState(() => selectedRecipeId = v),
+                            );
+                          }
+                          return ListView.separated(
+                            itemCount: favs.length,
+                            separatorBuilder: (_, _) =>
+                                const Divider(height: 1, indent: 16),
+                            itemBuilder: (_, i) {
+                              final r = favs[i];
+                              return RadioListTile<String>(
+                                title: Text(r.title,
+                                    style: const TextStyle(fontSize: 14)),
+                                subtitle: Text(
+                                  '${r.difficulty} · ${_formatMinutes(r.prepTimeMinutes)}',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                value: r.id,
+                                groupValue: selectedRecipeId,
+                                dense: true,
+                                activeColor: VillageTheme.danger,
+                                onChanged: (v) => setDialogState(
+                                    () => selectedRecipeId = v),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
                 const Divider(),
                 const Text('Or type a custom title:',
