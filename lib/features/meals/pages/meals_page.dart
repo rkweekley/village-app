@@ -436,8 +436,6 @@ class _MealSlot extends StatelessWidget {
   }
 
   void _showMealSlotPicker(BuildContext context) {
-    final recipesAsync = ref.read(recipesListProvider);
-
     showAdaptiveModalSheet(
       context: context,
       isScrollControlled: true,
@@ -446,6 +444,7 @@ class _MealSlot extends StatelessWidget {
       ),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) {
+          final recipesAsync = ref.watch(recipesListProvider);
           String? selectedRecipeId;
           String freeTextTitle = '';
           final titleCtrl = TextEditingController();
