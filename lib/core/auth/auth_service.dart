@@ -55,23 +55,15 @@ class AuthService {
     }
   }
 
-  /// Try to refresh the access token using the stored refresh token.
-  /// Returns true if successful, false if refresh failed.
+  /// DEPRECATED: Refresh is now handled exclusively by the Dio interceptor in AuthenticatedClient.
+  /// Kept for backward compatibility during migration.
   Future<bool> tryRefresh() async {
-    final accessToken = await _storage.read(_accessTokenKey);
-    final refreshToken = await _storage.read(_refreshTokenKey);
-    if (accessToken == null || refreshToken == null) return false;
-
+    // The Dio interceptor handles refresh on 401 automatically.
+    // Just check if we still have a valid token.
     try {
-      final response = await _dio.post('/api/auth/refresh', data: {
-        'accessToken': accessToken,
-        'refreshToken': refreshToken,
-      });
-      final newAccess = response.data['accessToken'] as String;
-      final newRefresh = response.data['refreshToken'] as String;
-      await _saveTokens(newAccess, newRefresh);
+      await _dio.get('/api/auth/me');
       return true;
-    } on DioException {
+    } catch (_) {
       return false;
     }
   }

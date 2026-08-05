@@ -146,11 +146,32 @@ class ShoppingListsPage extends ConsumerWidget {
                                     ],
                                   )),
                             ],
-                            onSelected: (action) {
+                            onSelected: (action) async {
                               if (action == 'delete') {
-                                ref
-                                    .read(shoppingServiceProvider)
-                                    .deleteList(list.id);
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text('Delete List'),
+                                    content: Text(
+                                        'Delete "${list.name}" and all its items?'),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, false),
+                                          child: const Text('Cancel')),
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, true),
+                                          child: const Text('Delete')),
+                                    ],
+                                  ),
+                                );
+                                if (confirm == true) {
+                                  await ref
+                                      .read(shoppingServiceProvider)
+                                      .deleteList(list.id);
+                                  ref.invalidate(shoppingListsProvider);
+                                }
                               }
                             },
                           ),

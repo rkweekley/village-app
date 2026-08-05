@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/network/dio_client.dart';
@@ -10,7 +12,7 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
   final dio = ref.watch(dioProvider);
   final storage = ref.watch(secureStorageProvider);
 
-  bool _isRefreshing = false;
+  Completer<void>? _refreshCompleter;
 
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
@@ -21,8 +23,23 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
       handler.next(options);
     },
     onError: (error, handler) async {
-      if (error.response?.statusCode == 401 && !_isRefreshing) {
-        _isRefreshing = true;
+      if (error.response?.statusCode == 401) {
+        // If another request is already refreshing, wait for it to complete
+        if (_refreshCompleter != null) {
+          await _refreshCompleter!.future;
+          // Retry the original request with the (now refreshed) token
+          final retryToken = await storage.read('jwt_access_token');
+          if (retryToken != null) {
+            error.requestOptions.headers['Authorization'] =
+                'Bearer $retryToken';
+            return handler.resolve(await dio.fetch(error.requestOptions));
+          }
+          // Refresh didn't produce a new token — reject
+          handler.next(error);
+          return;
+        }
+
+        _refreshCompleter = Completer<void>();
         try {
           final refreshToken = await storage.read('jwt_refresh_token');
           final accessToken = await storage.read('jwt_access_token');
@@ -45,16 +62,17 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
             error.requestOptions.headers['Authorization'] =
                 'Bearer $newAccess';
             final retryResponse = await dio.fetch(error.requestOptions);
-            _isRefreshing = false;
+            _refreshCompleter?.complete();
+            _refreshCompleter = null;
             return handler.resolve(retryResponse);
           }
         } catch (_) {
           // Refresh failed — clear tokens and trigger logout
         }
-        _isRefreshing = false;
-      }
+        _refreshCompleter?.complete();
+        _refreshCompleter = null;
 
-      if (error.response?.statusCode == 401) {
+        // Refresh failed or no tokens — trigger logout
         await storage.delete('jwt_access_token');
         await storage.delete('jwt_refresh_token');
         AuthInterceptorLogoutCallback.logout?.call();

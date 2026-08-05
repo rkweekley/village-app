@@ -193,7 +193,8 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             const SizedBox(height: 16),
 
             // Subscription card
-            _buildSubscriptionCard(context, familyState.family!),
+            if (familyState.family != null)
+              _buildSubscriptionCard(context, familyState.family!),
             const SizedBox(height: 16),
 
             // Members section

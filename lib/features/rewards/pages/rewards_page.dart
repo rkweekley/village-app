@@ -311,9 +311,42 @@ class _AvailableTab extends StatelessWidget {
                           width: double.infinity,
                           height: 36,
                           child: FilledButton(
-                            onPressed: () => ref
-                                .read(rewardsServiceProvider)
-                                .redeemReward(reward.id),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Redeem Reward'),
+                                  content: Text(
+                                      'Spend ${reward.pointCost} points on "${reward.name}"?'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(ctx, false),
+                                        child: const Text('Cancel')),
+                                    TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(ctx, true),
+                                        child: const Text('Redeem')),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                try {
+                                  await ref
+                                      .read(rewardsServiceProvider)
+                                      .redeemReward(reward.id);
+                                  ref.invalidate(rewardsListProvider);
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Failed to redeem: $e')),
+                                    );
+                                  }
+                                }
+                              }
+                            },
                             style: FilledButton.styleFrom(
                               backgroundColor: VillageTheme.warning,
                               shape: RoundedRectangleBorder(
