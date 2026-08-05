@@ -23,22 +23,7 @@ class _HubPageState extends ConsumerState<HubPage> {
   @override
   void initState() {
     super.initState();
-    ref.listen(familyProvider, (prev, next) {
-      if (_didRedirect) return;
-      final family = next.family;
-      if (family != null && !next.isLoading) {
-        final status = family.subscriptionStatus ?? 'trial';
-        final hasSubscription = family.subscriptionExpiresAt != null;
-        if (status == 'trial' && !hasSubscription) {
-          _didRedirect = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) context.go('/subscription');
-          });
-        }
-      }
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Invalidate family state if returning from Stripe checkout (session_id in URL)
       try {
         final uri = GoRouterState.of(context).uri;
         if (uri.queryParameters.containsKey('session_id')) {
@@ -53,6 +38,21 @@ class _HubPageState extends ConsumerState<HubPage> {
   Widget build(BuildContext context) {
     final familyState = ref.watch(familyProvider);
     final authState = ref.watch(authProvider);
+
+    // Redirect new users to subscription (once per session)
+    if (!_didRedirect) {
+      final family = familyState.family;
+      if (family != null && !familyState.isLoading) {
+        final status = family.subscriptionStatus ?? 'trial';
+        final hasSubscription = family.subscriptionExpiresAt != null;
+        if (status == 'trial' && !hasSubscription) {
+          _didRedirect = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) context.go('/subscription');
+          });
+        }
+      }
+    }
 
     final currentUserId = authState.userInfo?.id;
     final theme = Theme.of(context);
