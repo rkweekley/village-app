@@ -33,7 +33,7 @@ class SignalRHubClient {
 
   /// Build the WebSocket URL with JWT access token.
   Future<Uri> _buildUri() async {
-    final token = await storage.read('jwt_token');
+    final token = await storage.read('jwt_access_token');
     final wsUrl = baseUrl
         .replaceAll('https://', 'wss://')
         .replaceAll('http://', 'ws://');
