@@ -23,7 +23,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
   @override
   void initState() {
     super.initState();
-    final tabCount = ref.read(authProvider).userInfo?.role == 'Parent' ? 3 : 2;
+    final tabCount = ref.read(authProvider).canManage ? 3 : 2;
     _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
@@ -42,7 +42,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
   Widget build(BuildContext context) {
     final choresAsync = ref.watch(choresListProvider);
     final assignmentsAsync = ref.watch(assignmentsListProvider);
-    final isParent = ref.watch(authProvider).userInfo?.role == 'Parent';
+    final isParent = ref.watch(authProvider).canManage;
     final userId = ref.watch(authProvider).userInfo?.id;
     final tabCount = isParent ? 3 : 2;
 

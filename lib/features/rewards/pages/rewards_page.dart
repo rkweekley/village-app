@@ -13,7 +13,7 @@ class RewardsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final rewardsAsync = ref.watch(rewardsListProvider);
     final redemptionsAsync = ref.watch(redemptionsListProvider);
-    final isParent = ref.watch(authProvider).userInfo?.role == 'Parent';
+    final isParent = ref.watch(authProvider).canManage;
 
     return DefaultTabController(
       length: 2,

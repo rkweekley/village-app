@@ -15,7 +15,7 @@ class TasksPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isParent = ref.watch(authProvider).userInfo?.role == 'Parent';
+    final isParent = ref.watch(authProvider).canManage;
 
     return DefaultTabController(
       length: 2,

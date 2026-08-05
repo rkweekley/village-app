@@ -13,7 +13,7 @@ class ShoppingListsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listsAsync = ref.watch(shoppingListsProvider);
-    final isParent = ref.watch(authProvider).userInfo?.role == 'Parent';
+    final isParent = ref.watch(authProvider).canManage;
 
     return Scaffold(
       appBar: AppBar(

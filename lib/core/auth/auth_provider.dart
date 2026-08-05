@@ -37,6 +37,10 @@ class AuthState {
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
   bool get isLoading => status == AuthStatus.unknown;
+
+  /// Whether the current user can manage chores, rewards, tasks, etc.
+  bool get canManage =>
+      userInfo?.role == 'Parent' || userInfo?.role == 'Caregiver';
 }
 
 class AuthNotifier extends Notifier<AuthState> {
@@ -55,6 +59,17 @@ class AuthNotifier extends Notifier<AuthState> {
     if (!hasToken) {
       state = state.copyWith(status: AuthStatus.unauthenticated);
       return;
+    }
+
+    // Check JWT expiry before making network call (tokens are 15-min TTL)
+    final token = await _authService.getAccessToken();
+    if (_isTokenExpired(token)) {
+      final refreshed = await _authService.tryRefresh();
+      if (!refreshed) {
+        await _authService.logout();
+        state = state.copyWith(status: AuthStatus.unauthenticated);
+        return;
+      }
     }
 
     try {
@@ -103,6 +118,25 @@ class AuthNotifier extends Notifier<AuthState> {
     } catch (_) {
       await _authService.logout();
       state = state.copyWith(status: AuthStatus.unauthenticated);
+    }
+  }
+
+  /// Decode the JWT `exp` claim from an access token.
+  /// Returns true if the token is missing, malformed, or expired.
+  bool _isTokenExpired(String? token) {
+    if (token == null) return true;
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return true;
+      final payload = json.decode(
+        utf8.decode(base64.decode(base64.normalize(parts[1]))),
+      );
+      final exp = payload['exp'] as int?;
+      if (exp == null) return true;
+      return DateTime.fromMillisecondsSinceEpoch(exp * 1000)
+          .isBefore(DateTime.now());
+    } catch (_) {
+      return true; // can't decode = treat as expired
     }
   }
 

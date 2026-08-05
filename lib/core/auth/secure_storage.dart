@@ -15,6 +15,11 @@ class SecureStorage {
   SecureStorage(this._web, this._native);
 
   static Future<SecureStorage> create() async {
+    // SECURITY NOTE: On web, tokens are stored in localStorage (SharedPreferences).
+    // This is readable by any JS on the page. Mitigations:
+    // - JWT access tokens are short-lived (15 min)
+    // - CSP in nginx.conf blocks inline scripts
+    // - Long-term: migrate to HttpOnly cookie / BFF pattern
     if (kIsWeb) {
       return SecureStorage(await SharedPreferences.getInstance(), null);
     }

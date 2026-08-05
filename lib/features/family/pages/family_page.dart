@@ -398,7 +398,7 @@ class _MemberCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isAdmin = role == 'Admin' || role == 'Parent';
+    final isAdmin = role == 'Admin' || role == 'Parent' || role == 'Caregiver';
     final canManage = isAdmin && !isCurrentUser;
 
     // Generate avatar color from name
