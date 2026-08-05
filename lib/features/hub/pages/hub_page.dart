@@ -30,6 +30,19 @@ class _HubPageState extends ConsumerState<HubPage> {
   Widget build(BuildContext context) {
     final familyState = ref.watch(familyProvider);
     final authState = ref.watch(authProvider);
+
+    // Redirect to subscription if family exists but never subscribed
+    final family = familyState.family;
+    if (family != null && !familyState.isLoading) {
+      final status = family.subscriptionStatus ?? 'trial';
+      final hasSubscription = family.subscriptionExpiresAt != null;
+      if (status == 'trial' && !hasSubscription) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/subscription');
+        });
+      }
+    }
+
     final currentUserId = authState.userInfo?.id;
     final theme = Theme.of(context);
 
