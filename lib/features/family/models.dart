@@ -5,6 +5,10 @@ class FamilyInfo {
   final String inviteCode;
   final String currencyName;
   final String timezone;
+  final String? subscriptionStatus;
+  final String? subscriptionTier;
+  final String? subscriptionExpiresAt;
+  final String? trialEndsAt;
   final List<MemberInfo> members;
 
   FamilyInfo({
@@ -13,6 +17,10 @@ class FamilyInfo {
     required this.inviteCode,
     required this.currencyName,
     required this.timezone,
+    this.subscriptionStatus,
+    this.subscriptionTier,
+    this.subscriptionExpiresAt,
+    this.trialEndsAt,
     required this.members,
   });
 
@@ -23,6 +31,10 @@ class FamilyInfo {
       inviteCode: json['inviteCode'] as String,
       currencyName: json['currencyName'] as String? ?? 'Points',
       timezone: json['timezone'] as String? ?? 'America/New_York',
+      subscriptionStatus: json['subscriptionStatus'] as String?,
+      subscriptionTier: json['subscriptionTier'] as String?,
+      subscriptionExpiresAt: json['subscriptionExpiresAt'] as String?,
+      trialEndsAt: json['trialEndsAt'] as String?,
       members: (json['members'] as List<dynamic>?)
               ?.map((m) => MemberInfo.fromJson(m as Map<String, dynamic>))
               .toList() ??

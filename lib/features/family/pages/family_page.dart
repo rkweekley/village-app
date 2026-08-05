@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/family/family_provider.dart';
@@ -191,6 +192,10 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
               ),
             const SizedBox(height: 16),
 
+            // Subscription card
+            _buildSubscriptionCard(context, familyState.family!),
+            const SizedBox(height: 16),
+
             // Members section
             Padding(
               padding: const EdgeInsets.only(left: 4, bottom: 8),
@@ -286,6 +291,95 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
         ),
       ],
     );
+  }
+
+  Widget _buildSubscriptionCard(BuildContext context, FamilyInfo family) {
+    final status = family.subscriptionStatus ?? 'trial';
+    final tier = family.subscriptionTier;
+    final isTrial = status == 'trial';
+    final isPastDue = status == 'past_due';
+
+    Color statusColor;
+    IconData statusIcon;
+    String label;
+
+    switch (status) {
+      case 'active':
+        statusColor = VillageTheme.positive;
+        statusIcon = Icons.check_circle_rounded;
+        label = tier == 'annual' ? 'Annual Plan' : 'Monthly Plan';
+        break;
+      case 'past_due':
+        statusColor = VillageTheme.warning;
+        statusIcon = Icons.error_outline_rounded;
+        label = 'Payment Past Due';
+        break;
+      case 'expired':
+        statusColor = VillageTheme.danger;
+        statusIcon = Icons.cancel_rounded;
+        label = 'Expired';
+        break;
+      case 'canceled':
+        statusColor = Colors.grey;
+        statusIcon = Icons.remove_circle_outline_rounded;
+        label = 'Canceled';
+        break;
+      default:
+        statusColor = VillageTheme.primary;
+        statusIcon = Icons.timer_rounded;
+        label = 'Free Trial';
+        break;
+    }
+
+    return Card(
+      elevation: 0,
+      color: statusColor.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.2)),
+      ),
+      child: InkWell(
+        onTap: () => context.go('/subscription'),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(statusIcon, color: statusColor, size: 28),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            color: statusColor)),
+                    if (isTrial && family.trialEndsAt != null)
+                      Text('Ends ${_formatDate(family.trialEndsAt!)}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    if (!isTrial && family.subscriptionExpiresAt != null)
+                      Text('Renews ${_formatDate(family.subscriptionExpiresAt!)}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    if (isPastDue)
+                      const Text('Update payment method →',
+                          style: TextStyle(fontSize: 12, color: VillageTheme.warning, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(String iso) {
+    final d = DateTime.parse(iso);
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[d.month - 1]} ${d.day}';
   }
 }
 

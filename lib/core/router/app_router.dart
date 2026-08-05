@@ -7,6 +7,7 @@ import 'package:village_app/features/auth/pages/register_page.dart';
 import 'package:village_app/features/auth/pages/forgot_password_page.dart';
 import 'package:village_app/features/family/pages/family_page.dart';
 import 'package:village_app/features/family/pages/family_setup_page.dart';
+import 'package:village_app/features/family/pages/subscription_page.dart';
 import 'package:village_app/features/hub/pages/hub_page.dart';
 import 'package:village_app/features/tasks/pages/tasks_page.dart';
 import 'package:village_app/features/rewards/pages/rewards_page.dart';
@@ -157,6 +158,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/notifications',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
+        path: '/subscription',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SubscriptionPage(),
       ),
       // ── Shopping detail (pushed from shell tab) ──
       GoRoute(
