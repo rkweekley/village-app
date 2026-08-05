@@ -76,6 +76,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => ResetPasswordPage(
           token: state.pathParameters['token'],
+          email: state.uri.queryParameters['email'],
         ),
       ),
       GoRoute(

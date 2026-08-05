@@ -16,6 +16,7 @@ class SubscriptionPage extends ConsumerStatefulWidget {
 class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   Map<String, dynamic>? _status;
   bool _loading = true;
+  bool _actionLoading = false;
   String? _error;
 
   @override
@@ -30,38 +31,58 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       final dio = ref.read(authenticatedDioProvider);
       final res = await dio.get('/api/stripe/status');
       if (mounted) setState(() { _status = res.data as Map<String, dynamic>; _loading = false; });
+    } on DioException catch (_) {
+      if (mounted) setState(() { _error = 'Unable to load subscription info. Please check your connection.'; _loading = false; });
     } catch (e) {
       if (mounted) setState(() { _error = e.toString(); _loading = false; });
     }
   }
 
   Future<void> _startCheckout(String tier) async {
+    setState(() => _actionLoading = true);
     try {
       final dio = ref.read(authenticatedDioProvider);
       final res = await dio.post('/api/stripe/create-checkout', data: {'tier': tier});
       final url = res.data['url'] as String;
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } on DioException catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to load subscription info. Please check your connection.')),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to start checkout: $e')),
         );
       }
+    } finally {
+      if (mounted) setState(() => _actionLoading = false);
     }
   }
 
   Future<void> _openPortal() async {
+    setState(() => _actionLoading = true);
     try {
       final dio = ref.read(authenticatedDioProvider);
       final res = await dio.post('/api/stripe/portal');
       final url = res.data['url'] as String;
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } on DioException catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to load subscription info. Please check your connection.')),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to open portal: $e')),
         );
       }
+    } finally {
+      if (mounted) setState(() => _actionLoading = false);
     }
   }
 
@@ -170,6 +191,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             features: const ['Full access', 'Up to 2 families', '12 members each'],
             highlighted: tier == 'monthly',
             isCurrent: tier == 'monthly' && !isInTrial,
+            isLoading: _actionLoading,
             onTap: () => _startCheckout('monthly'),
           ),
           const SizedBox(height: 12),
@@ -180,6 +202,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             features: const ['Everything in Monthly', 'Save 30% (\$4.17/mo)'],
             highlighted: tier == 'annual',
             isCurrent: tier == 'annual' && !isInTrial,
+            isLoading: _actionLoading,
             onTap: () => _startCheckout('annual'),
           ),
         ],
@@ -209,12 +232,17 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             width: double.infinity,
             height: 52,
             child: FilledButton(
-              onPressed: _openPortal,
+              onPressed: _actionLoading ? null : _openPortal,
               style: FilledButton.styleFrom(
                 backgroundColor: VillageTheme.danger,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              child: const Text('Manage Subscription', style: TextStyle(fontSize: 16)),
+              child: _actionLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text('Manage Subscription', style: TextStyle(fontSize: 16)),
             ),
           ),
           const SizedBox(height: 8),
@@ -275,6 +303,7 @@ class _PlanCard extends StatelessWidget {
   final List<String> features;
   final bool highlighted;
   final bool isCurrent;
+  final bool isLoading;
   final VoidCallback onTap;
 
   const _PlanCard({
@@ -284,6 +313,7 @@ class _PlanCard extends StatelessWidget {
     required this.features,
     this.highlighted = false,
     this.isCurrent = false,
+    this.isLoading = false,
     required this.onTap,
   });
 
@@ -341,12 +371,17 @@ class _PlanCard extends StatelessWidget {
                       child: const Text('Current Plan'),
                     )
                   : FilledButton(
-                      onPressed: onTap,
+                      onPressed: isLoading ? null : onTap,
                       style: FilledButton.styleFrom(
                         backgroundColor: highlighted ? VillageTheme.primary : VillageTheme.danger,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: Text(highlighted ? 'Switch to $title' : 'Choose $title'),
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : Text(highlighted ? 'Switch to $title' : 'Choose $title'),
                     ),
             ),
           ],

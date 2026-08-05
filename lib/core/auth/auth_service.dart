@@ -100,10 +100,12 @@ class AuthService {
   Future<void> resetPassword({
     required String token,
     required String newPassword,
+    required String email,
   }) async {
     await _dio.post('/api/auth/reset-password', data: {
       'token': token,
       'newPassword': newPassword,
+      'email': email,
     });
   }
 

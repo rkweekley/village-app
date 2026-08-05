@@ -182,12 +182,14 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<void> resetPassword({
     required String token,
     required String newPassword,
+    required String email,
   }) async {
     try {
       state = state.copyWith(error: null);
       await _authService.resetPassword(
         token: token,
         newPassword: newPassword,
+        email: email,
       );
     } on DioException catch (e) {
       final msg = _extractError(e);

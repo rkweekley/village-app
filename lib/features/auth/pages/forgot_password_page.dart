@@ -107,7 +107,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         TextButton(
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => const ResetPasswordPage(),
+              builder: (_) => ResetPasswordPage(email: _emailCtrl.text.trim()),
             ));
           },
           child: Text('Enter reset code manually',
@@ -187,8 +187,9 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
 
 class ResetPasswordPage extends ConsumerStatefulWidget {
   final String? token;
+  final String? email;
 
-  const ResetPasswordPage({super.key, this.token});
+  const ResetPasswordPage({super.key, this.token, this.email});
 
   @override
   ConsumerState<ResetPasswordPage> createState() => _ResetPasswordPageState();
@@ -196,6 +197,7 @@ class ResetPasswordPage extends ConsumerStatefulWidget {
 
 class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
   final _formKey = GlobalKey<FormState>();
+  final _emailCtrl = TextEditingController();
   final _tokenCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
@@ -209,10 +211,14 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
     if (widget.token != null) {
       _tokenCtrl.text = widget.token!;
     }
+    if (widget.email != null) {
+      _emailCtrl.text = widget.email!;
+    }
   }
 
   @override
   void dispose() {
+    _emailCtrl.dispose();
     _tokenCtrl.dispose();
     _passwordCtrl.dispose();
     _confirmCtrl.dispose();
@@ -227,6 +233,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
       await ref.read(authProvider.notifier).resetPassword(
             token: _tokenCtrl.text.trim(),
             newPassword: _passwordCtrl.text,
+            email: _emailCtrl.text.trim(),
           );
       if (mounted) setState(() => _done = true);
     } catch (_) {
@@ -310,6 +317,28 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
           const Text('Set a new password',
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
           const SizedBox(height: 32),
+          TextFormField(
+            controller: _emailCtrl,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              labelText: 'Email',
+              hintText: 'you@example.com',
+              prefixIcon: const Icon(Icons.email_outlined),
+              filled: true,
+              fillColor: VillageTheme.surfaceBase,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Email is required';
+              if (!v.contains('@')) return 'Enter a valid email';
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
           TextFormField(
             controller: _tokenCtrl,
             decoration: InputDecoration(
