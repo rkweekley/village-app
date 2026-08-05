@@ -39,10 +39,12 @@ class _HubPageState extends ConsumerState<HubPage> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Invalidate family state if returning from Stripe checkout (session_id in URL)
-      final uri = GoRouterState.of(context).uri;
-      if (uri.queryParameters.containsKey('session_id')) {
-        ref.invalidate(familyProvider);
-      }
+      try {
+        final uri = GoRouterState.of(context).uri;
+        if (uri.queryParameters.containsKey('session_id')) {
+          ref.invalidate(familyProvider);
+        }
+      } catch (_) {}
       ref.read(familyProvider.notifier).loadFamily();
     });
   }
