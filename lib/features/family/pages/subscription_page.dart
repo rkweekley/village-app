@@ -86,6 +86,64 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     }
   }
 
+  Future<void> _confirmCancel(BuildContext ctx) async {
+    final confirm = await showDialog<bool>(
+      context: ctx,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Cancel Subscription'),
+        content: const Text(
+          'Your subscription will be canceled at the end of your current billing period. '
+          'You will continue to have access until then. This action cannot be undone from the app.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx, false),
+            child: const Text('Keep Subscription'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Cancel Subscription'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) await _cancelSubscription();
+  }
+
+  Future<void> _cancelSubscription() async {
+    setState(() => _actionLoading = true);
+    try {
+      final dio = ref.read(authenticatedDioProvider);
+      final res = await dio.post('/api/stripe/cancel');
+      final endDate = res.data['endDate'] as String;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Subscription will end ${_formatDate(endDate)}.'),
+            backgroundColor: VillageTheme.positive,
+          ),
+        );
+        _loadStatus();
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        final msg = e.response?.data is Map
+            ? e.response!.data['error'] as String? ?? 'Failed to cancel'
+            : 'Failed to cancel. Please try again.';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _actionLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,6 +309,30 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey[500], fontSize: 12),
           ),
+          // Cancel button — only for active subscriptions
+          if (status == 'active') ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                onPressed: _actionLoading ? null : () => _confirmCancel(context),
+                icon: const Icon(Icons.cancel_outlined, size: 20),
+                label: const Text('Cancel Subscription'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.red),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Your access continues until the end of your billing period.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            ),
+          ],
         ],
       ],
     );
