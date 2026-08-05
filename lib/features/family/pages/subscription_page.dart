@@ -157,8 +157,11 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
         // Plans
         if (status == 'trial' || status == 'expired' || status == 'canceled') ...[
-          const Text('Choose a plan',
+          const Text('First month free',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Text('Cancel anytime during your trial — you won\'t be charged.',
+              style: TextStyle(color: Colors.grey[600], fontSize: 14)),
           const SizedBox(height: 16),
           _PlanCard(
             title: 'Monthly',

@@ -124,6 +124,11 @@ class _HubPageState extends ConsumerState<HubPage> {
             ),
             const SizedBox(height: 16),
 
+            // ── Subscription / Trial banner ──
+            if (familyState.family != null)
+              _buildSubscriptionBanner(context, familyState.family!),
+            if (familyState.family != null) const SizedBox(height: 16),
+
             // ── Points card ──
             Card(
               shape: RoundedRectangleBorder(
@@ -974,6 +979,57 @@ class _BentoActionCardState extends State<_BentoActionCard> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionBanner(BuildContext context, FamilyInfo family) {
+    final status = family.subscriptionStatus ?? 'trial';
+    if (status == 'active') return const SizedBox.shrink();
+    if (status == 'canceled') return const SizedBox.shrink();
+
+    if (status == 'past_due') {
+      return _banner(VillageTheme.warning, Icons.error_outline_rounded,
+          'Payment Past Due', 'Update payment method to keep access', 'Update');
+    }
+
+    final isNew = status == 'trial' && family.subscriptionExpiresAt == null;
+    return _banner(VillageTheme.primary, Icons.rocket_launch_rounded,
+        'First month free', isNew ? 'Add a card to get started — cancel anytime' : 'Subscribe to restore access', 'Subscribe');
+  }
+
+  Widget _banner(Color color, IconData icon, String title, String subtitle, String action) {
+    return Card(
+      elevation: 0,
+      color: color.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: color.withValues(alpha: 0.25)),
+      ),
+      child: InkWell(
+        onTap: () => context.go('/subscription'),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(width: 40, height: 40,
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+                child: Icon(icon, color: color, size: 22)),
+              const SizedBox(width: 14),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: color)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              ])),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+                child: Text(action, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+              ),
+            ],
           ),
         ),
       ),
