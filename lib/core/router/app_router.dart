@@ -43,12 +43,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // Authenticated
       if (isAuthenticated) {
-        if (isAuthRoute) {
-          if (authState.authResponse?.isNewFamily == true) {
-            return '/family-setup';
-          }
-          return '/hub';
-        }
+        if (isAuthRoute) return '/hub';
         if (location == '/family-setup') return null;
       }
 
