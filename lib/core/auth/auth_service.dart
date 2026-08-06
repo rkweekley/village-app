@@ -101,6 +101,20 @@ class AuthService {
     });
   }
 
+  /// Update the current user's profile fields. Returns the updated UserInfo.
+  Future<UserInfo> updateProfile({
+    String? displayName,
+    String? email,
+    String? birthDate,
+  }) async {
+    final response = await _dio.put('/api/users/me', data: {
+      if (displayName != null) 'displayName': displayName,
+      if (email != null) 'email': email,
+      if (birthDate != null) 'birthDate': birthDate,
+    });
+    return UserInfo.fromJson(response.data);
+  }
+
   Future<void> _saveTokens(String accessToken, String refreshToken) async {
     await _storage.write(_accessTokenKey, accessToken);
     await _storage.write(_refreshTokenKey, refreshToken);

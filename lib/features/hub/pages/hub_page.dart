@@ -101,6 +101,11 @@ class _HubPageState extends ConsumerState<HubPage> {
             tooltip: 'Family',
             onPressed: () => context.go('/family'),
           ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Edit Profile',
+            onPressed: () => context.push('/profile/edit'),
+          ),
         ],
       ),
       body: Stack(

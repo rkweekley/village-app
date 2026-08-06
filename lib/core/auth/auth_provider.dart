@@ -207,6 +207,11 @@ class AuthNotifier extends Notifier<AuthState> {
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 
+  /// Update local user info (called after profile edit).
+  void updateUserInfo(UserInfo info) {
+    state = state.copyWith(userInfo: info);
+  }
+
   void clearError() {
     state = state.copyWith(error: null);
   }

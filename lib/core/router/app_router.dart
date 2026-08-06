@@ -17,6 +17,7 @@ import 'package:village_app/features/meals/pages/meals_page.dart';
 import 'package:village_app/features/chores/pages/chores_page.dart';
 import 'package:village_app/features/school/pages/school_page.dart';
 import 'package:village_app/features/notifications/pages/notifications_page.dart';
+import 'package:village_app/features/profile/pages/edit_profile_page.dart';
 import 'package:village_app/shared/widgets/app_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -159,6 +160,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/subscription',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const SubscriptionPage(),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const EditProfilePage(),
       ),
       // ── Shopping detail (pushed from shell tab) ──
       GoRoute(
