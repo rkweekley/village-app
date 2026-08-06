@@ -4,6 +4,8 @@ import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/signalr/signalr_service.dart';
 import 'package:village_app/features/notifications/notification_service.dart';
 import 'package:village_app/features/family/family_provider.dart';
+import 'package:village_app/features/chores/chores_service.dart';
+import 'package:village_app/features/shopping/shopping_service.dart';
 
 /// Provider that manages SignalR lifecycle — connects when authenticated,
 /// disconnects on logout, and invalidates feature providers on push events.
@@ -21,6 +23,7 @@ class SignalRConnector {
   StreamSubscription? _choresSub;
   StreamSubscription? _pointsSub;
   StreamSubscription? _notificationsSub;
+  StreamSubscription? _shoppingSub;
 
   SignalRConnector(this._ref)
       : _signalR = _ref.read(signalRServiceProvider);
@@ -54,10 +57,13 @@ class SignalRConnector {
               case 'ChoreCreated':
               case 'ChoreUpdated':
               case 'ChoreDeleted':
+                _ref.invalidate(choresListProvider);
+                break;
               case 'ChoreAssigned':
               case 'ChoreCompleted':
               case 'ChoreApproved':
-                _ref.invalidate(familyProvider);
+              case 'ChoreRejected':
+                _ref.invalidate(assignmentsListProvider);
                 break;
             }
           });
@@ -80,6 +86,20 @@ class SignalRConnector {
               _ref.read(notificationProvider.notifier).prepend(notification);
             }
           });
+
+          // Listen for shopping list changes
+          _shoppingSub ??= _signalR.shoppingMessages.listen((msg) {
+            switch (msg.target) {
+              case 'ShoppingListCreated':
+              case 'ShoppingListDeleted':
+              case 'ShoppingItemAdded':
+              case 'ShoppingItemToggled':
+              case 'ShoppingItemUpdated':
+              case 'ShoppingItemDeleted':
+                _ref.invalidate(shoppingListsProvider);
+                break;
+            }
+          });
         }
       } else if (next.status == AuthStatus.unauthenticated) {
         _signalR.disconnectAll();
@@ -92,6 +112,7 @@ class SignalRConnector {
     _choresSub?.cancel();
     _pointsSub?.cancel();
     _notificationsSub?.cancel();
+    _shoppingSub?.cancel();
     _signalR.dispose();
   }
 }

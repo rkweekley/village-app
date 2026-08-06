@@ -160,11 +160,13 @@ class SignalRService {
   late final SignalRHubClient choresHub;
   late final SignalRHubClient pointsHub;
   late final SignalRHubClient notificationsHub;
+  late final SignalRHubClient shoppingHub;
 
   Stream<SignalRMessage> get familyMessages => familyHub.messages;
   Stream<SignalRMessage> get choresMessages => choresHub.messages;
   Stream<SignalRMessage> get pointsMessages => pointsHub.messages;
   Stream<SignalRMessage> get notificationsMessages => notificationsHub.messages;
+  Stream<SignalRMessage> get shoppingMessages => shoppingHub.messages;
 
   SignalRService({required this.baseUrl, required this.storage}) {
     familyHub = SignalRHubClient(
@@ -191,6 +193,12 @@ class SignalRService {
       joinMethod: 'JoinNotificationGroup',
       storage: storage,
     );
+    shoppingHub = SignalRHubClient(
+      baseUrl: baseUrl,
+      hubPath: '/hubs/shopping',
+      joinMethod: 'JoinShoppingGroup',
+      storage: storage,
+    );
   }
 
   /// Connect to all hubs and join the family/notification groups.
@@ -200,6 +208,7 @@ class SignalRService {
       familyHub.connect(familyId: familyId),
       choresHub.connect(familyId: familyId),
       pointsHub.connect(familyId: familyId),
+      shoppingHub.connect(familyId: familyId),
       notificationsHub.connect(familyId: userId), // Notifications use user-scoped group
     ]);
   }
@@ -208,6 +217,7 @@ class SignalRService {
       familyHub.isConnected &&
       choresHub.isConnected &&
       pointsHub.isConnected &&
+      shoppingHub.isConnected &&
       notificationsHub.isConnected;
 
   Future<void> disconnectAll() async {
@@ -215,6 +225,7 @@ class SignalRService {
       familyHub.disconnect(),
       choresHub.disconnect(),
       pointsHub.disconnect(),
+      shoppingHub.disconnect(),
       notificationsHub.disconnect(),
     ]);
   }
@@ -223,6 +234,7 @@ class SignalRService {
     familyHub.dispose();
     choresHub.dispose();
     pointsHub.dispose();
+    shoppingHub.dispose();
     notificationsHub.dispose();
   }
 }
