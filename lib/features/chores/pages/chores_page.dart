@@ -109,6 +109,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
     String difficulty = 'Easy';
     bool requiresApproval = true;
     bool requiresPhoto = false;
+    bool submitting = false;
 
     showAdaptiveModalSheet(
       context: context,
@@ -242,25 +243,52 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: () async {
-                    await ref.read(choresServiceProvider).createChore(
-                          name: nameCtrl.text,
-                          description: descCtrl.text,
-                          pointValue: int.tryParse(pointCtrl.text) ?? 10,
-                          recurrence: recurrence,
-                          difficulty: difficulty,
-                          requiresApproval: requiresApproval,
-                          requiresPhoto: requiresPhoto,
-                        );
-                    ref.invalidate(choresListProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  },
+                  onPressed: submitting
+                      ? null
+                      : () async {
+                          setState(() => submitting = true);
+                          try {
+                            await ref.read(choresServiceProvider).createChore(
+                                  name: nameCtrl.text,
+                                  description: descCtrl.text,
+                                  pointValue:
+                                      int.tryParse(pointCtrl.text) ?? 10,
+                                  recurrence: recurrence,
+                                  difficulty: difficulty,
+                                  requiresApproval: requiresApproval,
+                                  requiresPhoto: requiresPhoto,
+                                );
+                            ref.invalidate(choresListProvider);
+                            if (ctx.mounted) Navigator.pop(ctx);
+                          } catch (e) {
+                            setState(() => submitting = false);
+                            if (ctx.mounted) {
+                              ScaffoldMessenger.of(ctx).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Failed to create chore: $e'),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.red.shade700,
+                                ),
+                              );
+                            }
+                          }
+                        },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
                     backgroundColor: VillageTheme.positive,
                   ),
-                  child: const Text('Create Chore',
-                      style: TextStyle(fontSize: 16)),
+                  child: submitting
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Create Chore',
+                          style: TextStyle(fontSize: 16)),
                 ),
               ],
             ),

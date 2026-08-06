@@ -1302,22 +1302,32 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
               FilledButton(
                 onPressed: () async {
                   if (titleCtrl.text.isEmpty) return;
-                  await ref.read(mealsServiceProvider).createRecipe(
-                        title: titleCtrl.text,
-                        description: descCtrl.text.isNotEmpty
-                            ? descCtrl.text
-                            : null,
-                        ingredients: ingredientsCtrl.text,
-                        instructions: instructionsCtrl.text,
-                        prepTimeMinutes:
-                            int.tryParse(prepCtrl.text) ?? 30,
-                        servings: int.tryParse(servingsCtrl.text) ?? 4,
-                        difficulty: difficulty,
-                        tags: tagsCtrl.text.isNotEmpty ? tagsCtrl.text : null,
-                        isFamilyFavorite: isFamilyFavorite,
+                  try {
+                    await ref.read(mealsServiceProvider).createRecipe(
+                          title: titleCtrl.text,
+                          description: descCtrl.text.isNotEmpty
+                              ? descCtrl.text
+                              : null,
+                          ingredients: ingredientsCtrl.text,
+                          instructions: instructionsCtrl.text,
+                          prepTimeMinutes:
+                              int.tryParse(prepCtrl.text) ?? 30,
+                          servings: int.tryParse(servingsCtrl.text) ?? 4,
+                          difficulty: difficulty,
+                          tags: tagsCtrl.text.isNotEmpty ? tagsCtrl.text : null,
+                          isFamilyFavorite: isFamilyFavorite,
+                        );
+                    ref.invalidate(recipesListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  } catch (e) {
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(content: Text('Failed: $e'),
+                            backgroundColor: Colors.red.shade700,
+                            behavior: SnackBarBehavior.floating),
                       );
-                  ref.invalidate(recipesListProvider);
-                  if (ctx.mounted) Navigator.pop(ctx);
+                    }
+                  }
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),

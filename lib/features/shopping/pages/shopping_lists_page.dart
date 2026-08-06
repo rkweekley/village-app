@@ -241,9 +241,19 @@ class ShoppingListsPage extends ConsumerWidget {
               autofocus: true,
               onSubmitted: (value) async {
                 if (value.trim().isNotEmpty) {
-                  await ref.read(shoppingServiceProvider).createList(value.trim());
-                  ref.invalidate(shoppingListsProvider);
-                  if (ctx.mounted) Navigator.pop(ctx);
+                  try {
+                    await ref.read(shoppingServiceProvider).createList(value.trim());
+                    ref.invalidate(shoppingListsProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  } catch (e) {
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(content: Text('Failed: $e'),
+                            backgroundColor: Colors.red.shade700,
+                            behavior: SnackBarBehavior.floating),
+                      );
+                    }
+                  }
                 }
               },
             ),
@@ -251,11 +261,21 @@ class ShoppingListsPage extends ConsumerWidget {
             FilledButton(
               onPressed: () async {
                 if (nameCtrl.text.trim().isNotEmpty) {
-                  await ref
-                      .read(shoppingServiceProvider)
-                      .createList(nameCtrl.text.trim());
-                  ref.invalidate(shoppingListsProvider);
-                  if (ctx.mounted) Navigator.pop(ctx);
+                  try {
+                    await ref
+                        .read(shoppingServiceProvider)
+                        .createList(nameCtrl.text.trim());
+                    ref.invalidate(shoppingListsProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  } catch (e) {
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(content: Text('Failed: $e'),
+                            backgroundColor: Colors.red.shade700,
+                            behavior: SnackBarBehavior.floating),
+                      );
+                    }
+                  }
                 }
               },
               style: FilledButton.styleFrom(
@@ -545,14 +565,24 @@ class _ShoppingListDetailPageState
                 FilledButton(
                   onPressed: () async {
                     if (nameCtrl.text.trim().isNotEmpty) {
-                      await ref.read(shoppingServiceProvider).addItem(
-                            widget.listId,
-                            name: nameCtrl.text.trim(),
-                            quantity: int.tryParse(qtyCtrl.text) ?? 1,
-                            category: category,
+                      try {
+                        await ref.read(shoppingServiceProvider).addItem(
+                              widget.listId,
+                              name: nameCtrl.text.trim(),
+                              quantity: int.tryParse(qtyCtrl.text) ?? 1,
+                              category: category,
+                            );
+                        ref.invalidate(shoppingListDetailProvider(widget.listId));
+                        if (ctx.mounted) Navigator.pop(ctx);
+                      } catch (e) {
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(content: Text('Failed: $e'),
+                                backgroundColor: Colors.red.shade700,
+                                behavior: SnackBarBehavior.floating),
                           );
-                      ref.invalidate(shoppingListDetailProvider(widget.listId));
-                      if (ctx.mounted) Navigator.pop(ctx);
+                        }
+                      }
                     }
                   },
                   style: FilledButton.styleFrom(

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 /// Shows a modal as a bottom sheet on mobile phones and as a centered dialog
@@ -47,6 +46,7 @@ Future<T?> showAdaptiveModalSheet<T>({
 }
 
 bool _isDesktopPlatform(BuildContext context) {
-  if (kIsWeb) return true;
+  // Check actual screen width — mobile web (Chrome on Samsung, etc.)
+  // should get BottomSheet, not Dialog. kIsWeb alone isn't enough.
   return MediaQuery.of(context).size.width >= 768;
 }

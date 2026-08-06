@@ -181,16 +181,26 @@ class RewardsPage extends ConsumerWidget {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () async {
-                    await ref.read(rewardsServiceProvider).createReward(
-                          name: nameCtrl.text,
-                          description: descCtrl.text,
-                          pointCost: int.tryParse(costCtrl.text) ?? 0,
-                          category: category,
-                          maxRedemptions: maxRedemptions,
-                          requiresApproval: requiresApproval,
+                    try {
+                      await ref.read(rewardsServiceProvider).createReward(
+                            name: nameCtrl.text,
+                            description: descCtrl.text,
+                            pointCost: int.tryParse(costCtrl.text) ?? 0,
+                            category: category,
+                            maxRedemptions: maxRedemptions,
+                            requiresApproval: requiresApproval,
+                          );
+                      ref.invalidate(rewardsListProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(content: Text('Failed: $e'),
+                              backgroundColor: Colors.red.shade700,
+                              behavior: SnackBarBehavior.floating),
                         );
-                    ref.invalidate(rewardsListProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
+                      }
+                    }
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
