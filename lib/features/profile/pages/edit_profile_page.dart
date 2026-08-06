@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/auth/auth_service.dart';
-import 'package:village_app/core/auth/models.dart';
+import 'package:village_app/features/family/family_provider.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({super.key});
@@ -15,6 +15,7 @@ class EditProfilePage extends ConsumerStatefulWidget {
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _emailCtrl;
+  late final TextEditingController _familyNameCtrl;
   DateTime? _birthDate;
   bool _submitting = false;
 
@@ -22,8 +23,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   void initState() {
     super.initState();
     final userInfo = ref.read(authProvider).userInfo;
+    final family = ref.read(familyProvider).family;
     _nameCtrl = TextEditingController(text: userInfo?.displayName ?? '');
     _emailCtrl = TextEditingController(text: userInfo?.email ?? '');
+    _familyNameCtrl = TextEditingController(text: family?.name ?? '');
     if (userInfo?.birthDate != null) {
       _birthDate = DateTime.tryParse(userInfo!.birthDate!);
     }
@@ -33,17 +36,19 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   void dispose() {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
+    _familyNameCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     final name = _nameCtrl.text.trim();
     final email = _emailCtrl.text.trim();
+    final familyName = _familyNameCtrl.text.trim();
 
     if (name.isEmpty || email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Name and email are required.'),
+          content: Text('Display name and email are required.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -52,6 +57,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
     final currentUser = ref.read(authProvider).userInfo;
     if (currentUser == null) return;
+
+    final currentFamily = ref.read(familyProvider).family;
 
     // Only send fields that actually changed
     final displayName = name != currentUser.displayName ? name : null;
@@ -63,23 +70,35 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           '${bd.year.toString().padLeft(4, '0')}-${bd.month.toString().padLeft(2, '0')}-${bd.day.toString().padLeft(2, '0')}';
       if (iso != currentUser.birthDate) birthDateParam = iso;
     } else if (currentUser.birthDate != null) {
-      birthDateParam = null; // clearing the date not supported by API — send current value unchanged
+      birthDateParam = null;
     }
 
-    if (displayName == null && emailParam == null && birthDateParam == null) {
-      // Nothing changed
+    final familyNameChanged = familyName.isNotEmpty &&
+        currentFamily != null &&
+        familyName != currentFamily.name;
+
+    if (displayName == null && emailParam == null && birthDateParam == null && !familyNameChanged) {
       if (mounted) Navigator.pop(context);
       return;
     }
 
     setState(() => _submitting = true);
     try {
-      final updated = await ref.read(authServiceProvider).updateProfile(
-            displayName: displayName,
-            email: emailParam,
-            birthDate: birthDateParam,
-          );
-      ref.read(authProvider.notifier).updateUserInfo(updated);
+      // Update profile fields if any changed
+      if (displayName != null || emailParam != null || birthDateParam != null) {
+        final updated = await ref.read(authServiceProvider).updateProfile(
+              displayName: displayName,
+              email: emailParam,
+              birthDate: birthDateParam,
+            );
+        ref.read(authProvider.notifier).updateUserInfo(updated);
+      }
+
+      // Update family name if changed
+      if (familyNameChanged) {
+        await ref.read(familyProvider.notifier).updateFamily(name: familyName);
+      }
+
       if (mounted) Navigator.pop(context);
     } catch (e) {
       setState(() => _submitting = false);
@@ -166,6 +185,41 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             ),
           ),
           const SizedBox(height: 32),
+
+          // ── Family ──
+          if (ref.watch(authProvider).canManage) ...[
+            Text('FAMILY',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: VillageTheme.textSecondary,
+                  letterSpacing: 1.2,
+                )),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _familyNameCtrl,
+              decoration: InputDecoration(
+                labelText: 'Family Name',
+                prefixIcon: const Icon(Icons.groups_outlined),
+                filled: true,
+                fillColor: VillageTheme.surfaceBase,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              textCapitalization: TextCapitalization.words,
+            ),
+            const SizedBox(height: 24),
+            Text('PROFILE',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: VillageTheme.textSecondary,
+                  letterSpacing: 1.2,
+                )),
+            const SizedBox(height: 12),
+          ],
 
           // Display Name
           TextField(
