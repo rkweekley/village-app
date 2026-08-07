@@ -49,7 +49,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // Authenticated
       if (isAuthenticated) {
-        if (isAuthRoute) return '/hub';
+        // Leave auth pages AND the startup splash once we're logged in —
+        // without the /splash case the redirect returns null and the user
+        // sits on the spinner forever after a cold restart (the token
+        // restored fine, but nothing ever navigated away from /splash).
+        if (isAuthRoute || location == '/splash') {
+          // Registered without an invite code → family setup first.
+          if (authState.userInfo != null &&
+              authState.userInfo!.familyId.isEmpty &&
+              location != '/family-setup') {
+            return '/family-setup';
+          }
+          return '/hub';
+        }
         if (location == '/family-setup') return null;
       }
 
