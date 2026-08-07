@@ -53,8 +53,22 @@ class AuthNotifier extends Notifier<AuthState> {
 
   AuthService get _authService => ref.read(authServiceProvider);
 
-  /// Try to restore session from stored token
+  /// Try to restore session from stored token.
+  ///
+  /// GUARANTEED to leave the [AuthStatus.unknown] state — any failure
+  /// (storage exception, network hang, anything) falls through to a
+  /// definite authenticated/unauthenticated state. A stuck `unknown`
+  /// shows the splash spinner forever (the Android cold-restart bug).
   Future<void> tryAutoLogin() async {
+    try {
+      await _tryAutoLoginInner().timeout(const Duration(seconds: 20));
+    } catch (_) {
+      // Timeout or unexpected error — drop to login rather than spin forever.
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+    }
+  }
+
+  Future<void> _tryAutoLoginInner() async {
     final hasToken = await _authService.hasToken();
     if (!hasToken) {
       state = state.copyWith(status: AuthStatus.unauthenticated);
@@ -86,9 +100,14 @@ class AuthNotifier extends Notifier<AuthState> {
       }
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionError ||
-          e.type == DioExceptionType.connectionTimeout) {
-        // Network error — stay authenticated with cached token
-        state = state.copyWith(status: AuthStatus.authenticated);
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        // Network error — stay authenticated with cached token so the
+        // app shell renders and pages can show their own retry states.
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          error: 'Could not reach Village. Check your connection.',
+        );
       } else if (e.response?.statusCode == 401) {
         // Try refresh
         final refreshed = await _authService.tryRefresh();

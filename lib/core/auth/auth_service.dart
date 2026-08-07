@@ -71,13 +71,25 @@ class AuthService {
   Future<String?> getAccessToken() async => _storage.read(_accessTokenKey);
 
   Future<void> logout() async {
-    try {
-      await _dio.post('/api/auth/logout');
-    } catch (_) {
-      // Server may be unreachable — clear local tokens regardless
-    }
+    // Grab the token before clearing, then delete local tokens FIRST.
+    final token = await _storage.read(_accessTokenKey);
     await _storage.delete(_accessTokenKey);
     await _storage.delete(_refreshTokenKey);
+
+    // Tell the server best-effort. Uses a bare Dio (no auth interceptor) —
+    // posting through the authenticated Dio can 401, whose interceptor
+    // triggers the logout callback again → infinite recursion.
+    try {
+      final bareDio = Dio(BaseOptions(baseUrl: _dio.options.baseUrl));
+      await bareDio.post(
+        '/api/auth/logout',
+        options: token != null && token.isNotEmpty
+            ? Options(headers: {'Authorization': 'Bearer $token'})
+            : null,
+      );
+    } catch (_) {
+      // Server may be unreachable — tokens already cleared locally.
+    }
   }
 
   Future<bool> hasToken() async {
