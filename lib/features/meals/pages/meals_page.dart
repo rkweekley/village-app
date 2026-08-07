@@ -848,48 +848,21 @@ class _RecipeCard extends StatelessWidget {
                           )),
                   const SizedBox(height: 20),
 
-                  // Instructions
+                  // Instructions — render as clean paragraphs
                   const Text('Instructions',
                       style: TextStyle(
                           fontWeight: FontWeight.w700, fontSize: 17)),
                   const SizedBox(height: 8),
                   ...r.instructions
-                      .split(RegExp(r'[,.\\n]+'))
-                      .map((line) => line.trim())
-                      .where((line) => line.isNotEmpty)
-                      .toList()
-                      .asMap()
-                      .entries
-                      .map((entry) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: VillageTheme.danger
-                                        .withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${entry.key + 1}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: VillageTheme.danger,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(entry.value,
-                                      style: const TextStyle(fontSize: 14)),
-                                ),
-                              ],
+                      .split('\n')
+                      .map((p) => p.trim())
+                      .where((p) => p.isNotEmpty)
+                      .map((paragraph) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Text(
+                              paragraph,
+                              style: const TextStyle(
+                                  fontSize: 14, height: 1.6),
                             ),
                           )),
 
