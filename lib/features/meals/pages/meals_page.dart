@@ -442,6 +442,14 @@ class _MealSlot extends StatelessWidget {
 
     if (!context.mounted) return;
 
+    // Sheet-local state lives OUTSIDE the StatefulBuilder builder —
+    // declared inside, it gets recreated on every rebuild (each keystroke
+    // via setDialogState), which reset the controller and made the custom
+    // title field impossible to type into.
+    String? selectedRecipeId;
+    String freeTextTitle = '';
+    final titleCtrl = TextEditingController();
+
     showAdaptiveModalSheet(
       context: context,
       isScrollControlled: true,
@@ -450,10 +458,6 @@ class _MealSlot extends StatelessWidget {
       ),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) {
-          String? selectedRecipeId;
-          String freeTextTitle = '';
-          final titleCtrl = TextEditingController();
-
           return Padding(
             padding: EdgeInsets.only(
               left: 24,
