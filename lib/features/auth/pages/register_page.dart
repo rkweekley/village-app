@@ -5,7 +5,9 @@ import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
-  const RegisterPage({super.key});
+  final String? inviteCode;
+
+  const RegisterPage({super.key, this.inviteCode});
 
   @override
   ConsumerState<RegisterPage> createState() => _RegisterPageState();
@@ -19,6 +21,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _inviteCtrl = TextEditingController();
   bool _obscurePassword = true;
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.inviteCode != null && widget.inviteCode!.isNotEmpty) {
+      _inviteCtrl.text = widget.inviteCode!;
+    }
+  }
 
   @override
   void dispose() {

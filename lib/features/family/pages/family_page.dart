@@ -132,6 +132,11 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 12),
+
+                      // ── Send invite via email ──
+                      _InviteEmailField(familyId: familyState.family!.id),
+
                       const SizedBox(height: 8),
                       Text(
                         'New members enter this code when creating their account.',
@@ -381,6 +386,101 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
     final d = DateTime.parse(iso);
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${months[d.month - 1]} ${d.day}';
+  }
+}
+
+class _InviteEmailField extends ConsumerStatefulWidget {
+  final String familyId;
+
+  const _InviteEmailField({required this.familyId});
+
+  @override
+  ConsumerState<_InviteEmailField> createState() => _InviteEmailFieldState();
+}
+
+class _InviteEmailFieldState extends ConsumerState<_InviteEmailField> {
+  final _emailCtrl = TextEditingController();
+  bool _sending = false;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid email address.'),
+            behavior: SnackBarBehavior.floating),
+      );
+      return;
+    }
+
+    setState(() => _sending = true);
+    try {
+      final result = await ref
+          .read(familyServiceProvider)
+          .sendInviteEmail(email);
+      _emailCtrl.clear();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(result['message'] as String? ?? 'Invite sent!'),
+              behavior: SnackBarBehavior.floating),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _emailCtrl,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.send,
+            onSubmitted: (_) => _send(),
+            decoration: InputDecoration(
+              hintText: 'Email to invite...',
+              isDense: true,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              filled: true,
+              fillColor: VillageTheme.surfaceBase,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        _sending
+            ? const SizedBox(
+                width: 20, height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2))
+            : IconButton(
+                icon: const Icon(Icons.send_rounded,
+                    color: VillageTheme.primary, size: 22),
+                tooltip: 'Send invite',
+                onPressed: _send,
+              ),
+      ],
+    );
   }
 }
 

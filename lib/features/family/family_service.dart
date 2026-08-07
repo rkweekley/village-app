@@ -52,6 +52,13 @@ class FamilyService {
   Future<void> removeMember(String userId) async {
     await _dio.delete('/api/families/mine/members/$userId');
   }
+
+  /// Send an invite email to join this family.
+  Future<Map<String, dynamic>> sendInviteEmail(String email) async {
+    final response = await _dio.post('/api/families/mine/invite',
+        data: {'email': email});
+    return response.data as Map<String, dynamic>;
+  }
 }
 
 final familyServiceProvider = Provider<FamilyService>((ref) {

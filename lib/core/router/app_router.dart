@@ -63,6 +63,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
+        path: '/join',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => RegisterPage(
+          inviteCode: state.uri.queryParameters['code'],
+        ),
+      ),
+      GoRoute(
         path: '/forgot-password',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ForgotPasswordPage(),
