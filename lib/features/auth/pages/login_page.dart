@@ -17,6 +17,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
   bool _loading = false;
+  bool _redirectChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check URL hash for invite code — GoRouter hash routing is unreliable
+    // on first load, so we read window.location directly.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_redirectChecked) return;
+      _redirectChecked = true;
+      try {
+        final hash = Uri.base.fragment;
+        // Match #/register/CODE or #/register?code=CODE
+        final registerMatch = RegExp(r'^/register/([A-Z0-9]+)').firstMatch(hash);
+        final queryMatch = RegExp(r'^/register\?code=([A-Z0-9]+)').firstMatch(hash);
+        final code = registerMatch?.group(1) ?? queryMatch?.group(1);
+        if (code != null && code.isNotEmpty && mounted) {
+          context.go('/register/$code');
+        }
+      } catch (_) {}
+    });
+  }
 
   @override
   void dispose() {
