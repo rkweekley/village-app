@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:village_app/core/auth/secure_storage.dart';
+import 'package:village_app/core/config.dart';
 
 /// Lightweight SignalR client using the JSON hub protocol over WebSocket.
 ///
@@ -243,8 +244,10 @@ class SignalRService {
 /// Disposal is handled by [SignalRConnector] — do NOT register a separate
 /// onDispose here to avoid double-dispose on the StreamController.
 final signalRServiceProvider = Provider<SignalRService>((ref) {
-  // Empty string = relative to page origin; nginx proxies /hubs/ to the API
   final storage = ref.read(secureStorageProvider);
-  final service = SignalRService(baseUrl: '', storage: storage);
+  final service = SignalRService(
+    baseUrl: AppConfig.signalRBaseUrl,
+    storage: storage,
+  );
   return service;
 });
