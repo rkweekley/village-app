@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/features/meals/meals_service.dart';
+import 'package:village_app/features/meals/pages/recipe_ideas_tab.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
 
 class MealsPage extends ConsumerWidget {
@@ -11,7 +12,7 @@ class MealsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Meals'),
@@ -25,6 +26,7 @@ class MealsPage extends ConsumerWidget {
               Tab(text: 'Week'),
               Tab(text: 'Recipes'),
               Tab(text: 'Favorites'),
+              Tab(text: 'Ideas'),
             ],
           ),
         ),
@@ -33,6 +35,7 @@ class MealsPage extends ConsumerWidget {
             _WeekTab(),
             _RecipesTab(),
             _FavoritesTab(),
+            const RecipeIdeasTab(),
           ],
         ),
       ),
