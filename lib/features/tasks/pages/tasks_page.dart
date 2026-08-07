@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/theme/village_theme.dart';
@@ -531,15 +532,37 @@ class _ChoreCard extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (selectedMember == null) return;
                       final dueDate = '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-                      ref.read(choresServiceProvider).assignChore(
-                        chore.id,
-                        selectedMember!.id,
-                        dueDate,
-                      );
-                      Navigator.pop(ctx);
+                      try {
+                        await ref.read(choresServiceProvider).assignChore(
+                          chore.id,
+                          selectedMember!.id,
+                          dueDate,
+                        );
+                        ref.invalidate(assignmentsListProvider);
+                        if (ctx.mounted) Navigator.pop(ctx);
+                      } on DioException {
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                  'Failed to assign chore. Check your connection.'),
+                              backgroundColor: Colors.red.shade700,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed: $e'),
+                              backgroundColor: Colors.red.shade700,
+                            ),
+                          );
+                        }
+                      }
                     },
                     child: const Text('Assign'),
                   ),
@@ -906,7 +929,7 @@ class _AssignmentCard extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               FilledButton(
-                onPressed: () {
+                onPressed: () async {
                   final pts = int.tryParse(pointsCtrl.text);
                   if (pts == null || pts < 0 || pts > maxPoints) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -914,8 +937,30 @@ class _AssignmentCard extends ConsumerWidget {
                     );
                     return;
                   }
-                  ref.read(schoolServiceProvider).gradeSchoolWork(id, pointsEarned: pts);
-                  Navigator.pop(ctx);
+                  try {
+                    await ref.read(schoolServiceProvider).gradeSchoolWork(id, pointsEarned: pts);
+                    ref.invalidate(schoolWorkListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  } on DioException {
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                              'Failed to grade assignment. Check your connection.'),
+                          backgroundColor: Colors.red.shade700,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed: $e'),
+                          backgroundColor: Colors.red.shade700,
+                        ),
+                      );
+                    }
+                  }
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
@@ -1167,6 +1212,7 @@ class _CreateAssignmentSheetState
   final _descCtrl = TextEditingController();
   final _pointsCtrl = TextEditingController(text: '10');
   MemberInfo? _selectedMember;
+  String? _selectedSubjectId;
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -1269,6 +1315,51 @@ class _CreateAssignmentSheetState
               const Text('No family members loaded.',
                   style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 12),
+            Builder(
+              builder: (context) {
+                final subjectsAsync = ref.watch(subjectsListProvider);
+                final subjects = subjectsAsync.asData?.value ?? [];
+                // Set default subject on first data arrival.
+                if (_selectedSubjectId == null && subjects.isNotEmpty) {
+                  _selectedSubjectId = subjects.first.id;
+                }
+                if (subjects.isNotEmpty) {
+                  return Column(
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: _selectedSubjectId,
+                        decoration: InputDecoration(
+                          labelText: 'Subject',
+                          filled: true,
+                          fillColor: VillageTheme.surfaceBase,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        items: subjects
+                            .map((s) => DropdownMenuItem(
+                                  value: s.id,
+                                  child: Text(s.name),
+                                ))
+                            .toList(),
+                        onChanged: (v) =>
+                            setState(() => _selectedSubjectId = v),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'No subjects yet — create one in School first.',
+                    style: TextStyle(
+                        color: VillageTheme.warning, fontSize: 13),
+                  ),
+                );
+              },
+            ),
             TextField(
               controller: _descCtrl,
               decoration: InputDecoration(
@@ -1351,21 +1442,51 @@ class _CreateAssignmentSheetState
                   );
                   return;
                 }
+                if (_selectedSubjectId == null || _selectedSubjectId!.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Please select a subject.'),
+                      backgroundColor: Colors.red.shade700,
+                    ),
+                  );
+                  return;
+                }
                 final dueDate =
                     '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
-                await widget.ref.read(schoolServiceProvider).createSchoolWork(
-                      subjectId: '', // user picks subject later
-                      assignedToId: _selectedMember!.id,
-                      title: _titleCtrl.text.trim(),
-                      description: _descCtrl.text.trim().isNotEmpty
-                          ? _descCtrl.text.trim()
-                          : null,
-                      dueDate: dueDate,
-                      pointsPossible:
-                          int.tryParse(_pointsCtrl.text) ?? 10,
+                try {
+                  await widget.ref.read(schoolServiceProvider).createSchoolWork(
+                        subjectId: _selectedSubjectId!,
+                        assignedToId: _selectedMember!.id,
+                        title: _titleCtrl.text.trim(),
+                        description: _descCtrl.text.trim().isNotEmpty
+                            ? _descCtrl.text.trim()
+                            : null,
+                        dueDate: dueDate,
+                        pointsPossible:
+                            int.tryParse(_pointsCtrl.text) ?? 10,
+                      );
+                  widget.ref.invalidate(schoolWorkListProvider);
+                  if (context.mounted) Navigator.pop(context);
+                } on DioException {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                            'Failed to create assignment. Check your connection.'),
+                        backgroundColor: Colors.red.shade700,
+                      ),
                     );
-                widget.ref.invalidate(schoolWorkListProvider);
-                if (context.mounted) Navigator.pop(context);
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed: $e'),
+                        backgroundColor: Colors.red.shade700,
+                      ),
+                    );
+                  }
+                }
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),

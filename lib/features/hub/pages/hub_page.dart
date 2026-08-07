@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -722,10 +723,15 @@ class _HubPageState extends ConsumerState<HubPage> {
       return;
     }
 
+    // Pre-fetch school subjects for the dropdown.
+    final subjectsAsync = ref.read(subjectsListProvider);
+    final subjects = subjectsAsync.asData?.value ?? [];
+
     final titleCtrl = TextEditingController();
     final descCtrl = TextEditingController();
     final pointsCtrl = TextEditingController(text: '10');
     MemberInfo? selectedMember = members.first;
+    String? selectedSubjectId = subjects.isNotEmpty ? subjects.first.id : null;
     DateTime selectedDate = DateTime.now();
 
     showAdaptiveModalSheet(
@@ -815,8 +821,37 @@ class _HubPageState extends ConsumerState<HubPage> {
                 else
                   const Text('No family members loaded.',
                       style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 12),
-                TextField(
+                  const SizedBox(height: 12),
+                  if (subjects.isNotEmpty)
+                  DropdownButtonFormField<String>(
+                    value: selectedSubjectId,
+                    decoration: InputDecoration(
+                      labelText: 'Subject',
+                      filled: true,
+                      fillColor: VillageTheme.surfaceBase,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items: subjects
+                        .map((s) => DropdownMenuItem(
+                              value: s.id,
+                              child: Text(s.name),
+                            ))
+                        .toList(),
+                    onChanged: (v) => setState(() => selectedSubjectId = v),
+                  )
+                  else
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      'No subjects yet — create one in School first.',
+                      style: TextStyle(color: VillageTheme.warning, fontSize: 13),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
                   controller: descCtrl,
                   decoration: InputDecoration(
                     labelText: 'Description (optional)',
@@ -898,21 +933,51 @@ class _HubPageState extends ConsumerState<HubPage> {
                       );
                       return;
                     }
+                    if (selectedSubjectId == null || selectedSubjectId!.isEmpty) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: const Text('Please select a subject.'),
+                          backgroundColor: Colors.red.shade700,
+                        ),
+                      );
+                      return;
+                    }
                     final dueDate =
                         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-                    await ref.read(schoolServiceProvider).createSchoolWork(
-                          subjectId: '', // user picks subject later
-                          assignedToId: selectedMember!.id,
-                          title: titleCtrl.text.trim(),
-                          description: descCtrl.text.trim().isNotEmpty
-                              ? descCtrl.text.trim()
-                              : null,
-                          dueDate: dueDate,
-                          pointsPossible:
-                              int.tryParse(pointsCtrl.text) ?? 10,
+                    try {
+                      await ref.read(schoolServiceProvider).createSchoolWork(
+                            subjectId: selectedSubjectId!,
+                            assignedToId: selectedMember!.id,
+                            title: titleCtrl.text.trim(),
+                            description: descCtrl.text.trim().isNotEmpty
+                                ? descCtrl.text.trim()
+                                : null,
+                            dueDate: dueDate,
+                            pointsPossible:
+                                int.tryParse(pointsCtrl.text) ?? 10,
+                          );
+                      ref.invalidate(schoolWorkListProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } on DioException {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                                'Failed to create assignment. Check your connection.'),
+                            backgroundColor: Colors.red.shade700,
+                          ),
                         );
-                    ref.invalidate(schoolWorkListProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
+                      }
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed: $e'),
+                            backgroundColor: Colors.red.shade700,
+                          ),
+                        );
+                      }
+                    }
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
