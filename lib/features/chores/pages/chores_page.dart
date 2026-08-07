@@ -44,18 +44,6 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
     final assignmentsAsync = ref.watch(assignmentsListProvider);
     final isParent = ref.watch(authProvider).canManage;
     final userId = ref.watch(authProvider).userInfo?.id;
-    final tabCount = isParent ? 3 : 2;
-
-    // Sync tab count if role changed (unlikely but safe)
-    if (_tabController.length != tabCount) {
-      _tabController.dispose();
-      _tabController = TabController(length: tabCount, vsync: this);
-      _tabController.addListener(() {
-        if (!_tabController.indexIsChanging) {
-          setState(() => _currentTab = _tabController.index);
-        }
-      });
-    }
 
     return Scaffold(
       appBar: AppBar(

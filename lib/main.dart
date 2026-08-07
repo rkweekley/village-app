@@ -33,8 +33,8 @@ class _AppBootstrapState extends ConsumerState<AppBootstrap> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authProvider.notifier).tryAutoLogin();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(authProvider.notifier).tryAutoLogin();
       ref.read(signalRConnectorProvider).initialize();
     });
   }
@@ -42,9 +42,15 @@ class _AppBootstrapState extends ConsumerState<AppBootstrap> {
   @override
   Widget build(BuildContext context) {
     final status = ref.watch(authProvider.select((s) => s.status));
-    return KeyedSubtree(
-      key: ValueKey(status),
-      child: const VillageApp(),
-    );
+    // Only key the subtree during the initial unknown phase to preserve
+    // the router across storage-read; after that let it live across
+    // all auth transitions to avoid needless full-tree rebuilds.
+    if (status == AuthStatus.unknown) {
+      return KeyedSubtree(
+        key: const ValueKey('bootstrap'),
+        child: const VillageApp(),
+      );
+    }
+    return const VillageApp();
   }
 }

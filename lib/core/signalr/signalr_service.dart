@@ -240,14 +240,11 @@ class SignalRService {
 }
 
 /// Riverpod provider for the SignalR service.
+/// Disposal is handled by [SignalRConnector] — do NOT register a separate
+/// onDispose here to avoid double-dispose on the StreamController.
 final signalRServiceProvider = Provider<SignalRService>((ref) {
   // Empty string = relative to page origin; nginx proxies /hubs/ to the API
   final storage = ref.read(secureStorageProvider);
   final service = SignalRService(baseUrl: '', storage: storage);
-
-  ref.onDispose(() {
-    service.dispose();
-  });
-
   return service;
 });

@@ -123,6 +123,6 @@ class AuthService {
 
 final authServiceProvider = Provider<AuthService>((ref) {
   final storage = ref.read(secureStorageProvider);
-  final dio = ref.watch(authenticatedDioProvider);
+  final dio = ref.read(authenticatedDioProvider);
   return AuthService(dio, storage);
 });
