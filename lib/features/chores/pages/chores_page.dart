@@ -1051,7 +1051,7 @@ class _AssignmentsTab extends StatelessWidget {
                 ),
                 title: Text(a.choreName),
                 subtitle: Text(
-                    'Assigned to: ${a.assignedToName}\\n${a.status}${a.completion != null ? ' · ${a.completion!.approvalStatus}' : ''}'),
+                    'Assigned to: ${a.assignedToName}\n${a.status}${a.completion != null ? ' · ${a.completion!.approvalStatus}' : ''}'),
                 trailing: isPending
                     ? IconButton(
                         icon: const Icon(Icons.check_circle_outline),
