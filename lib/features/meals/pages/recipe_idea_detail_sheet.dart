@@ -4,11 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:village_app/core/network/authenticated_client.dart';
 import 'package:village_app/core/theme/village_theme.dart';
+import 'package:village_app/features/meals/meals_service.dart';
 import 'package:village_app/features/meals/recipe_ideas_service.dart';
 import 'package:village_app/features/shopping/shopping_service.dart';
 
-/// Modal bottom sheet showing a recipe from TheMealDB with ingredients
-/// and an "Add to Shopping List" flow.
+/// Modal bottom sheet showing a recipe from TheMealDB with ingredients,
+/// an "Add to Shopping List" flow, and "Save to My Recipes".
 class RecipeIdeaDetailSheet extends ConsumerStatefulWidget {
   final RecipeIdea recipe;
 
@@ -22,21 +23,21 @@ class RecipeIdeaDetailSheet extends ConsumerStatefulWidget {
 class _RecipeIdeaDetailSheetState
     extends ConsumerState<RecipeIdeaDetailSheet> {
   bool _addingToShoppingList = false;
+  bool _saving = false;
+  bool _saved = false;
 
   @override
   Widget build(BuildContext context) {
     final recipe = widget.recipe;
     final theme = Theme.of(context);
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.92,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) => Stack(
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.92,
+      ),
+      child: Stack(
         children: [
           ListView(
-            controller: scrollController,
             padding: EdgeInsets.zero,
             children: [
               // ── Hero image ──
@@ -52,7 +53,8 @@ class _RecipeIdeaDetailSheetState
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
                         height: 220,
-                        color: VillageTheme.primary.withValues(alpha: 0.15),
+                        color:
+                            VillageTheme.primary.withValues(alpha: 0.15),
                         child: const Center(
                           child: Icon(Icons.restaurant_rounded,
                               size: 48, color: VillageTheme.primary),
@@ -103,8 +105,7 @@ class _RecipeIdeaDetailSheetState
                       children: [
                         Text(
                           recipe.title,
-                          style:
-                              theme.textTheme.titleLarge?.copyWith(
+                          style: theme.textTheme.titleLarge?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                           ),
@@ -119,8 +120,8 @@ class _RecipeIdeaDetailSheetState
                                     VillageTheme.primary),
                               if (recipe.area != null) ...[
                                 const SizedBox(width: 6),
-                                _badge(recipe.area!,
-                                    VillageTheme.warning),
+                                _badge(
+                                    recipe.area!, VillageTheme.warning),
                               ],
                             ],
                           ),
@@ -133,8 +134,8 @@ class _RecipeIdeaDetailSheetState
 
               // ── Actions bar ──
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 12),
                 child: Row(
                   children: [
                     if (recipe.youtubeUrl != null)
@@ -144,12 +145,12 @@ class _RecipeIdeaDetailSheetState
                               Uri.parse(recipe.youtubeUrl!)),
                           icon: const Icon(Icons.play_circle_outline,
                               size: 18),
-                          label:
-                              const Text('Watch', style: TextStyle(fontSize: 13)),
+                          label: const Text('Watch',
+                              style: TextStyle(fontSize: 13)),
                         ),
                       ),
                     if (recipe.youtubeUrl != null)
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                     Expanded(
                       child: FilledButton.icon(
                         onPressed: _addingToShoppingList
@@ -171,11 +172,32 @@ class _RecipeIdeaDetailSheetState
                             style: const TextStyle(fontSize: 13)),
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed:
+                            (_saving || _saved) ? null : _saveToMyRecipes,
+                        icon: _saving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white))
+                            : Icon(_saved
+                                ? Icons.check_rounded
+                                : Icons.bookmark_outline,
+                                size: 18),
+                        label: Text(
+                            _saved ? 'Saved!' : 'Save Recipe',
+                            style: const TextStyle(fontSize: 13)),
+                      ),
+                    ),
                   ],
                 ),
               ),
 
-              // ── Ingredients header ──
+              // ── Ingredients ──
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -184,8 +206,6 @@ class _RecipeIdeaDetailSheetState
                         fontWeight: FontWeight.w700)),
               ),
               const SizedBox(height: 4),
-
-              // ── Ingredient list ──
               ...recipe.ingredients
                   .where((i) => i.name.isNotEmpty)
                   .map((ing) => ListTile(
@@ -207,10 +227,9 @@ class _RecipeIdeaDetailSheetState
                         visualDensity: VisualDensity.compact,
                       )),
 
-              const SizedBox(height: 8),
-
               // ── Instructions ──
               if (recipe.instructions.isNotEmpty) ...[
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20, vertical: 4),
@@ -231,7 +250,7 @@ class _RecipeIdeaDetailSheetState
                 ),
               ],
 
-              const SizedBox(height: 100), // space for FAB
+              const SizedBox(height: 100),
             ],
           ),
         ],
@@ -247,7 +266,9 @@ class _RecipeIdeaDetailSheetState
         ),
         child: Text(text,
             style: TextStyle(
-                color: color, fontSize: 12, fontWeight: FontWeight.w600)),
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600)),
       );
 
   void _showShoppingListPicker() {
@@ -277,9 +298,7 @@ class _RecipeIdeaDetailSheetState
                           color: Colors.grey[600], fontSize: 13)),
                   const SizedBox(height: 20),
                   FilledButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                    },
+                    onPressed: () => Navigator.pop(ctx),
                     child: const Text('OK'),
                   ),
                 ],
@@ -297,10 +316,10 @@ class _RecipeIdeaDetailSheetState
                         fontSize: 18, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 12),
                 ...lists.map((list) => ListTile(
-                      leading: const Icon(Icons.shopping_cart_outlined),
+                      leading:
+                          const Icon(Icons.shopping_cart_outlined),
                       title: Text(list.name),
-                      subtitle:
-                          Text('${list.itemCount} items'),
+                      subtitle: Text('${list.itemCount} items'),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                       onTap: () {
@@ -312,7 +331,8 @@ class _RecipeIdeaDetailSheetState
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () =>
+            const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
@@ -347,7 +367,8 @@ class _RecipeIdeaDetailSheetState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Failed to add ingredients. Check your connection.'),
+            content: const Text(
+                'Failed to add ingredients. Check your connection.'),
             backgroundColor: Colors.red.shade700,
           ),
         );
@@ -363,6 +384,70 @@ class _RecipeIdeaDetailSheetState
       }
     } finally {
       if (mounted) setState(() => _addingToShoppingList = false);
+    }
+  }
+
+  Future<void> _saveToMyRecipes() async {
+    setState(() => _saving = true);
+    final recipe = widget.recipe;
+    final mealsService = ref.read(mealsServiceProvider);
+
+    try {
+      // Convert TheMealDB recipe to Village Recipe format
+      final ingredientsText = recipe.ingredients
+          .where((i) => i.name.isNotEmpty)
+          .map((i) =>
+              i.measure.isNotEmpty ? '${i.name} (${i.measure})' : i.name)
+          .join('\n');
+
+      await mealsService.createRecipe(
+        title: recipe.title,
+        description: recipe.category != null && recipe.area != null
+            ? '${recipe.area} ${recipe.category}'
+            : (recipe.category ?? recipe.area ?? ''),
+        ingredients: ingredientsText,
+        instructions: recipe.instructions,
+        photoUrl: recipe.image,
+        difficulty: 'Medium',
+        tags: recipe.category,
+      );
+
+      ref.invalidate(recipesListProvider);
+      ref.invalidate(familyFavoritesListProvider);
+
+      if (mounted) {
+        setState(() {
+          _saving = false;
+          _saved = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Recipe saved to My Recipes'),
+            backgroundColor: VillageTheme.positive,
+          ),
+        );
+      }
+    } on DioException {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+                'Failed to save recipe. Check your connection.'),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed: $e'),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
     }
   }
 }

@@ -340,7 +340,10 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: VillageTheme.surfaceBase,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) => ProviderScope(
         child: RecipeIdeaDetailSheet(recipe: recipe),
       ),
