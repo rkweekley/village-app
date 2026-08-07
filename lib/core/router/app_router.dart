@@ -26,7 +26,6 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/login',
     redirect: (context, state) {
       final authState = ref.read(authProvider);
 
