@@ -45,7 +45,6 @@ dependencies:
   uuid: ^4.6.0
   intl: ^0.20.3
   shimmer: ^3.0.0
-  cached_network_image: ^3.4.1
   google_fonts: ^6.2.1
   url_launcher: ^6.3.2
 

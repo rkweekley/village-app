@@ -369,21 +369,30 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                           ),
                     ),
                     const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: _isJoining ? null : _joinFamily,
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 48),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: VillageTheme.info.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: _isJoining
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Join Family'),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.info_outline,
+                              color: VillageTheme.info, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'To join this family, register a new account '
+                              'with the invite code \"${_lookedUpFamily!.name}\". '
+                              'Joining after registration is coming soon.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
