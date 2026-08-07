@@ -33,7 +33,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authState.isAuthenticated;
       final location = state.matchedLocation;
       final isAuthRoute = location == '/login' || location == '/register' ||
-          location.startsWith('/forgot-password') || location.startsWith('/reset-password');
+          location.startsWith('/forgot-password') || location.startsWith('/reset-password') ||
+          location.startsWith('/join');
       final isUnknown = authState.isLoading;
 
       // Still checking token — stay put
