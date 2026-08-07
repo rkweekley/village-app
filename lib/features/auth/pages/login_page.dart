@@ -60,30 +60,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: [
                 const SizedBox(height: 48),
 
-                // ── Brand (subtle, no gradient) ──
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: VillageTheme.primary.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.home_rounded,
-                    color: VillageTheme.primary,
-                    size: 36,
-                  ),
+                // ── Brand logo ──
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 100,
+                  width: 100,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Text(
-                  'Village',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: VillageTheme.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Your family os',
+                  'It takes a village to raise a family',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: VillageTheme.textTertiary,
                   ),
