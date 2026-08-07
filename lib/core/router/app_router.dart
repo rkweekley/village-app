@@ -32,7 +32,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final isAuthenticated = authState.isAuthenticated;
       final location = state.matchedLocation;
-      final isAuthRoute = location == '/login' || location == '/register' ||
+      final isAuthRoute = location == '/login' ||
+          location.startsWith('/register') ||
           location.startsWith('/forgot-password') || location.startsWith('/reset-password');
       final isUnknown = authState.isLoading;
 
@@ -58,11 +59,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
-        path: '/register',
+        path: '/register/:code',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => RegisterPage(
-          inviteCode: state.uri.queryParameters['code'],
+          inviteCode: state.pathParameters['code'],
         ),
+      ),
+      GoRoute(
+        path: '/register',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
         path: '/forgot-password',
