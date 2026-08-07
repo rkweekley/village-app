@@ -47,7 +47,8 @@ void main() {
   group('AuthResponse.fromJson', () {
     test('parses all fields from JSON', () {
       final json = {
-        'token': 'abc.def.ghi',
+        'accessToken': 'abc.def.ghi',
+        'refreshToken': 'rft.xyz.789',
         'userId': '123e4567-e89b-12d3-a456-426614174000',
         'displayName': 'Test User',
         'email': 'test@example.com',
@@ -57,7 +58,7 @@ void main() {
         'isNewFamily': true,
       };
       final response = AuthResponse.fromJson(json);
-      expect(response.token, 'abc.def.ghi');
+      expect(response.accessToken, 'abc.def.ghi');
       expect(response.userId, '123e4567-e89b-12d3-a456-426614174000');
       expect(response.displayName, 'Test User');
       expect(response.email, 'test@example.com');

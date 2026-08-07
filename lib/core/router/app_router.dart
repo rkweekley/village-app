@@ -19,6 +19,7 @@ import 'package:village_app/features/school/pages/school_page.dart';
 import 'package:village_app/features/notifications/pages/notifications_page.dart';
 import 'package:village_app/features/profile/pages/edit_profile_page.dart';
 import 'package:village_app/shared/widgets/app_shell.dart';
+import 'package:village_app/features/auth/pages/splash_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -36,8 +37,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           location.startsWith('/forgot-password') || location.startsWith('/reset-password');
       final isUnknown = authState.isLoading;
 
-      // Still checking token — stay put
-      if (isUnknown) return null;
+      // Still checking token — hold the current route so deep links
+      // (e.g. emailed /register/<code> invites) survive the auth check.
+      // Only the bare root shows a splash while we decide.
+      if (isUnknown) {
+        return location == '/' ? '/splash' : null;
+      }
 
       // Not authenticated → login
       if (!isAuthenticated && !isAuthRoute) return '/login';
@@ -52,6 +57,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       // ── Public pages (no shell) ──
+      GoRoute(
+        path: '/splash',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SplashPage(),
+      ),
       GoRoute(
         path: '/login',
         parentNavigatorKey: _rootNavigatorKey,

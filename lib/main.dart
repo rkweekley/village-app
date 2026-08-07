@@ -18,8 +18,10 @@ void main() async {
   );
 }
 
-/// Wrapper that triggers auto-login check after the first frame.
-/// Shows a loading splash while auth state is unknown.
+/// Triggers auto-login + SignalR after the first frame, then defers to
+/// [VillageApp]. Keyed by auth status so the router widget subtree is
+/// preserved across unknown → unauthenticated/authenticated transitions —
+/// replacing the subtree would drop the deep link the router captured.
 class AppBootstrap extends ConsumerStatefulWidget {
   const AppBootstrap({super.key});
 
@@ -39,26 +41,10 @@ class _AppBootstrapState extends ConsumerState<AppBootstrap> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
-    // Show splash while loading
-    if (authState.isLoading) {
-      return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: 80),
-                CircularProgressIndicator(),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    return const VillageApp();
+    final status = ref.watch(authProvider.select((s) => s.status));
+    return KeyedSubtree(
+      key: ValueKey(status),
+      child: const VillageApp(),
+    );
   }
 }
