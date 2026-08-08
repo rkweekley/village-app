@@ -914,6 +914,7 @@ class _RecipeCard extends StatelessWidget {
     String? selectedPlanId;
     int selectedDay = DateTime.now().weekday % 7;
     String selectedMealType = 'Dinner';
+    final _addLoading = ValueNotifier<bool>(false);
 
     showAdaptiveModalSheet(
       context: context,
@@ -1043,47 +1044,69 @@ class _RecipeCard extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: () async {
-                    if (selectedPlanId == null) {
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        const SnackBar(
-                            content: Text('Please select a meal plan.')),
-                      );
-                      return;
-                    }
-                    try {
-                      await ref.read(mealsServiceProvider).addEntry(
-                            selectedPlanId!,
-                            dayOfWeek: selectedDay,
-                            mealType: selectedMealType,
-                            recipeId: recipe.id,
-                            title: recipe.title,
-                          );
-                      if (ctx.mounted) {
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Added ${recipe.title} to ${_dayNames[selectedDay]} $selectedMealType'),
-                          ),
-                        );
-                        onRefresh();
-                      }
-                    } catch (e) {
-                      if (ctx.mounted) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          SnackBar(content: Text('Failed: $e')),
-                        );
-                      }
-                    }
+                StatefulBuilder(
+                  builder: (ctx, setBtnState) {
+                    final loading = _addLoading.value;
+                    return FilledButton(
+                      onPressed: loading
+                          ? null
+                          : () async {
+                              if (selectedPlanId == null) {
+                                ScaffoldMessenger.of(ctx).showSnackBar(
+                                  const SnackBar(content:
+                                      Text('Please select a meal plan.')),
+                                );
+                                return;
+                              }
+                              setBtnState(() => _addLoading.value = true);
+                              try {
+                                await ref.read(mealsServiceProvider).addEntry(
+                                      selectedPlanId!,
+                                      dayOfWeek: selectedDay,
+                                      mealType: selectedMealType,
+                                      recipeId: recipe.id,
+                                      title: recipe.title,
+                                    );
+                                if (ctx.mounted) {
+                                  Navigator.pop(ctx);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'Added ${recipe.title} to ${_dayNames[selectedDay]} $selectedMealType'),
+                                    ),
+                                  );
+                                  onRefresh();
+                                }
+                              } catch (e) {
+                                if (ctx.mounted) {
+                                  ScaffoldMessenger.of(ctx).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'Could not add to meal plan. Check your connection.'),
+                                    ),
+                                  );
+                                }
+                              } finally {
+                                if (ctx.mounted) {
+                                  setBtnState(
+                                      () => _addLoading.value = false);
+                                }
+                              }
+                            },
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 52),
+                        backgroundColor: VillageTheme.danger,
+                      ),
+                      child: loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
+                          : const Text('Add to Plan',
+                              style: TextStyle(fontSize: 16)),
+                    );
                   },
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.danger,
-                  ),
-                  child: const Text('Add to Plan',
-                      style: TextStyle(fontSize: 16)),
                 ),
               ],
             ),
