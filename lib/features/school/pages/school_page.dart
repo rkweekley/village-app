@@ -199,9 +199,10 @@ class SchoolPage extends ConsumerWidget {
     final subjectsAvailable = subjectsAsync.asData?.value ?? [];
 
     if (subjectsAvailable.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Create at least one subject first.')),
-      );
+      // No subjects yet — open the subject creation sheet first,
+      // then they can create an assignment after.
+      Navigator.pop(context); // close any existing sheet
+      _showCreateSubjectSheet(context, ref);
       return;
     }
 
