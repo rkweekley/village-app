@@ -18,6 +18,7 @@ import 'package:village_app/features/chores/pages/chores_page.dart';
 import 'package:village_app/features/school/pages/school_page.dart';
 import 'package:village_app/features/notifications/pages/notifications_page.dart';
 import 'package:village_app/features/profile/pages/edit_profile_page.dart';
+import 'package:village_app/features/settings/legal_page.dart';
 import 'package:village_app/shared/widgets/app_shell.dart';
 import 'package:village_app/features/auth/pages/splash_page.dart';
 
@@ -194,6 +195,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/profile/edit',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const EditProfilePage(),
+      ),
+      GoRoute(
+        path: '/legal',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const LegalPage(),
       ),
       // ── Shopping detail (pushed from shell tab) ──
       GoRoute(

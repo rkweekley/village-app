@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/auth/auth_service.dart';
@@ -321,6 +322,20 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   )
                 : const Text('Save Changes',
                     style: TextStyle(fontSize: 16)),
+          ),
+
+          const SizedBox(height: 16),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('About & Privacy'),
+            subtitle:
+                Text('Version 1.0.0', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+            trailing: const Icon(Icons.chevron_right_rounded,
+                color: VillageTheme.textTertiary),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            onTap: () => context.push('/legal'),
           ),
         ],
       ),
