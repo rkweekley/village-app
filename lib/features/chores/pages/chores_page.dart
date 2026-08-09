@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/chores/chores_service.dart';
 import 'package:village_app/features/family/family_provider.dart';
@@ -1152,10 +1153,11 @@ class _ApprovalsTab extends StatelessWidget {
                             }
                           } catch (e) {
                             if (context.mounted) {
+                              final msg = e is DioException && e.response?.statusCode == 403
+                                  ? 'Only a parent or caregiver can approve chores.'
+                                  : 'Error approving: $e';
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text('Error approving: $e')),
+                                SnackBar(content: Text(msg)),
                               );
                             }
                           }
