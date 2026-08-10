@@ -38,7 +38,7 @@ class SchoolPage extends ConsumerWidget {
             if (tabIndex == 1) {
               _showCreateSubjectSheet(context, ref);
             } else {
-              _showCreateAssignmentSheet(context, ref, subjectsAsync);
+              _showCreateAssignmentSheet(context, ref);
             }
           },
           child: const Icon(Icons.add),
@@ -193,15 +193,20 @@ class SchoolPage extends ConsumerWidget {
   }
 
   void _showCreateAssignmentSheet(
-      BuildContext context, WidgetRef ref, AsyncValue<List<Subject>> subjectsAsync) {
+      BuildContext context, WidgetRef ref) {
     final familyState = ref.read(familyProvider);
     final members = familyState.family?.members ?? [];
-    final subjectsAvailable = subjectsAsync.asData?.value ?? [];
+    // Read subjects fresh — the passed-in AsyncValue may be stale (still loading
+    // at last build time even though the provider has since completed).
+    final subjectsAvailable =
+        ref.read(subjectsListProvider).asData?.value ?? [];
 
     if (subjectsAvailable.isEmpty) {
       // No subjects yet — open the subject creation sheet first,
       // then they can create an assignment after.
-      Navigator.pop(context); // close any existing sheet
+      // Do NOT call Navigator.pop(context) here — when no sheet is open,
+      // that pops the entire /school route off the navigation stack,
+      // causing a cascade of null-reference errors.
       _showCreateSubjectSheet(context, ref);
       return;
     }
