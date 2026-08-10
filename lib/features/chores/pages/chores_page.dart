@@ -1070,11 +1070,15 @@ class _AssignmentsTab extends StatelessWidget {
                             }
                           } catch (e) {
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text('Error completing chore: $e')),
-                              );
+                              final is409 = e is DioException && e.response?.statusCode == 409;
+                              // 409 = already completed (double-tap or stale UI) — just refresh
+                              ref.invalidate(assignmentsListProvider);
+                              if (!is409) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text('Error completing chore: $e')),
+                                );
+                              }
                             }
                           }
                         },
