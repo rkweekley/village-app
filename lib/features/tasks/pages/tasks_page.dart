@@ -9,6 +9,8 @@ import 'package:village_app/features/family/models.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
+import 'package:village_app/shared/widgets/create_chore_sheet.dart';
+import 'package:village_app/shared/utils/status_color.dart';
 
 /// Combined Tasks page with Chores and School tabs.
 class TasksPage extends ConsumerWidget {
@@ -82,7 +84,7 @@ class TasksPage extends ConsumerWidget {
             FilledButton.icon(
               onPressed: () {
                 Navigator.pop(ctx);
-                _showCreateChoreSheet(context, ref);
+                showCreateChoreSheet(context, ref);
               },
               icon: const Icon(Icons.cleaning_services_rounded),
               label: const Text('New Chore'),
@@ -107,14 +109,6 @@ class TasksPage extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _showCreateChoreSheet(BuildContext context, WidgetRef ref) {
-    showAdaptiveModalSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => _CreateChoreSheet(ref: ref),
     );
   }
 
@@ -187,7 +181,7 @@ class _ChoreCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final diffColor = _difficultyColor(chore.difficulty);
+    final diffColor = difficultyColor(chore.difficulty);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -268,19 +262,6 @@ class _ChoreCard extends ConsumerWidget {
     );
   }
 
-  Color _difficultyColor(String d) {
-    switch (d) {
-      case 'Easy':
-        return VillageTheme.positive;
-      case 'Medium':
-        return VillageTheme.warning;
-      case 'Hard':
-        return VillageTheme.danger;
-      default:
-        return Colors.grey;
-    }
-  }
-
   void _showChoreDetail(BuildContext context) {
     showAdaptiveModalSheet(
       context: context,
@@ -297,7 +278,7 @@ class _ChoreCard extends ConsumerWidget {
             const SizedBox(height: 16),
             _detailChip('${chore.pointValue} pts', VillageTheme.warning),
             const SizedBox(width: 8),
-            _detailChip(chore.difficulty, _difficultyColor(chore.difficulty)),
+            _detailChip(chore.difficulty, difficultyColor(chore.difficulty)),
             const SizedBox(width: 8),
             _detailChip(chore.recurrence, VillageTheme.primary),
           ],
@@ -658,7 +639,7 @@ class _AssignmentCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final statusColor = _statusColor(assignment.status);
+    final sc = statusColor(assignment.status);
     final statusIcon = _statusIcon(assignment.status);
 
     return Card(
@@ -675,10 +656,10 @@ class _AssignmentCard extends ConsumerWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.12),
+                  color: sc.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(statusIcon, color: statusColor, size: 22),
+                child: Icon(statusIcon, color: sc, size: 22),
               ),
               const SizedBox(width: 14),
               // Info
@@ -690,7 +671,7 @@ class _AssignmentCard extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        _Tag(assignment.status, statusColor),
+                        _Tag(assignment.status, sc),
                         const SizedBox(width: 8),
                         Text(
                           'Due: ${assignment.dueDate}',
@@ -783,7 +764,7 @@ class _AssignmentCard extends ConsumerWidget {
           children: [
             Text(a.title, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
-            _infoRow('Status', a.status, _statusColor(a.status)),
+            _infoRow('Status', a.status, statusColor(a.status)),
             _infoRow('Assigned to', a.assignedToName, null),
             _infoRow('Due date', a.dueDate, null),
             _infoRow('Points possible', '${a.pointsPossible}', null),
@@ -976,21 +957,6 @@ class _AssignmentCard extends ConsumerWidget {
     );
   }
 
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'Pending':
-        return VillageTheme.warning;
-      case 'Submitted':
-        return VillageTheme.info;
-      case 'Graded':
-        return VillageTheme.positive;
-      case 'Excused':
-        return Colors.grey;
-      default:
-        return Colors.grey;
-    }
-  }
-
   IconData _statusIcon(String status) {
     switch (status) {
       case 'Pending':
@@ -1004,192 +970,6 @@ class _AssignmentCard extends ConsumerWidget {
       default:
         return Icons.help_outline;
     }
-  }
-}
-
-// ── Create Chore Sheet ──
-
-/// Extracted StatefulWidget so TextEditingControllers are properly disposed.
-class _CreateChoreSheet extends ConsumerStatefulWidget {
-  final WidgetRef ref;
-  const _CreateChoreSheet({required this.ref});
-
-  @override
-  ConsumerState<_CreateChoreSheet> createState() => _CreateChoreSheetState();
-}
-
-class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
-  final _nameCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
-  final _pointCtrl = TextEditingController(text: '10');
-  String _recurrence = 'Once';
-  String _difficulty = 'Easy';
-  bool _requiresApproval = true;
-  bool _requiresPhoto = false;
-
-  @override
-  void dispose() {
-    _nameCtrl.dispose();
-    _descCtrl.dispose();
-    _pointCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: VillageTheme.positive.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.cleaning_services_rounded,
-                      color: VillageTheme.positive, size: 22),
-                ),
-                const SizedBox(width: 12),
-                const Text('New Chore',
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w700)),
-              ],
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _nameCtrl,
-              decoration: InputDecoration(
-                labelText: 'Chore name',
-                prefixIcon: const Icon(Icons.edit_outlined),
-                filled: true,
-                fillColor: VillageTheme.surfaceBase,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _descCtrl,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                prefixIcon: const Icon(Icons.description_outlined),
-                filled: true,
-                fillColor: VillageTheme.surfaceBase,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _pointCtrl,
-              decoration: InputDecoration(
-                labelText: 'Point value',
-                prefixIcon: const Icon(Icons.stars_rounded),
-                filled: true,
-                fillColor: VillageTheme.surfaceBase,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              value: _recurrence,
-              decoration: InputDecoration(
-                labelText: 'Recurrence',
-                prefixIcon: const Icon(Icons.repeat_outlined),
-                filled: true,
-                fillColor: VillageTheme.surfaceBase,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              items: ['Once', 'Daily', 'Weekly', 'Monthly']
-                  .map((r) => DropdownMenuItem(value: r, child: Text(r)))
-                  .toList(),
-              onChanged: (v) => setState(() => _recurrence = v!),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              value: _difficulty,
-              decoration: InputDecoration(
-                labelText: 'Difficulty',
-                prefixIcon: const Icon(Icons.speed_rounded),
-                filled: true,
-                fillColor: VillageTheme.surfaceBase,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              items: ['Easy', 'Medium', 'Hard']
-                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                  .toList(),
-              onChanged: (v) => setState(() => _difficulty = v!),
-            ),
-            const SizedBox(height: 8),
-            SwitchListTile(
-              title: const Text('Requires approval'),
-              value: _requiresApproval,
-              onChanged: (v) => setState(() => _requiresApproval = v),
-              activeColor: VillageTheme.positive,
-              contentPadding: EdgeInsets.zero,
-            ),
-            SwitchListTile(
-              title: const Text('Requires photo'),
-              value: _requiresPhoto,
-              onChanged: (v) => setState(() => _requiresPhoto = v),
-              activeColor: VillageTheme.positive,
-              contentPadding: EdgeInsets.zero,
-            ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () async {
-                if (_nameCtrl.text.trim().isEmpty) return;
-                await widget.ref.read(choresServiceProvider).createChore(
-                      name: _nameCtrl.text.trim(),
-                      description: _descCtrl.text.trim(),
-                      pointValue: int.tryParse(_pointCtrl.text) ?? 10,
-                      recurrence: _recurrence,
-                      difficulty: _difficulty,
-                      requiresApproval: _requiresApproval,
-                      requiresPhoto: _requiresPhoto,
-                    );
-                widget.ref.invalidate(choresListProvider);
-                if (context.mounted) Navigator.pop(context);
-              },
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.positive,
-              ),
-              child: const Text('Create Chore',
-                  style: TextStyle(fontSize: 16)),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 

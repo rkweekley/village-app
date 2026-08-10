@@ -8,6 +8,8 @@ import 'package:village_app/features/family/models.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
+import 'package:village_app/shared/widgets/create_chore_sheet.dart';
+import 'package:village_app/shared/utils/status_color.dart';
 
 class ChoresPage extends ConsumerStatefulWidget {
   const ChoresPage({super.key});
@@ -67,7 +69,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
           : FloatingActionButton(
               onPressed: () {
                 if (_currentTab == 0) {
-                  _showCreateChoreDialog(context);
+                  showCreateChoreSheet(context, ref);
                 } else if (_currentTab == 1) {
                   _showCreateAssignmentDialog(context);
                 }
@@ -84,205 +86,6 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
             _ApprovalsTab(
                 assignmentsAsync: assignmentsAsync, ref: ref),
         ],
-      ),
-    );
-  }
-
-  // ── Create Chore ──
-
-  void _showCreateChoreDialog(BuildContext context) {
-    final nameCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    final pointCtrl = TextEditingController(text: '10');
-    String recurrence = 'Once';
-    String difficulty = 'Easy';
-    bool requiresApproval = true;
-    bool requiresPhoto = false;
-    bool submitting = false;
-
-    showAdaptiveModalSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => Padding(
-          padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 24,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: VillageTheme.positive.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.cleaning_services_rounded,
-                          color: VillageTheme.positive, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text('New Chore',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: nameCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Chore name',
-                    prefixIcon: const Icon(Icons.edit_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.surfaceBase,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  autofocus: true,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Description',
-                    prefixIcon: const Icon(Icons.description_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.surfaceBase,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  maxLines: 2,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pointCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Point value',
-                    prefixIcon: const Icon(Icons.stars_rounded),
-                    filled: true,
-                    fillColor: VillageTheme.surfaceBase,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: recurrence,
-                  decoration: InputDecoration(
-                    labelText: 'Recurrence',
-                    prefixIcon: const Icon(Icons.repeat_outlined),
-                    filled: true,
-                    fillColor: VillageTheme.surfaceBase,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  items: ['Once', 'Daily', 'Weekly', 'Monthly']
-                      .map((r) => DropdownMenuItem(value: r, child: Text(r)))
-                      .toList(),
-                  onChanged: (v) => setState(() => recurrence = v!),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: difficulty,
-                  decoration: InputDecoration(
-                    labelText: 'Difficulty',
-                    prefixIcon: const Icon(Icons.speed_rounded),
-                    filled: true,
-                    fillColor: VillageTheme.surfaceBase,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  items: ['Easy', 'Medium', 'Hard']
-                      .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                      .toList(),
-                  onChanged: (v) => setState(() => difficulty = v!),
-                ),
-                const SizedBox(height: 8),
-                SwitchListTile(
-                  title: const Text('Requires approval'),
-                  value: requiresApproval,
-                  onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.positive,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                SwitchListTile(
-                  title: const Text('Requires photo'),
-                  value: requiresPhoto,
-                  onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.positive,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: submitting
-                      ? null
-                      : () async {
-                          setState(() => submitting = true);
-                          try {
-                            await ref.read(choresServiceProvider).createChore(
-                                  name: nameCtrl.text,
-                                  description: descCtrl.text,
-                                  pointValue:
-                                      int.tryParse(pointCtrl.text) ?? 10,
-                                  recurrence: recurrence,
-                                  difficulty: difficulty,
-                                  requiresApproval: requiresApproval,
-                                  requiresPhoto: requiresPhoto,
-                                );
-                            ref.invalidate(choresListProvider);
-                            if (ctx.mounted) Navigator.pop(ctx);
-                          } catch (e) {
-                            setState(() => submitting = false);
-                            if (ctx.mounted) {
-                              ScaffoldMessenger.of(ctx).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Failed to create chore: $e'),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: Colors.red.shade700,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    backgroundColor: VillageTheme.positive,
-                  ),
-                  child: submitting
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Create Chore',
-                          style: TextStyle(fontSize: 16)),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -645,7 +448,7 @@ class _ChoresTab extends StatelessWidget {
               final chore = chores[i];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: _difficultyColor(chore.difficulty),
+                  backgroundColor: difficultyColor(chore.difficulty),
                   child: Text('${chore.pointValue}',
                       style: const TextStyle(fontSize: 12)),
                 ),
@@ -1002,19 +805,6 @@ class _ChoresTab extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _difficultyColor(String d) {
-    switch (d) {
-      case 'Easy':
-        return Colors.green;
-      case 'Medium':
-        return Colors.orange;
-      case 'Hard':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
   }
 }
 

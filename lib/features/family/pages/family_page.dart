@@ -7,6 +7,7 @@ import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/family/family_provider.dart';
 import 'package:village_app/features/family/family_service.dart';
 import 'package:village_app/features/family/models.dart';
+import 'package:village_app/shared/utils/date_utils.dart';
 
 class FamilyPage extends ConsumerStatefulWidget {
   const FamilyPage({super.key});
@@ -363,10 +364,10 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             fontSize: 15,
                             color: statusColor)),
                     if (isTrial && family.trialEndsAt != null)
-                      Text('Ends ${_formatDate(family.trialEndsAt!)}',
+                      Text('Ends ${formatDate(family.trialEndsAt!, includeYear: false)}',
                           style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                     if (!isTrial && family.subscriptionExpiresAt != null)
-                      Text('Renews ${_formatDate(family.subscriptionExpiresAt!)}',
+                      Text('Renews ${formatDate(family.subscriptionExpiresAt!, includeYear: false)}',
                           style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                     if (isPastDue)
                       const Text('Update payment method →',
@@ -380,12 +381,6 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
         ),
       ),
     );
-  }
-
-  String _formatDate(String iso) {
-    final d = DateTime.parse(iso);
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${months[d.month - 1]} ${d.day}';
   }
 }
 

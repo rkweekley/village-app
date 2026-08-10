@@ -1,10 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:village_app/core/network/authenticated_client.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/family/family_service.dart';
-import 'package:dio/dio.dart';
+import 'package:village_app/shared/utils/date_utils.dart';
+import 'package:village_app/shared/utils/status_color.dart';
 
 class SubscriptionPage extends ConsumerStatefulWidget {
   const SubscriptionPage({super.key});
@@ -120,7 +122,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Subscription will end ${_formatDate(endDate)}.'),
+            content: Text('Subscription will end ${formatDate(endDate)}.'),
             backgroundColor: VillageTheme.positive,
           ),
         );
@@ -186,33 +188,33 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: _statusColor(status).withValues(alpha: 0.1),
+            color: statusColor(status).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: _statusColor(status).withValues(alpha: 0.3)),
+            border: Border.all(color: statusColor(status).withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
-              Icon(_statusIcon(status), size: 40, color: _statusColor(status)),
+              Icon(_statusIcon(status), size: 40, color: statusColor(status)),
               const SizedBox(height: 12),
               Text(
                 _statusLabel(status, tier),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: _statusColor(status),
+                  color: statusColor(status),
                 ),
               ),
               if (isInTrial) ...[
                 const SizedBox(height: 4),
                 Text(
-                  'Trial ends ${_formatDate(_status!['trialEndsAt'] as String)}',
+                  'Trial ends ${formatDate(_status!['trialEndsAt'] as String)}',
                   style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ],
               if (!isInTrial && _status!['expiresAt'] != null) ...[
                 const SizedBox(height: 4),
                 Text(
-                  'Next billing: ${_formatDate(_status!['expiresAt'] as String)}',
+                  'Next billing: ${formatDate(_status!['expiresAt'] as String)}',
                   style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ],
@@ -338,17 +340,6 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'active': return VillageTheme.positive;
-      case 'trial': return VillageTheme.primary;
-      case 'past_due': return VillageTheme.warning;
-      case 'expired': return VillageTheme.danger;
-      case 'canceled': return Colors.grey;
-      default: return Colors.grey;
-    }
-  }
-
   IconData _statusIcon(String status) {
     switch (status) {
       case 'active': return Icons.check_circle_rounded;
@@ -369,12 +360,6 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       case 'canceled': return 'Canceled';
       default: return status;
     }
-  }
-
-  String _formatDate(String iso) {
-    final d = DateTime.parse(iso);
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }
 }
 

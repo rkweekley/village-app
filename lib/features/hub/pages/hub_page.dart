@@ -10,6 +10,7 @@ import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/features/notifications/notification_service.dart';
 import 'package:village_app/features/family/models.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
+import 'package:village_app/shared/widgets/create_chore_sheet.dart';
 
 class HubPage extends ConsumerStatefulWidget {
   const HubPage({super.key});
@@ -515,7 +516,7 @@ class _HubPageState extends ConsumerState<HubPage> {
             FilledButton.icon(
               onPressed: () {
                 Navigator.pop(ctx);
-                _showCreateChoreSheet(context);
+                showCreateChoreSheet(context, ref);
               },
               icon: const Icon(Icons.cleaning_services_rounded),
               label: const Text('New Chore'),
@@ -821,8 +822,8 @@ class _HubPageState extends ConsumerState<HubPage> {
                 else
                   const Text('No family members loaded.',
                       style: TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 12),
-                  if (subjects.isNotEmpty)
+                const SizedBox(height: 12),
+                if (subjects.isNotEmpty)
                   DropdownButtonFormField<String>(
                     value: selectedSubjectId,
                     decoration: InputDecoration(

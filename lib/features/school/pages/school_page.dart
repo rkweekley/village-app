@@ -6,6 +6,8 @@ import 'package:village_app/features/school/school_service.dart';
 import 'package:village_app/features/family/family_provider.dart';
 import 'package:village_app/features/family/models.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
+import 'package:village_app/shared/utils/status_color.dart';
+import 'package:village_app/core/auth/auth_provider.dart';
 
 class SchoolPage extends ConsumerWidget {
   const SchoolPage({super.key});
@@ -668,6 +670,7 @@ class _AssignmentsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
     return schoolWorkAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
@@ -705,7 +708,7 @@ class _AssignmentsTab extends ConsumerWidget {
             itemCount: assignments.length,
             itemBuilder: (ctx, i) {
               final a = assignments[i];
-              final statusColor = _statusColor(a.status);
+              final sc = statusColor(a.status);
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
@@ -727,7 +730,7 @@ class _AssignmentsTab extends ConsumerWidget {
                           width: 4,
                           height: 60,
                           decoration: BoxDecoration(
-                            color: statusColor,
+                            color: sc,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -797,7 +800,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                     ),
                                   ),
                                   const Spacer(),
-                                  if (a.status == 'Pending')
+                                  if (a.status == 'Pending' && !authState.canManage)
                                     TextButton.icon(
                                       onPressed: () =>
                                           _showSubmitDialog(context, a.id),
@@ -831,7 +834,7 @@ class _AssignmentsTab extends ConsumerWidget {
   }
 
   Widget _statusChip(String status) {
-    final color = _statusColor(status);
+    final color = statusColor(status);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -961,7 +964,7 @@ class _AssignmentsTab extends ConsumerWidget {
 
   void _showDetailSheet(BuildContext context, SchoolWork a) {
     final isGraded = a.status == 'Graded';
-    final canGrade = a.status == 'Submitted';
+    final canGrade = a.status == 'Submitted' && ref.read(authProvider).canManage;
 
     showAdaptiveModalSheet(
       context: context,
@@ -1142,21 +1145,6 @@ class _AssignmentsTab extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'Pending':
-        return VillageTheme.warning;
-      case 'Submitted':
-        return VillageTheme.info;
-      case 'Graded':
-        return VillageTheme.positive;
-      case 'Excused':
-        return Colors.grey;
-      default:
-        return Colors.grey;
-    }
   }
 
   IconData _statusIcon(String status) {

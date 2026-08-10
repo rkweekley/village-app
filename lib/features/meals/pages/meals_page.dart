@@ -5,6 +5,7 @@ import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/features/meals/meals_service.dart';
 import 'package:village_app/features/meals/pages/recipe_ideas_tab.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
+import 'package:village_app/shared/utils/status_color.dart';
 
 class MealsPage extends ConsumerWidget {
   const MealsPage({super.key});
@@ -53,19 +54,6 @@ const _mealIcons = {
   'Dinner': Icons.dinner_dining,
   'Snack': Icons.cookie,
 };
-
-Color _difficultyColor(String d) {
-  switch (d) {
-    case 'Easy':
-      return VillageTheme.positive;
-    case 'Medium':
-      return VillageTheme.warning;
-    case 'Hard':
-      return VillageTheme.danger;
-    default:
-      return Colors.grey;
-  }
-}
 
 String _formatMinutes(int mins) {
   if (mins < 60) return '${mins}m';
@@ -610,7 +598,7 @@ class _RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = recipe;
-    final diffColor = _difficultyColor(r.difficulty);
+    final diffColor = difficultyColor(r.difficulty);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -798,7 +786,7 @@ class _RecipeCard extends StatelessWidget {
                     runSpacing: 6,
                     children: [
                       _metaChip(r.difficulty, Icons.flag_rounded,
-                          _difficultyColor(r.difficulty)),
+                          difficultyColor(r.difficulty)),
                       _metaChip(_formatMinutes(r.prepTimeMinutes),
                           Icons.schedule_rounded, Colors.grey),
                       _metaChip('${r.servings} servings', Icons.people_rounded,
