@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/school/school_service.dart';
 import 'package:village_app/features/family/family_provider.dart';
@@ -923,14 +924,39 @@ class _AssignmentsTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             FilledButton(
-              onPressed: () {
-                ref.read(schoolServiceProvider).submitSchoolWork(
-                      assignmentId,
-                      submissionNote: noteCtrl.text.isNotEmpty
-                          ? noteCtrl.text
-                          : null,
+              onPressed: () async {
+                try {
+                  await ref.read(schoolServiceProvider).submitSchoolWork(
+                        assignmentId,
+                        submissionNote: noteCtrl.text.isNotEmpty
+                            ? noteCtrl.text
+                            : null,
+                      );
+                  ref.invalidate(schoolWorkListProvider);
+                  ref.invalidate(pendingGradingProvider);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                } on DioException catch (e) {
+                  final msg = e.response?.statusCode == 403
+                      ? "You don't have permission to submit this assignment."
+                      : 'Failed to submit: ${e.message}';
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(
+                        content: Text(msg),
+                        backgroundColor: Colors.red.shade700,
+                      ),
                     );
-                Navigator.pop(ctx);
+                  }
+                } catch (e) {
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to submit: $e'),
+                        backgroundColor: Colors.red.shade700,
+                      ),
+                    );
+                  }
+                }
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
