@@ -336,7 +336,7 @@ class _ShoppingListDetailPageState
             return const EmptyState(
               icon: Icons.receipt_long_rounded,
               title: 'List is empty',
-              subtitle: 'Tap the FAB to add items',
+              subtitle: 'Tap the + button to add items',
               iconBgColor: VillageTheme.primary,
               iconColor: VillageTheme.primary,
             );
