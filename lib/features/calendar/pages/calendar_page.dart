@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/theme/village_theme.dart';
@@ -688,9 +689,31 @@ class _DayEventsList extends ConsumerWidget {
                       Icons.more_horiz_rounded,
                       color: Colors.grey[400],
                     ),
-                    onSelected: (value) {
+                    onSelected: (value) async {
                       if (value == 'delete') {
-                        ref.read(calendarServiceProvider).deleteEvent(e.id);
+                        try {
+                          await ref.read(calendarServiceProvider).deleteEvent(e.id);
+                          final monthStart = DateTime(day.year, day.month, 1);
+                          final monthEnd = DateTime(day.year, day.month + 1, 0, 23, 59);
+                          ref.invalidate(calendarEventsProvider(
+                              CalendarDateRange(start: monthStart, end: monthEnd)));
+                        } on DioException catch (err) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Failed to delete event: ${err.message}')),
+                            );
+                          }
+                        } catch (err) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Failed to delete event: ${err.toString()}')),
+                            );
+                          }
+                        }
                       }
                     },
                     itemBuilder: (ctx) => [
@@ -725,9 +748,35 @@ class _DayEventsList extends ConsumerWidget {
                             (a) => a.userId == userId && a.status == 'Accepted',
                           ),
                           selectedColor: VillageTheme.positive,
-                          onPressed: () => ref
-                              .read(calendarServiceProvider)
-                              .rsvp(e.id, 'Accepted'),
+                          onPressed: () async {
+                            try {
+                              await ref
+                                  .read(calendarServiceProvider)
+                                  .rsvp(e.id, 'Accepted');
+                              final monthStart = DateTime(day.year, day.month, 1);
+                              final monthEnd =
+                                  DateTime(day.year, day.month + 1, 0, 23, 59);
+                              ref.invalidate(calendarEventsProvider(
+                                  CalendarDateRange(
+                                      start: monthStart, end: monthEnd)));
+                            } on DioException catch (err) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Failed to RSVP: ${err.message}')),
+                                );
+                              }
+                            } catch (err) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Failed to RSVP: ${err.toString()}')),
+                                );
+                              }
+                            }
+                          },
                         ),
                         const SizedBox(width: 8),
                         _RsvpButton(
@@ -738,9 +787,35 @@ class _DayEventsList extends ConsumerWidget {
                                 a.userId == userId && a.status == 'Tentative',
                           ),
                           selectedColor: VillageTheme.warning,
-                          onPressed: () => ref
-                              .read(calendarServiceProvider)
-                              .rsvp(e.id, 'Tentative'),
+                          onPressed: () async {
+                            try {
+                              await ref
+                                  .read(calendarServiceProvider)
+                                  .rsvp(e.id, 'Tentative');
+                              final monthStart = DateTime(day.year, day.month, 1);
+                              final monthEnd =
+                                  DateTime(day.year, day.month + 1, 0, 23, 59);
+                              ref.invalidate(calendarEventsProvider(
+                                  CalendarDateRange(
+                                      start: monthStart, end: monthEnd)));
+                            } on DioException catch (err) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Failed to RSVP: ${err.message}')),
+                                );
+                              }
+                            } catch (err) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Failed to RSVP: ${err.toString()}')),
+                                );
+                              }
+                            }
+                          },
                         ),
                         const SizedBox(width: 8),
                         _RsvpButton(
@@ -750,9 +825,35 @@ class _DayEventsList extends ConsumerWidget {
                             (a) => a.userId == userId && a.status == 'Declined',
                           ),
                           selectedColor: VillageTheme.danger,
-                          onPressed: () => ref
-                              .read(calendarServiceProvider)
-                              .rsvp(e.id, 'Declined'),
+                          onPressed: () async {
+                            try {
+                              await ref
+                                  .read(calendarServiceProvider)
+                                  .rsvp(e.id, 'Declined');
+                              final monthStart = DateTime(day.year, day.month, 1);
+                              final monthEnd =
+                                  DateTime(day.year, day.month + 1, 0, 23, 59);
+                              ref.invalidate(calendarEventsProvider(
+                                  CalendarDateRange(
+                                      start: monthStart, end: monthEnd)));
+                            } on DioException catch (err) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Failed to RSVP: ${err.message}')),
+                                );
+                              }
+                            } catch (err) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Failed to RSVP: ${err.toString()}')),
+                                );
+                              }
+                            }
+                          },
                         ),
                       ],
                     ),

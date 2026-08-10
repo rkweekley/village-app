@@ -501,7 +501,6 @@ class _HubPageState extends ConsumerState<HubPage> {
   // ── Create Task FAB methods ──
 
   void _showCreateChoice(BuildContext context) {
-    print('[HUB] FAB + pressed → showing create choice');
     showAdaptiveModalSheet(
       context: context,
       builder: (ctx) => Padding(
@@ -515,7 +514,6 @@ class _HubPageState extends ConsumerState<HubPage> {
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: () {
-                print('[HUB] chose New Chore');
                 Navigator.pop(ctx);
                 _showCreateChoreSheet(context);
               },
@@ -529,7 +527,6 @@ class _HubPageState extends ConsumerState<HubPage> {
             const SizedBox(height: 12),
             FilledButton.icon(
               onPressed: () {
-                print('[HUB] chose New Assignment');
                 Navigator.pop(ctx);
                 _showCreateAssignmentSheet(context);
               },
@@ -717,10 +714,8 @@ class _HubPageState extends ConsumerState<HubPage> {
   }
 
   void _showCreateAssignmentSheet(BuildContext context) {
-    print('[HUB] _showCreateAssignmentSheet called');
     final familyState = ref.read(familyProvider);
     final members = familyState.family?.members ?? [];
-    print('[HUB] members.length=${members.length}');
     if (members.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No family members loaded. Visit Hub first.')),
@@ -729,10 +724,8 @@ class _HubPageState extends ConsumerState<HubPage> {
     }
 
     // Pre-fetch school subjects for the dropdown.
-    print('[HUB] reading subjectsListProvider...');
     final subjectsAsync = ref.read(subjectsListProvider);
     final subjects = subjectsAsync.asData?.value ?? [];
-    print('[HUB] subjects.length=${subjects.length}');
 
     final titleCtrl = TextEditingController();
     final descCtrl = TextEditingController();
@@ -741,7 +734,6 @@ class _HubPageState extends ConsumerState<HubPage> {
     String? selectedSubjectId = subjects.isNotEmpty ? subjects.first.id : null;
     DateTime selectedDate = DateTime.now();
 
-    print('[HUB] calling showAdaptiveModalSheet...');
     showAdaptiveModalSheet(
       context: context,
       isScrollControlled: true,

@@ -36,14 +36,10 @@ class SchoolPage extends ConsumerWidget {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            print('[SCHOOL] FAB pressed');
             final tabIndex = DefaultTabController.of(innerContext).index;
-            print('[SCHOOL] tabIndex=$tabIndex');
             if (tabIndex == 1) {
-              print('[SCHOOL] → create subject sheet');
               _showCreateSubjectSheet(innerContext, ref);
             } else {
-              print('[SCHOOL] → create assignment sheet');
               _showCreateAssignmentSheet(innerContext, ref);
             }
           },
@@ -201,17 +197,11 @@ class SchoolPage extends ConsumerWidget {
   void _showCreateAssignmentSheet(
       BuildContext context, WidgetRef ref) {
     final familyState = ref.read(familyProvider);
-    print('[SCHOOL] familyState.family=${familyState.family != null ? "present" : "null"}');
     final members = familyState.family?.members ?? [];
-    print('[SCHOOL] members.length=${members.length}');
-    // Read subjects fresh — the passed-in AsyncValue may be stale (still loading
-    // at last build time even though the provider has since completed).
     final subjectsAvailable =
         ref.read(subjectsListProvider).asData?.value ?? [];
-    print('[SCHOOL] subjectsAvailable.length=${subjectsAvailable.length}');
 
     if (subjectsAvailable.isEmpty) {
-      print('[SCHOOL] no subjects → creating subject sheet');
       // No subjects yet — open the subject creation sheet first,
       // then they can create an assignment after.
       // Do NOT call Navigator.pop(context) here — when no sheet is open,
@@ -221,15 +211,14 @@ class SchoolPage extends ConsumerWidget {
       return;
     }
 
-    print('[SCHOOL] building assignment sheet...');
+    MemberInfo? selectedMember = members.isNotEmpty ? members.first : null;
+    DateTime selectedDate = DateTime.now();
+
     final titleCtrl = TextEditingController();
     final descCtrl = TextEditingController();
     final pointsCtrl = TextEditingController(text: '10');
     String selectedSubjectId = subjectsAvailable.first.id;
-    MemberInfo? selectedMember = members.isNotEmpty ? members.first : null;
-    DateTime selectedDate = DateTime.now();
 
-    print('[SCHOOL] calling showAdaptiveModalSheet...');
     showAdaptiveModalSheet(
       context: context,
       isScrollControlled: true,

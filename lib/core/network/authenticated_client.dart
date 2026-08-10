@@ -47,9 +47,11 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
           }
 
           _refreshCompleter = Completer<void>();
+          String? refreshToken;
+          String? accessToken;
           try {
-            final refreshToken = await storage.read('jwt_refresh_token');
-            final accessToken = await storage.read('jwt_access_token');
+            refreshToken = await storage.read('jwt_refresh_token');
+            accessToken = await storage.read('jwt_access_token');
             if (refreshToken != null && accessToken != null) {
               // Attempt refresh with a fresh Dio (no auth header)
               final refreshDio = Dio(BaseOptions(baseUrl: dio.options.baseUrl));
@@ -79,10 +81,15 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
           _refreshCompleter?.complete();
           _refreshCompleter = null;
 
-          // Refresh failed or no tokens — trigger logout
-          await storage.delete('jwt_access_token');
-          await storage.delete('jwt_refresh_token');
-          AuthInterceptorLogoutCallback.logout?.call();
+          // Only trigger logout if we actually had tokens and refresh failed.
+          // Don't log out for login/register 401s (wrong credentials) or
+          // endpoints that return 401 for permissions reasons.
+          final hadTokens = refreshToken != null && accessToken != null;
+          if (hadTokens) {
+            await storage.delete('jwt_access_token');
+            await storage.delete('jwt_refresh_token');
+            AuthInterceptorLogoutCallback.logout?.call();
+          }
         }
         handler.next(error);
       },

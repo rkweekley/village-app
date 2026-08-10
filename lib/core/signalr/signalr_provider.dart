@@ -39,7 +39,12 @@ class SignalRConnector {
         final familyId = next.userInfo!.familyId;
         final userId = next.userInfo!.id;
         if (familyId.isNotEmpty) {
-          _signalR.connectAll(familyId, userId);
+          // Fire-and-forget is intentional here — connection failures are
+          // surfaced via the connection state stream, not exceptions.
+          _signalR.connectAll(familyId, userId).catchError((_) {
+            // Connection failures are already tracked internally via
+            // SignalRService._isConnected; the reconnection timer handles retries.
+          });
 
           // Subscribe to hub messages (once per session)
           _familySub ??= _signalR.familyMessages.listen((msg) {
@@ -81,9 +86,11 @@ class SignalRConnector {
           // Listen for real-time notifications
           _notificationsSub ??= _signalR.notificationsMessages.listen((msg) {
             if (msg.target == 'NewNotification' && msg.arguments.isNotEmpty) {
-              final data = msg.arguments[0] as Map<String, dynamic>;
-              final notification = AppNotification.fromJson(data);
-              _ref.read(notificationProvider.notifier).prepend(notification);
+              final arg = msg.arguments[0];
+              if (arg is Map<String, dynamic>) {
+                final notification = AppNotification.fromJson(arg);
+                _ref.read(notificationProvider.notifier).prepend(notification);
+              }
             }
           });
 

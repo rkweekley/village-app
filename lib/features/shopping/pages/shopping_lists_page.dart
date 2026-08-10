@@ -628,8 +628,18 @@ class _ItemTile extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6),
           ),
-          onChanged: (_) {
-            ref.read(shoppingServiceProvider).toggleItem(listId, item.id);
+          onChanged: (_) async {
+            try {
+              await ref.read(shoppingServiceProvider).toggleItem(listId, item.id);
+            } catch (e) {
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Failed to toggle item: ${e.toString()}'),
+                ),
+              );
+              ref.invalidate(shoppingListDetailProvider(listId));
+            }
           },
         ),
         title: Text(
@@ -667,10 +677,20 @@ class _ItemTile extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.delete_outline, size: 18),
               color: VillageTheme.danger.withValues(alpha: 0.7),
-              onPressed: () {
-                ref
-                    .read(shoppingServiceProvider)
-                    .deleteItem(listId, item.id);
+              onPressed: () async {
+                try {
+                  await ref
+                      .read(shoppingServiceProvider)
+                      .deleteItem(listId, item.id);
+                } catch (e) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete item: ${e.toString()}'),
+                    ),
+                  );
+                  ref.invalidate(shoppingListDetailProvider(listId));
+                }
               },
             ),
           ],
