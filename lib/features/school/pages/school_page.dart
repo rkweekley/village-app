@@ -17,6 +17,7 @@ class SchoolPage extends ConsumerWidget {
     final subjectsAsync = ref.watch(subjectsListProvider);
     final schoolWorkAsync = ref.watch(schoolWorkListProvider);
     final pendingGradingAsync = ref.watch(pendingGradingProvider);
+    final canManage = ref.watch(authProvider).canManage;
 
     return DefaultTabController(
       length: 2,
@@ -36,7 +37,8 @@ class SchoolPage extends ConsumerWidget {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: canManage
+            ? FloatingActionButton(
           onPressed: () {
             final tabIndex = DefaultTabController.of(innerContext).index;
             if (tabIndex == 1) {
@@ -46,17 +48,20 @@ class SchoolPage extends ConsumerWidget {
             }
           },
           child: const Icon(Icons.add),
-        ),
+            )
+            : null,
         body: TabBarView(
           children: [
             _AssignmentsTab(
               schoolWorkAsync: schoolWorkAsync,
               pendingGradingAsync: pendingGradingAsync,
               ref: ref,
+              canManage: canManage,
             ),
             _SubjectsTab(
               subjectsAsync: subjectsAsync,
               ref: ref,
+              canManage: canManage,
             ),
           ],
         ),
@@ -473,8 +478,9 @@ class SchoolPage extends ConsumerWidget {
 class _SubjectsTab extends ConsumerWidget {
   final AsyncValue<List<Subject>> subjectsAsync;
   final WidgetRef ref;
+  final bool canManage;
 
-  const _SubjectsTab({required this.subjectsAsync, required this.ref});
+  const _SubjectsTab({required this.subjectsAsync, required this.ref, required this.canManage});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -502,7 +508,10 @@ class _SubjectsTab extends ConsumerWidget {
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
-                Text('Tap + to create one',
+                Text(
+                    canManage
+                        ? 'Tap + to create one'
+                        : 'Ask a parent to create subjects',
                     style: TextStyle(color: Colors.grey[600], fontSize: 14)),
               ],
             ),
@@ -661,11 +670,13 @@ class _AssignmentsTab extends ConsumerWidget {
   final AsyncValue<List<SchoolWork>> schoolWorkAsync;
   final AsyncValue<List<SchoolWork>> pendingGradingAsync;
   final WidgetRef ref;
+  final bool canManage;
 
   const _AssignmentsTab({
     required this.schoolWorkAsync,
     required this.pendingGradingAsync,
     required this.ref,
+    required this.canManage,
   });
 
   @override
@@ -695,7 +706,10 @@ class _AssignmentsTab extends ConsumerWidget {
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
-                Text('Tap + to create one',
+                Text(
+                    canManage
+                        ? 'Tap + to create one'
+                        : 'Ask a parent to create assignments',
                     style: TextStyle(color: Colors.grey[600], fontSize: 14)),
               ],
             ),

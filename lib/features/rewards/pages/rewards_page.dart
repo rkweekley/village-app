@@ -40,7 +40,7 @@ class RewardsPage extends ConsumerWidget {
             : null,
         body: TabBarView(
           children: [
-            _AvailableTab(rewardsAsync: rewardsAsync, ref: ref),
+            _AvailableTab(rewardsAsync: rewardsAsync, ref: ref, isParent: isParent),
             _RedemptionsTab(redemptionsAsync: redemptionsAsync, ref: ref),
           ],
         ),
@@ -222,7 +222,8 @@ class RewardsPage extends ConsumerWidget {
 class _AvailableTab extends StatelessWidget {
   final AsyncValue<List<Reward>> rewardsAsync;
   final WidgetRef ref;
-  const _AvailableTab({required this.rewardsAsync, required this.ref});
+  final bool isParent;
+  const _AvailableTab({required this.rewardsAsync, required this.ref, required this.isParent});
 
   @override
   Widget build(BuildContext context) {
@@ -231,10 +232,10 @@ class _AvailableTab extends StatelessWidget {
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (rewards) {
         if (rewards.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.card_giftcard_rounded,
             title: 'No rewards yet',
-            subtitle: 'Tap + to create one',
+            subtitle: isParent ? 'Tap + to create one' : 'Ask a parent to create rewards',
             iconBgColor: VillageTheme.warning,
             iconColor: VillageTheme.warning,
           );

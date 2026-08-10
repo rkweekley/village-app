@@ -79,7 +79,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _ChoresTab(choresAsync: choresAsync, ref: ref, userId: userId),
+          _ChoresTab(choresAsync: choresAsync, ref: ref, userId: userId, isParent: isParent),
           _AssignmentsTab(
               assignmentsAsync: assignmentsAsync, ref: ref),
           if (isParent)
@@ -425,7 +425,8 @@ class _ChoresTab extends StatelessWidget {
   final AsyncValue<List<Chore>> choresAsync;
   final WidgetRef ref;
   final String? userId;
-  const _ChoresTab({required this.choresAsync, required this.ref, this.userId});
+  final bool isParent;
+  const _ChoresTab({required this.choresAsync, required this.ref, this.userId, required this.isParent});
 
   @override
   Widget build(BuildContext context) {
@@ -434,10 +435,10 @@ class _ChoresTab extends StatelessWidget {
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (chores) {
         if (chores.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.cleaning_services_rounded,
             title: 'No chores yet',
-            subtitle: 'Tap + to create one',
+            subtitle: isParent ? 'Tap + to create one' : 'Ask a parent to create chores',
           );
         }
         return RefreshIndicator(

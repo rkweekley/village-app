@@ -31,10 +31,10 @@ class ShoppingListsPage extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (lists) {
           if (lists.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.shopping_cart_rounded,
               title: 'No shopping lists yet',
-              subtitle: 'Tap + to create one',
+              subtitle: isParent ? 'Tap + to create one' : 'Ask a parent to create a list',
               iconBgColor: VillageTheme.primary,
               iconColor: VillageTheme.primary,
             );
