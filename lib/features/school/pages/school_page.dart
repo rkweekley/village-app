@@ -423,11 +423,13 @@ class SchoolPage extends ConsumerWidget {
                   onPressed: () async {
                     if (titleCtrl.text.isEmpty) return;
                     if (selectedMember == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Please assign to a family member.')),
-                      );
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Please assign to a family member.')),
+                        );
+                      }
                       return;
                     }
                     final dueDate =

@@ -336,7 +336,9 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
         ),
       );
 
-  void _openDetail(RecipeIdea recipe) {
+  Future<void> _openDetail(RecipeIdea recipe) async {
+    // Show loading sheet while fetching full detail (category browse
+    // results are summaries without ingredients/instructions).
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -344,10 +346,35 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => ProviderScope(
-        child: RecipeIdeaDetailSheet(recipe: recipe),
-      ),
+      builder: (_) => const _LoadingSheet(),
     );
+
+    try {
+      final service = ref.read(recipeIdeasServiceProvider);
+      final fullRecipe = await service.getDetail(recipe.id);
+
+      if (mounted) {
+        Navigator.pop(context); // dismiss loading
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: VillageTheme.surfaceBase,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          builder: (_) => ProviderScope(
+            child: RecipeIdeaDetailSheet(recipe: fullRecipe),
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        Navigator.pop(context); // dismiss loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Couldn't load recipe details")),
+        );
+      }
+    }
   }
 
   void _clearSearch() {
@@ -369,5 +396,18 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
         );
       }
     }
+  }
+}
+
+/// Simple loading placeholder shown while fetching recipe detail.
+class _LoadingSheet extends StatelessWidget {
+  const _LoadingSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 220,
+      child: Center(child: CircularProgressIndicator()),
+    );
   }
 }
