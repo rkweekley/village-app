@@ -272,10 +272,110 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                   ),
                 ),
               ),
+            const SizedBox(height: 24),
+
+            // ── Account section ──
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: VillageTheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.person_rounded,
+                        size: 16, color: VillageTheme.primary),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text('Account',
+                      style:
+                          TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ),
+            Card(
+              elevation: 0,
+              color: VillageTheme.surfaceCard,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: VillageTheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.edit_rounded,
+                          size: 20, color: VillageTheme.primary),
+                    ),
+                    title: const Text('Edit Profile',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 15)),
+                    subtitle: Text(
+                      authState.userInfo?.email ?? '',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                    ),
+                    trailing: Icon(Icons.chevron_right_rounded,
+                        color: Colors.grey[400]),
+                    onTap: () => context.go('/profile/edit'),
+                  ),
+                  const Divider(height: 1, indent: 72),
+                  ListTile(
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.logout_rounded,
+                          size: 20, color: Colors.red),
+                    ),
+                    title: const Text('Log Out',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Colors.red)),
+                    onTap: () => _confirmLogout(context),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _confirmLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Log Out'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      await ref.read(authProvider.notifier).logout();
+    }
   }
 
   Widget _infoRow(String label, String value) {
