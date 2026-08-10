@@ -1136,7 +1136,7 @@ class _ApprovalsTab extends StatelessWidget {
                   ),
                   title: Text(a.choreName),
                   subtitle:
-                      Text('Completed by: ${a.assignedToName}\\n${c.note ?? ''}'),
+                      Text('Completed by: ${c.completedByName ?? 'someone'}\n${c.note ?? ''}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

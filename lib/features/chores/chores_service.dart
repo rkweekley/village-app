@@ -88,6 +88,7 @@ class ChoreCompletion {
   final String approvalStatus;
   final int pointsAwarded;
   final String? completedById;
+  final String? completedByName;
   final String? approvedById;
   final String createdAt;
   final String? approvedAt;
@@ -99,6 +100,7 @@ class ChoreCompletion {
     required this.approvalStatus,
     required this.pointsAwarded,
     this.completedById,
+    this.completedByName,
     this.approvedById,
     required this.createdAt,
     this.approvedAt,
@@ -111,6 +113,7 @@ class ChoreCompletion {
         approvalStatus: json['approvalStatus'] as String,
         pointsAwarded: json['pointsAwarded'] as int,
         completedById: json['completedById'] as String?,
+        completedByName: json['completedByName'] as String?,
         approvedById: json['approvedById'] as String?,
         createdAt: json['createdAt'] as String,
         approvedAt: json['approvedAt'] as String?,
