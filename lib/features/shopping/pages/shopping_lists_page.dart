@@ -203,7 +203,8 @@ class ShoppingListsPage extends ConsumerWidget {
           top: 24,
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
         ),
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -286,6 +287,7 @@ class ShoppingListsPage extends ConsumerWidget {
                   style: TextStyle(fontSize: 16)),
             ),
           ],
+          ),
         ),
       ),
     );
