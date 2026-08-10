@@ -208,6 +208,11 @@ class ChoresService {
     );
     return res.data as Map<String, dynamic>;
   }
+
+  /// Soft-delete a chore (parent only).
+  Future<void> deleteChore(String choreId) async {
+    await _dio.delete('/api/chores/$choreId');
+  }
 }
 
 // ── Provider ──

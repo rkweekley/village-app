@@ -244,14 +244,24 @@ class _ChoreCard extends ConsumerWidget {
                 icon: Icon(Icons.more_horiz, color: Colors.grey[500]),
                 itemBuilder: (_) => [
                   const PopupMenuItem(value: 'complete', child: Text('Mark Complete')),
-                  if (isParent)
+                  if (isParent) ...[
                     const PopupMenuItem(value: 'assign', child: Text('Assign')),
+                    const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Text('Delete', style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
                 ],
                 onSelected: (action) {
                   if (action == 'complete') {
                     _showQuickCompleteSheet(context);
                   } else if (action == 'assign') {
                     _showAssignSheet(context);
+                  } else if (action == 'edit') {
+                    _showEditSheet(context);
+                  } else if (action == 'delete') {
+                    _deleteChore(context);
                   }
                 },
               ),
@@ -554,6 +564,219 @@ class _ChoreCard extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  void _showEditSheet(BuildContext context) {
+    final nameCtrl = TextEditingController(text: chore.name);
+    final descCtrl = TextEditingController(text: chore.description ?? '');
+    final pointCtrl = TextEditingController(text: '${chore.pointValue}');
+    String recurrence = chore.recurrence;
+    String difficulty = chore.difficulty;
+    bool requiresApproval = chore.requiresApproval;
+    bool requiresPhoto = chore.requiresPhoto;
+
+    showAdaptiveModalSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: VillageTheme.positive.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.edit_outlined,
+                          color: VillageTheme.positive, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Edit Chore',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w700)),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Chore name',
+                    prefixIcon: const Icon(Icons.edit_outlined),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  autofocus: true,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    prefixIcon: const Icon(Icons.description_outlined),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: pointCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Point value',
+                    prefixIcon: const Icon(Icons.stars_rounded),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: recurrence,
+                  decoration: InputDecoration(
+                    labelText: 'Recurrence',
+                    prefixIcon: const Icon(Icons.repeat_outlined),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  items: ['Once', 'Daily', 'Weekly', 'Monthly']
+                      .map((r) =>
+                          DropdownMenuItem(value: r, child: Text(r)))
+                      .toList(),
+                  onChanged: (v) => setState(() => recurrence = v!),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: difficulty,
+                  decoration: InputDecoration(
+                    labelText: 'Difficulty',
+                    prefixIcon: const Icon(Icons.speed_rounded),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  items: ['Easy', 'Medium', 'Hard']
+                      .map((d) =>
+                          DropdownMenuItem(value: d, child: Text(d)))
+                      .toList(),
+                  onChanged: (v) => setState(() => difficulty = v!),
+                ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: const Text('Requires approval'),
+                  value: requiresApproval,
+                  onChanged: (v) => setState(() => requiresApproval = v),
+                  activeColor: VillageTheme.positive,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                SwitchListTile(
+                  title: const Text('Requires photo'),
+                  value: requiresPhoto,
+                  onChanged: (v) => setState(() => requiresPhoto = v),
+                  activeColor: VillageTheme.positive,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () async {
+                    await ref.read(choresServiceProvider).updateChore(
+                          chore.id,
+                          name: nameCtrl.text,
+                          description: descCtrl.text,
+                          pointValue: int.tryParse(pointCtrl.text) ??
+                              chore.pointValue,
+                          recurrence: recurrence,
+                          difficulty: difficulty,
+                          requiresApproval: requiresApproval,
+                          requiresPhoto: requiresPhoto,
+                        );
+                    ref.invalidate(choresListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    backgroundColor: VillageTheme.positive,
+                  ),
+                  child: const Text('Save Changes',
+                      style: TextStyle(fontSize: 16)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _deleteChore(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Chore'),
+        content: Text(
+            'Delete "${chore.name}"? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style:
+                TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      try {
+        await ref
+            .read(choresServiceProvider)
+            .deleteChore(chore.id);
+        ref.invalidate(choresListProvider);
+      } on DioException catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete: ${e.message}'),
+              backgroundColor: Colors.red.shade700,
+            ),
+          );
+        }
+      }
+    }
   }
 }
 

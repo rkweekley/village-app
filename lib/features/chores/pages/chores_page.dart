@@ -799,6 +799,57 @@ class _ChoresTab extends StatelessWidget {
                   child: const Text('Save Changes',
                       style: TextStyle(fontSize: 16)),
                 ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: ctx,
+                      builder: (dctx) => AlertDialog(
+                        title: const Text('Delete Chore'),
+                        content: Text(
+                            'Delete "${chore.name}"? This cannot be undone.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(dctx, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dctx, true),
+                            style: TextButton.styleFrom(
+                                foregroundColor: Colors.red),
+                            child: const Text('Delete'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirmed == true) {
+                      try {
+                        await ref
+                            .read(choresServiceProvider)
+                            .deleteChore(chore.id);
+                        ref.invalidate(choresListProvider);
+                        if (ctx.mounted) Navigator.pop(ctx);
+                      } on DioException catch (e) {
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Failed to delete: ${e.message}'),
+                              backgroundColor: Colors.red.shade700,
+                            ),
+                          );
+                        }
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  label: const Text('Delete Chore',
+                      style: TextStyle(color: Colors.red)),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    side: const BorderSide(color: Colors.red),
+                  ),
+                ),
               ],
             ),
           ),
