@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/rewards/rewards_service.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
+import 'package:village_app/features/family/family_provider.dart';
 import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
 
@@ -307,7 +308,7 @@ class _AvailableTab extends StatelessWidget {
                                   size: 14, color: VillageTheme.warning),
                               const SizedBox(width: 4),
                               Text(
-                                '${reward.pointCost} pts',
+                                '${reward.pointCost} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -328,7 +329,7 @@ class _AvailableTab extends StatelessWidget {
                                 builder: (ctx) => AlertDialog(
                                   title: const Text('Redeem Reward'),
                                   content: Text(
-                                      'Spend ${reward.pointCost} points on "${reward.name}"?'),
+                                      'Spend ${reward.pointCost} ${ref.read(familyProvider).family?.currencyName ?? 'points'} on "${reward.name}"?'),
                                   actions: [
                                     TextButton(
                                         onPressed: () =>
@@ -511,7 +512,7 @@ class _RedemptionsTab extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          '${r.pointsCost} pts',
+                          '${r.pointsCost} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,

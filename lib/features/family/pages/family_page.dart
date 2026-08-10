@@ -394,6 +394,11 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
     final nameCtrl = TextEditingController(text: family.name);
     final currencyCtrl = TextEditingController(text: family.currencyName);
     final timezoneCtrl = TextEditingController(text: family.timezone);
+    const presets = ['Points', 'Stars', 'Coins', 'Bucks', 'Gems', 'Tickets', 'Tokens'];
+    String selectedCurrency = presets.contains(family.currencyName)
+        ? family.currencyName
+        : 'Custom';
+    bool showCustomCurrency = selectedCurrency == 'Custom';
 
     showAdaptiveModalSheet(
       context: context,
@@ -445,8 +450,9 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                   autofocus: true,
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: currencyCtrl,
+
+                DropdownButtonFormField<String>(
+                  initialValue: selectedCurrency,
                   decoration: InputDecoration(
                     labelText: 'Currency name',
                     prefixIcon: const Icon(Icons.monetization_on_outlined),
@@ -457,7 +463,34 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       borderSide: BorderSide.none,
                     ),
                   ),
+                  items: [
+                    ...presets.map((c) =>
+                        DropdownMenuItem(value: c, child: Text(c))),
+                    const DropdownMenuItem(
+                        value: 'Custom', child: Text('Custom…')),
+                  ],
+                  onChanged: (v) => setState(() {
+                    selectedCurrency = v!;
+                    showCustomCurrency = v == 'Custom';
+                    if (v != 'Custom') currencyCtrl.text = v;
+                  }),
                 ),
+                if (showCustomCurrency) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: currencyCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'Custom currency name',
+                      prefixIcon: const Icon(Icons.edit_outlined),
+                      filled: true,
+                      fillColor: VillageTheme.surfaceBase,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 TextField(
                   controller: timezoneCtrl,

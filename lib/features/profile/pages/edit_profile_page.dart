@@ -298,7 +298,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               ),
             ),
             child: Text(
-              '${userInfo?.pointsBalance ?? 0} pts',
+              '${userInfo?.pointsBalance ?? 0} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
               style: const TextStyle(fontSize: 16),
             ),
           ),

@@ -190,7 +190,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'My Points',
+                            'My ${familyState.family?.currencyName ?? 'Points'}',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
@@ -484,7 +484,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${member.pointsBalance} pts',
+                    '${member.pointsBalance} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: VillageTheme.warning,

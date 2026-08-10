@@ -123,6 +123,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
       builder: (ctx) => _CreateAssignmentSheet(
         chores: choresData,
         members: members,
+        ref: ref,
         onAssign: (choreId, assignedToId, dueDate) async {
           await ref.read(choresServiceProvider).assignChore(
                 choreId,
@@ -141,12 +142,14 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
 class _CreateAssignmentSheet extends StatefulWidget {
   final List<Chore> chores;
   final List<MemberInfo> members;
+  final WidgetRef ref;
   final Future<void> Function(String choreId, String assignedToId, String dueDate)
       onAssign;
 
   const _CreateAssignmentSheet({
     required this.chores,
     required this.members,
+    required this.ref,
     required this.onAssign,
   });
 
@@ -330,7 +333,7 @@ class _CreateAssignmentSheetState extends State<_CreateAssignmentSheet> {
                                 ],
                               ),
                               Text(
-                                '${m.pointsBalance} pts',
+                                '${m.pointsBalance} ${widget.ref.read(familyProvider).family?.currencyName ?? 'pts'}',
                                 style: const TextStyle(
                                     color: Colors.grey, fontSize: 12),
                               ),
@@ -566,7 +569,7 @@ class _ChoresTab extends StatelessWidget {
                                   ],
                                 ),
                                 Text(
-                                  '${m.pointsBalance} pts',
+                                  '${m.pointsBalance} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
                                   style: const TextStyle(
                                       color: Colors.grey, fontSize: 12),
                                 ),
