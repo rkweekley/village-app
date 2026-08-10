@@ -18,6 +18,32 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
   DateTime? _selectedDay;
 
   @override
+  void initState() {
+    super.initState();
+    _selectedDay = DateTime.now();
+  }
+
+  void _navigateMonth(int delta) {
+    setState(() {
+      _focusedMonth = DateTime(
+        _focusedMonth.year,
+        _focusedMonth.month + delta,
+        1,
+      );
+      _updateSelectedDay();
+    });
+  }
+
+  void _updateSelectedDay() {
+    final now = DateTime.now();
+    if (_focusedMonth.year == now.year && _focusedMonth.month == now.month) {
+      _selectedDay = now;
+    } else {
+      _selectedDay = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final monthStart = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
     final monthEnd = DateTime(
@@ -40,18 +66,12 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.chevron_left_rounded),
-          onPressed: () => setState(
-            () => _focusedMonth = _focusedMonth.subtract(
-              const Duration(days: 30),
-            ),
-          ),
+          onPressed: () => _navigateMonth(-1),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.chevron_right_rounded),
-            onPressed: () => setState(
-              () => _focusedMonth = _focusedMonth.add(const Duration(days: 30)),
-            ),
+            onPressed: () => _navigateMonth(1),
           ),
           IconButton(
             icon: const Icon(Icons.today_rounded),
