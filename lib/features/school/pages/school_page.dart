@@ -800,7 +800,18 @@ class _AssignmentsTab extends ConsumerWidget {
                                     ),
                                   ),
                                   const Spacer(),
-                                  if (a.status == 'Pending' && !authState.canManage)
+                                  if (a.status == 'Pending' && authState.canManage)
+                                    IconButton(
+                                      icon: const Icon(Icons.edit_outlined,
+                                          size: 18),
+                                      tooltip: 'Edit assignment',
+                                      visualDensity: VisualDensity.compact,
+                                      onPressed: () =>
+                                          _showEditAssignmentSheet(
+                                              context, a),
+                                    ),
+                                  if (a.status == 'Pending' &&
+                                      !authState.canManage)
                                     TextButton.icon(
                                       onPressed: () =>
                                           _showSubmitDialog(context, a.id),
@@ -859,6 +870,321 @@ class _AssignmentsTab extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showEditAssignmentSheet(BuildContext context, SchoolWork a) {
+    final titleCtrl = TextEditingController(text: a.title);
+    final descCtrl = TextEditingController(text: a.description ?? '');
+    final pointsCtrl = TextEditingController(text: a.pointsPossible.toString());
+
+    // Parse the existing due date
+    DateTime selectedDate;
+    try {
+      final parts = a.dueDate.split('-');
+      selectedDate = DateTime(
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+        int.parse(parts[2]),
+      );
+    } catch (_) {
+      selectedDate = DateTime.now();
+    }
+
+    String selectedSubjectId = a.subjectId;
+    String selectedAssigneeId = a.assignedToId;
+
+    showAdaptiveModalSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: VillageTheme.info.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.edit_rounded,
+                          color: VillageTheme.info, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Edit Assignment',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w700)),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    prefixIcon: const Icon(Icons.edit_outlined),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  autofocus: true,
+                ),
+                const SizedBox(height: 12),
+                // Subject dropdown
+                Builder(
+                  builder: (ctx2) {
+                    final subjects = ref
+                        .read(subjectsListProvider)
+                        .asData
+                        ?.value
+                        .where((s) => s.isActive)
+                        .toList();
+                    if (subjects == null || subjects.isEmpty) {
+                      return const Text('No subjects available.',
+                          style: TextStyle(color: Colors.grey));
+                    }
+                    return DropdownButtonFormField<String>(
+                      value: subjects.any((s) => s.id == selectedSubjectId)
+                          ? selectedSubjectId
+                          : subjects.first.id,
+                      decoration: InputDecoration(
+                        labelText: 'Subject',
+                        filled: true,
+                        fillColor: VillageTheme.surfaceBase,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      items: subjects
+                          .map((s) => DropdownMenuItem(
+                                value: s.id,
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: _parseColor(s.color),
+                                      radius: 8,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(s.name),
+                                  ],
+                                ),
+                              ))
+                          .toList(),
+                      onChanged: (v) =>
+                          setState(() => selectedSubjectId = v!),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                // Assignee dropdown
+                Builder(
+                  builder: (ctx2) {
+                    final members =
+                        ref.read(familyProvider).family?.members ?? [];
+                    if (members.isEmpty) {
+                      return const Text('No family members loaded.',
+                          style: TextStyle(color: Colors.grey));
+                    }
+                    final currentAssignee = members
+                        .where((m) => m.id == selectedAssigneeId)
+                        .firstOrNull;
+                    return DropdownButtonFormField<MemberInfo>(
+                      value: currentAssignee ?? members.first,
+                      decoration: InputDecoration(
+                        labelText: 'Assign to',
+                        filled: true,
+                        fillColor: VillageTheme.surfaceBase,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      items: members
+                          .map((m) => DropdownMenuItem(
+                                value: m,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      m.role == 'Parent'
+                                          ? Icons.star
+                                          : Icons.person,
+                                      size: 18,
+                                      color: m.role == 'Parent'
+                                          ? Colors.amber
+                                          : Colors.grey,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(m.displayName),
+                                  ],
+                                ),
+                              ))
+                          .toList(),
+                      onChanged: (v) =>
+                          setState(() => selectedAssigneeId = v!.id),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Description (optional)',
+                    prefixIcon: const Icon(Icons.description_outlined),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: pointsCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'Points',
+                          prefixIcon: const Icon(Icons.numbers_outlined),
+                          filled: true,
+                          fillColor: VillageTheme.surfaceBase,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final date = await showDatePicker(
+                            context: ctx,
+                            initialDate: selectedDate,
+                            firstDate: DateTime.now()
+                                .subtract(const Duration(days: 30)),
+                            lastDate: DateTime.now()
+                                .add(const Duration(days: 365)),
+                            helpText: 'Select due date',
+                          );
+                          if (date != null) {
+                            setState(() => selectedDate = date);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'Due date',
+                            filled: true,
+                            fillColor: VillageTheme.surfaceBase,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: const Icon(Icons.calendar_today,
+                                size: 18),
+                          ),
+                          child: Text(
+                            '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: () async {
+                    final title = titleCtrl.text.trim();
+                    if (title.isEmpty) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                            content: Text('Title is required.'),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    final points =
+                        int.tryParse(pointsCtrl.text.trim()) ?? a.pointsPossible;
+                    final dueDateStr =
+                        '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+
+                    try {
+                      await ref
+                          .read(schoolServiceProvider)
+                          .updateSchoolWork(
+                            a.id,
+                            title: title,
+                            description: descCtrl.text.trim().isNotEmpty
+                                ? descCtrl.text.trim()
+                                : null,
+                            dueDate: dueDateStr,
+                            pointsPossible: points,
+                            subjectId: selectedSubjectId,
+                            assignedToId: selectedAssigneeId,
+                          );
+                      ref.invalidate(schoolWorkListProvider);
+                      ref.invalidate(pendingGradingProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } on DioException catch (e) {
+                      final msg = e.response?.statusCode == 409
+                          ? 'This assignment can no longer be edited.'
+                          : 'Failed to save: ${e.message}';
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text(msg),
+                            backgroundColor: Colors.red.shade700,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to save: $e'),
+                            backgroundColor: Colors.red.shade700,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    backgroundColor: VillageTheme.info,
+                  ),
+                  child: const Text('Save Changes',
+                      style: TextStyle(fontSize: 16)),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1160,5 +1486,16 @@ class _AssignmentsTab extends ConsumerWidget {
       default:
         return Icons.help_outline;
     }
+  }
+
+  Color _parseColor(String? color) {
+    if (color == null || color.isEmpty) return VillageTheme.info;
+    try {
+      if (color.startsWith('#')) {
+        final hex = color.replaceAll('#', '');
+        return Color(int.parse('FF$hex', radix: 16));
+      }
+    } catch (_) {}
+    return VillageTheme.info;
   }
 }

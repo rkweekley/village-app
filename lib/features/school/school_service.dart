@@ -168,6 +168,27 @@ class SchoolService {
     final res = await _dio.get('/api/school/pending-grading');
     return (res.data as List).map((j) => SchoolWork.fromJson(j)).toList();
   }
+
+  /// Edit a pending school work assignment (parent only).
+  Future<Map<String, dynamic>> updateSchoolWork(
+    String id, {
+    String? title,
+    String? description,
+    String? dueDate,
+    int? pointsPossible,
+    String? subjectId,
+    String? assignedToId,
+  }) async {
+    final res = await _dio.put('/api/school/$id/edit', data: {
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (dueDate != null) 'dueDate': dueDate,
+      if (pointsPossible != null) 'pointsPossible': pointsPossible,
+      if (subjectId != null) 'subjectId': subjectId,
+      if (assignedToId != null) 'assignedToId': assignedToId,
+    });
+    return res.data as Map<String, dynamic>;
+  }
 }
 
 // ── Providers ──
