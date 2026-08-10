@@ -465,7 +465,7 @@ class _ChoresTab extends StatelessWidget {
                     }
                   },
                 ),
-                onTap: chore.createdById != null && chore.createdById == userId
+                onTap: ref.read(authProvider).canManage
                     ? () => _showEditChoreDialog(context, chore)
                     : null,
               );
