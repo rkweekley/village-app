@@ -399,6 +399,18 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
         ? family.currencyName
         : 'Custom';
     bool showCustomCurrency = selectedCurrency == 'Custom';
+    const timezones = {
+      'Eastern (ET)': 'America/New_York',
+      'Central (CT)': 'America/Chicago',
+      'Mountain (MT)': 'America/Denver',
+      'Pacific (PT)': 'America/Los_Angeles',
+      'Alaska (AKT)': 'America/Anchorage',
+      'Hawaii (HT)': 'Pacific/Honolulu',
+    };
+    String selectedTimezone = timezones.containsValue(family.timezone)
+        ? timezones.entries.firstWhere((e) => e.value == family.timezone).key
+        : 'Custom';
+    bool showCustomTimezone = selectedTimezone == 'Custom';
 
     showAdaptiveModalSheet(
       context: context,
@@ -492,8 +504,8 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                   ),
                 ],
                 const SizedBox(height: 12),
-                TextField(
-                  controller: timezoneCtrl,
+                DropdownButtonFormField<String>(
+                  initialValue: selectedTimezone,
                   decoration: InputDecoration(
                     labelText: 'Timezone',
                     prefixIcon: const Icon(Icons.language_rounded),
@@ -504,7 +516,34 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       borderSide: BorderSide.none,
                     ),
                   ),
+                  items: [
+                    ...timezones.entries.map((e) =>
+                        DropdownMenuItem(value: e.key, child: Text(e.key))),
+                    const DropdownMenuItem(
+                        value: 'Custom', child: Text('Custom…')),
+                  ],
+                  onChanged: (v) => setState(() {
+                    selectedTimezone = v!;
+                    showCustomTimezone = v == 'Custom';
+                    if (v != 'Custom') timezoneCtrl.text = timezones[v]!;
+                  }),
                 ),
+                if (showCustomTimezone) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: timezoneCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'Custom timezone (e.g. America/Chicago)',
+                      prefixIcon: const Icon(Icons.edit_outlined),
+                      filled: true,
+                      fillColor: VillageTheme.surfaceBase,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: () async {
