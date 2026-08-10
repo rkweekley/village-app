@@ -17,13 +17,14 @@ class SchoolPage extends ConsumerWidget {
 
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
+      child: Builder(
+        builder: (innerContext) => Scaffold(
         appBar: AppBar(
           title: const Text('School'),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(innerContext).pop(),
           ),
           bottom: TabBar(
             tabs: const [
@@ -35,14 +36,14 @@ class SchoolPage extends ConsumerWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             print('[SCHOOL] FAB pressed');
-            final tabIndex = DefaultTabController.of(context).index;
+            final tabIndex = DefaultTabController.of(innerContext).index;
             print('[SCHOOL] tabIndex=$tabIndex');
             if (tabIndex == 1) {
               print('[SCHOOL] → create subject sheet');
-              _showCreateSubjectSheet(context, ref);
+              _showCreateSubjectSheet(innerContext, ref);
             } else {
               print('[SCHOOL] → create assignment sheet');
-              _showCreateAssignmentSheet(context, ref);
+              _showCreateAssignmentSheet(innerContext, ref);
             }
           },
           child: const Icon(Icons.add),
@@ -61,7 +62,7 @@ class SchoolPage extends ConsumerWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 
   void _showCreateSubjectSheet(BuildContext context, WidgetRef ref) {
