@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/family/family_provider.dart';
 import 'package:village_app/features/family/family_service.dart';
 import 'package:village_app/features/family/models.dart';
 import 'package:village_app/shared/utils/date_utils.dart';
+import 'package:village_app/shared/widgets/adaptive_sheet.dart';
 
 class FamilyPage extends ConsumerStatefulWidget {
   const FamilyPage({super.key});
@@ -178,9 +180,19 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                                 size: 20, color: VillageTheme.primary),
                           ),
                           const SizedBox(width: 10),
-                          const Text('Family Settings',
-                              style: TextStyle(
-                                  fontSize: 17, fontWeight: FontWeight.w700)),
+                          const Expanded(
+                            child: Text('Family Settings',
+                                style: TextStyle(
+                                    fontSize: 17, fontWeight: FontWeight.w700)),
+                          ),
+                          if (authState.canManage)
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined,
+                                  size: 20, color: VillageTheme.primary),
+                              tooltip: 'Edit family settings',
+                              onPressed: () =>
+                                  _showEditFamilySheet(context, familyState.family!),
+                            ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -376,6 +388,134 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
     if (confirmed == true && mounted) {
       await ref.read(authProvider.notifier).logout();
     }
+  }
+
+  void _showEditFamilySheet(BuildContext context, FamilyInfo family) {
+    final nameCtrl = TextEditingController(text: family.name);
+    final currencyCtrl = TextEditingController(text: family.currencyName);
+    final timezoneCtrl = TextEditingController(text: family.timezone);
+
+    showAdaptiveModalSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: VillageTheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.settings_rounded,
+                          color: VillageTheme.primary, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Edit Family Settings',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w700)),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Family name',
+                    prefixIcon: const Icon(Icons.family_restroom_rounded),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  autofocus: true,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: currencyCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Currency name',
+                    prefixIcon: const Icon(Icons.monetization_on_outlined),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: timezoneCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Timezone',
+                    prefixIcon: const Icon(Icons.language_rounded),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: () async {
+                    final name = nameCtrl.text.trim();
+                    if (name.isEmpty) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text('Family name is required.')),
+                        );
+                      }
+                      return;
+                    }
+                    try {
+                      await ref.read(familyProvider.notifier).updateFamily(
+                            name: name,
+                            currencyName: currencyCtrl.text.trim(),
+                            timezone: timezoneCtrl.text.trim(),
+                          );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } on DioException catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed: ${e.message}'),
+                            backgroundColor: Colors.red.shade700,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    backgroundColor: VillageTheme.primary,
+                  ),
+                  child: const Text('Save Changes',
+                      style: TextStyle(fontSize: 16)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _infoRow(String label, String value) {
