@@ -254,10 +254,14 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       ),
                       const SizedBox(height: 12),
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: InkWell(
-                              onTap: () async {
+                            child: _EventDateTimeField(
+                              label: 'Starts',
+                              value: start,
+                              timeEnabled: !allDay,
+                              onDateTap: () async {
                                 final picked = await showDatePicker(
                                   context: ctx,
                                   initialDate: start,
@@ -289,38 +293,41 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                   );
                                 }
                               },
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: VillageTheme.surfaceBase,
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Start',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey[600],
-                                      ),
+                              onTimeTap: () async {
+                                final picked = await showTimePicker(
+                                  context: ctx,
+                                  initialTime: TimeOfDay.fromDateTime(start),
+                                  builder: (ctx, child) => Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: Theme.of(context).colorScheme
+                                          .copyWith(
+                                            primary: VillageTheme.primaryLight,
+                                          ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${start.month}/${start.day}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    child: child!,
+                                  ),
+                                );
+                                if (picked != null) {
+                                  setDialogState(
+                                    () => start = DateTime(
+                                      start.year,
+                                      start.month,
+                                      start.day,
+                                      picked.hour,
+                                      picked.minute,
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  );
+                                }
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: InkWell(
-                              onTap: () async {
+                            child: _EventDateTimeField(
+                              label: 'Ends',
+                              value: end,
+                              timeEnabled: !allDay,
+                              onDateTap: () async {
                                 final picked = await showDatePicker(
                                   context: ctx,
                                   initialDate: end,
@@ -352,32 +359,32 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                   );
                                 }
                               },
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: VillageTheme.surfaceBase,
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'End',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey[600],
-                                      ),
+                              onTimeTap: () async {
+                                final picked = await showTimePicker(
+                                  context: ctx,
+                                  initialTime: TimeOfDay.fromDateTime(end),
+                                  builder: (ctx, child) => Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: Theme.of(context).colorScheme
+                                          .copyWith(
+                                            primary: VillageTheme.primaryLight,
+                                          ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${end.month}/${end.day}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    child: child!,
+                                  ),
+                                );
+                                if (picked != null) {
+                                  setDialogState(
+                                    () => end = DateTime(
+                                      end.year,
+                                      end.month,
+                                      end.day,
+                                      picked.hour,
+                                      picked.minute,
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  );
+                                }
+                              },
                             ),
                           ),
                         ],
@@ -471,6 +478,101 @@ Color _parseHexColor(String hex) {
   hex = hex.replaceAll('#', '');
   if (hex.length == 6) hex = 'FF$hex';
   return Color(int.parse(hex, radix: 16));
+}
+
+String _formatTime12h(DateTime dt) {
+  final h = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+  final ampm = dt.hour >= 12 ? 'PM' : 'AM';
+  return '${h}:${dt.minute.toString().padLeft(2, '0')} $ampm';
+}
+
+class _EventDateTimeField extends StatelessWidget {
+  final String label;
+  final DateTime value;
+  final bool timeEnabled;
+  final VoidCallback onDateTap;
+  final VoidCallback onTimeTap;
+
+  const _EventDateTimeField({
+    required this.label,
+    required this.value,
+    required this.timeEnabled,
+    required this.onDateTap,
+    required this.onTimeTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dateLabel = '${value.month}/${value.day}/${value.year}';
+    final timeLabel = _formatTime12h(value);
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: VillageTheme.surfaceBase,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: onDateTap,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 15,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    dateLabel,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          InkWell(
+            onTap: timeEnabled ? onTimeTap : null,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.access_time_rounded,
+                    size: 15,
+                    color: timeEnabled ? Colors.grey : Colors.grey[300],
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    timeLabel,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: timeEnabled ? null : Colors.grey[400],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // ── Calendar Grid ──
