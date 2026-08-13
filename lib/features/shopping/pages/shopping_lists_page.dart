@@ -682,8 +682,16 @@ class _ItemTile extends StatelessWidget {
               ),
             const SizedBox(width: 4),
             IconButton(
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              color: Colors.grey[600],
+              tooltip: 'Edit item',
+              onPressed: () => _showEditItemSheet(context),
+            ),
+            const SizedBox(width: 4),
+            IconButton(
               icon: const Icon(Icons.delete_outline, size: 18),
               color: VillageTheme.danger.withValues(alpha: 0.7),
+              tooltip: 'Delete item',
               onPressed: () async {
                 try {
                   await ref
@@ -706,6 +714,158 @@ class _ItemTile extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showEditItemSheet(BuildContext context) {
+    final nameCtrl = TextEditingController(text: item.name);
+    final qtyCtrl = TextEditingController(text: item.quantity.toString());
+    String? category = item.category;
+
+    showAdaptiveModalSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) {
+          // Include the item's existing category if it's not one of the
+          // standard options, so the dropdown never crashes on unknown values.
+          final categories = <String>[
+            'Produce', 'Dairy', 'Meat', 'Bakery', 'Pantry', 'Other',
+            if (category != null &&
+                !['Produce', 'Dairy', 'Meat', 'Bakery', 'Pantry', 'Other']
+                    .contains(category))
+              category!,
+          ];
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: VillageTheme.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.edit_note_rounded,
+                            color: VillageTheme.primary, size:22),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text('Edit Item',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'Item name',
+                      prefixIcon: const Icon(Icons.shopping_bag_outlined),
+                      filled: true,
+                      fillColor: VillageTheme.surfaceBase,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    autofocus: true,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: qtyCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'Quantity',
+                            prefixIcon: const Icon(Icons.numbers_outlined),
+                            filled: true,
+                            fillColor: VillageTheme.surfaceBase,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          value: category,
+                          decoration: InputDecoration(
+                            labelText: 'Category',
+                            filled: true,
+                            fillColor: VillageTheme.surfaceBase,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          items: categories
+                              .map((c) => DropdownMenuItem(
+                                  value: c, child: Text(c)))
+                              .toList(),
+                          onChanged: (v) => setState(() => category = v),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton(
+                    onPressed: () async {
+                      if (nameCtrl.text.trim().isNotEmpty) {
+                        try {
+                          await ref.read(shoppingServiceProvider).updateItem(
+                                listId,
+                                item.id,
+                                name: nameCtrl.text.trim(),
+                                quantity:
+                                    int.tryParse(qtyCtrl.text) ?? item.quantity,
+                                category: category,
+                              );
+                          ref.invalidate(shoppingListDetailProvider(listId));
+                          ref.invalidate(shoppingListsProvider);
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        } catch (e) {
+                          if (ctx.mounted) {
+                            ScaffoldMessenger.of(ctx).showSnackBar(
+                              SnackBar(
+                                  content: Text('Failed: $e'),
+                                  backgroundColor: Colors.red.shade700,
+                                  behavior: SnackBarBehavior.floating),
+                            );
+                          }
+                        }
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 52),
+                      backgroundColor: VillageTheme.primary,
+                    ),
+                    child: const Text('Save Changes',
+                        style: TextStyle(fontSize: 16)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
