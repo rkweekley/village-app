@@ -146,8 +146,23 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final titleCtrl = TextEditingController();
     final descCtrl = TextEditingController();
     final locCtrl = TextEditingController();
-    DateTime start = DateTime.now().add(const Duration(hours: 1));
-    DateTime end = DateTime.now().add(const Duration(hours: 2));
+    // Default the new event to the selected day (today's time, +1h/+2h).
+    final selectedDay = _selectedDay ?? DateTime.now();
+    final now = DateTime.now();
+    DateTime start = DateTime(
+      selectedDay.year,
+      selectedDay.month,
+      selectedDay.day,
+      now.hour,
+      now.minute,
+    ).add(const Duration(hours: 1));
+    DateTime end = DateTime(
+      selectedDay.year,
+      selectedDay.month,
+      selectedDay.day,
+      now.hour,
+      now.minute,
+    ).add(const Duration(hours: 2));
     bool allDay = false;
     showAdaptiveModalSheet(
       context: context,
