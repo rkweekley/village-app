@@ -633,6 +633,11 @@ class _ItemTile extends StatelessWidget {
           onChanged: (_) async {
             try {
               await ref.read(shoppingServiceProvider).toggleItem(listId, item.id);
+              if (!context.mounted) return;
+              // Refresh the detail page (and list counts) so the checkbox
+              // reflects the new state immediately.
+              ref.invalidate(shoppingListDetailProvider(listId));
+              ref.invalidate(shoppingListsProvider);
             } catch (e) {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -684,6 +689,10 @@ class _ItemTile extends StatelessWidget {
                   await ref
                       .read(shoppingServiceProvider)
                       .deleteItem(listId, item.id);
+                  if (!context.mounted) return;
+                  // Refresh so the removed item disappears immediately.
+                  ref.invalidate(shoppingListDetailProvider(listId));
+                  ref.invalidate(shoppingListsProvider);
                 } catch (e) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
