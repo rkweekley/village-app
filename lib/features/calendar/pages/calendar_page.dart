@@ -744,6 +744,7 @@ class _DayEventsList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = ref.watch(authProvider).userInfo?.id;
+    final canManage = ref.watch(authProvider).canManage;
     final dayEvents = events.where((e) {
       return !e.endTime.isBefore(day) &&
           !e.startTime.isAfter(day.add(const Duration(hours: 24)));
@@ -827,7 +828,9 @@ class _DayEventsList extends ConsumerWidget {
                       color: Colors.grey[400],
                     ),
                     onSelected: (value) async {
-                      if (value == 'delete') {
+                      if (value == 'edit') {
+                        _showEditEventSheet(context, ref, e);
+                      } else if (value == 'delete') {
                         try {
                           await ref.read(calendarServiceProvider).deleteEvent(e.id);
                           final monthStart = DateTime(day.year, day.month, 1);
@@ -854,20 +857,32 @@ class _DayEventsList extends ConsumerWidget {
                       }
                     },
                     itemBuilder: (ctx) => [
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.delete_outline,
-                              size: 20,
-                              color: Colors.red,
-                            ),
-                            SizedBox(width: 8),
-                            Text('Delete', style: TextStyle(color: Colors.red)),
-                          ],
+                      if (e.organizerId == userId || canManage)
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit_outlined, size: 20),
+                              SizedBox(width: 8),
+                              Text('Edit'),
+                            ],
+                          ),
                         ),
-                      ),
+                      if (e.organizerId == userId || canManage)
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_outline,
+                                size: 20,
+                                color: Colors.red,
+                              ),
+                              SizedBox(width: 8),
+                              Text('Delete', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -1008,6 +1023,316 @@ class _DayEventsList extends ConsumerWidget {
     final h = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
     final ampm = dt.hour >= 12 ? 'PM' : 'AM';
     return '${h}:${dt.minute.toString().padLeft(2, '0')} $ampm';
+  }
+
+  void _showEditEventSheet(
+    BuildContext context,
+    WidgetRef ref,
+    CalendarEventModel event,
+  ) {
+    final titleCtrl = TextEditingController(text: event.title);
+    final descCtrl = TextEditingController(text: event.description ?? '');
+    final locCtrl = TextEditingController(text: event.location ?? '');
+    DateTime start = event.startTime;
+    DateTime end = event.endTime;
+    bool allDay = event.isAllDay;
+
+    showAdaptiveModalSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: VillageTheme.primaryLight.withValues(
+                          alpha: 0.12,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.edit_rounded,
+                        color: VillageTheme.primaryLight,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Edit Event',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  autofocus: true,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Description (optional)',
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: locCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Location (optional)',
+                    prefixIcon: const Icon(
+                      Icons.location_on_outlined,
+                      size: 20,
+                    ),
+                    filled: true,
+                    fillColor: VillageTheme.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _EventDateTimeField(
+                        label: 'Starts',
+                        value: start,
+                        timeEnabled: !allDay,
+                        onDateTap: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: start,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => start = DateTime(
+                                picked.year,
+                                picked.month,
+                                picked.day,
+                                start.hour,
+                                start.minute,
+                              ),
+                            );
+                          }
+                        },
+                        onTimeTap: () async {
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: TimeOfDay.fromDateTime(start),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => start = DateTime(
+                                start.year,
+                                start.month,
+                                start.day,
+                                picked.hour,
+                                picked.minute,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _EventDateTimeField(
+                        label: 'Ends',
+                        value: end,
+                        timeEnabled: !allDay,
+                        onDateTap: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: end,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => end = DateTime(
+                                picked.year,
+                                picked.month,
+                                picked.day,
+                                end.hour,
+                                end.minute,
+                              ),
+                            );
+                          }
+                        },
+                        onTimeTap: () async {
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: TimeOfDay.fromDateTime(end),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => end = DateTime(
+                                end.year,
+                                end.month,
+                                end.day,
+                                picked.hour,
+                                picked.minute,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: VillageTheme.surfaceBase,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: SwitchListTile(
+                    title: const Text('All day event'),
+                    value: allDay,
+                    activeColor: VillageTheme.primaryLight,
+                    onChanged: (v) => setDialogState(() => allDay = v),
+                    dense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: () async {
+                    if (titleCtrl.text.isEmpty) return;
+                    try {
+                      await ref.read(calendarServiceProvider).updateEvent(
+                        event.id,
+                        title: titleCtrl.text,
+                        description: descCtrl.text.isNotEmpty
+                            ? descCtrl.text
+                            : null,
+                        location: locCtrl.text.isNotEmpty
+                            ? locCtrl.text
+                            : null,
+                        startTime: start,
+                        endTime: end,
+                        isAllDay: allDay,
+                      );
+                      final monthStart = DateTime(day.year, day.month, 1);
+                      final monthEnd = DateTime(
+                        day.year,
+                        day.month + 1,
+                        0,
+                        23,
+                        59,
+                      );
+                      ref.invalidate(
+                        calendarEventsProvider(
+                          CalendarDateRange(
+                            start: monthStart,
+                            end: monthEnd,
+                          ),
+                        ),
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed: $e'),
+                            backgroundColor: Colors.red.shade700,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    backgroundColor: VillageTheme.primaryLight,
+                  ),
+                  child: const Text(
+                    'Save Changes',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

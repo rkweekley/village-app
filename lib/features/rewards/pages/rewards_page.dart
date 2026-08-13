@@ -220,6 +220,223 @@ class RewardsPage extends ConsumerWidget {
   }
 }
 
+void _showEditRewardDialog(
+    BuildContext context, WidgetRef ref, Reward reward) {
+  final nameCtrl = TextEditingController(text: reward.name);
+  final descCtrl = TextEditingController(text: reward.description ?? '');
+  final costCtrl = TextEditingController(text: reward.pointCost.toString());
+  final maxRedemptionsCtrl = TextEditingController(
+      text: reward.maxRedemptions?.toString() ?? '');
+  String category = reward.category;
+  bool requiresApproval = reward.requiresApproval;
+  int? maxRedemptions = reward.maxRedemptions;
+
+  // The backend serialises category as enum names (e.g. 'ScreenTime'), so
+  // ensure the reward's stored value is a valid dropdown option.
+  final categories = ['Screen Time', 'Treat', 'Outing', 'Toy', 'Custom'];
+  if (!categories.contains(category)) {
+    categories.add(category);
+  }
+
+  showAdaptiveModalSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setState) => Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: VillageTheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.edit_rounded,
+                        color: VillageTheme.primary, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Edit Reward',
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w700)),
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: nameCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Reward name',
+                  prefixIcon: const Icon(Icons.emoji_events_outlined),
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  prefixIcon: const Icon(Icons.description_outlined),
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: costCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Point cost',
+                  prefixIcon: const Icon(Icons.stars_rounded),
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: category,
+                decoration: InputDecoration(
+                  labelText: 'Category',
+                  prefixIcon: const Icon(Icons.category_outlined),
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                items: categories
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (v) => setState(() => category = v!),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: maxRedemptionsCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Max redemptions (optional)',
+                  prefixIcon: const Icon(Icons.repeat_outlined),
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+                onChanged: (v) => maxRedemptions = int.tryParse(v),
+              ),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                title: const Text('Requires approval'),
+                value: requiresApproval,
+                onChanged: (v) => setState(() => requiresApproval = v),
+                contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () async {
+                  try {
+                    await ref.read(rewardsServiceProvider).updateReward(
+                          reward.id,
+                          name: nameCtrl.text,
+                          description: descCtrl.text,
+                          pointCost: int.tryParse(costCtrl.text) ?? 0,
+                          category: category,
+                          maxRedemptions: maxRedemptions,
+                          requiresApproval: requiresApproval,
+                        );
+                    ref.invalidate(rewardsListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  } catch (e) {
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(content: Text('Failed: $e'),
+                            backgroundColor: Colors.red.shade700,
+                            behavior: SnackBarBehavior.floating),
+                      );
+                    }
+                  }
+                },
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  backgroundColor: VillageTheme.primary,
+                ),
+                child: const Text('Save Changes',
+                    style: TextStyle(fontSize: 16)),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> _confirmDeleteReward(
+    BuildContext context, WidgetRef ref, Reward reward) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Delete Reward'),
+      content: Text('Delete "${reward.name}"? This cannot be undone.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          style: TextButton.styleFrom(foregroundColor: VillageTheme.danger),
+          child: const Text('Delete'),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+  if (!context.mounted) return;
+  try {
+    await ref.read(rewardsServiceProvider).deleteReward(reward.id);
+    ref.invalidate(rewardsListProvider);
+  } catch (e) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed: $e'),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating),
+      );
+    }
+  }
+}
+
 class _AvailableTab extends StatelessWidget {
   final AsyncValue<List<Reward>> rewardsAsync;
   final WidgetRef ref;
@@ -266,20 +483,68 @@ class _AvailableTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Category icon
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: _categoryColor(reward.category)
-                                .withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Icon(
-                            _categoryIcon(reward.category),
-                            color: _categoryColor(reward.category),
-                            size: 22,
-                          ),
+                        // Category icon + parent edit/delete menu
+                        Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: _categoryColor(reward.category)
+                                    .withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Icon(
+                                _categoryIcon(reward.category),
+                                color: _categoryColor(reward.category),
+                                size: 22,
+                              ),
+                            ),
+                            const Spacer(),
+                            if (isParent)
+                              PopupMenuButton<String>(
+                                icon: const Icon(Icons.more_vert_rounded,
+                                    size: 20),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                tooltip: 'Reward options',
+                                onSelected: (value) {
+                                  if (value == 'edit') {
+                                    _showEditRewardDialog(
+                                        context, ref, reward);
+                                  } else if (value == 'delete') {
+                                    _confirmDeleteReward(
+                                        context, ref, reward);
+                                  }
+                                },
+                                itemBuilder: (ctx) => const [
+                                  PopupMenuItem(
+                                    value: 'edit',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.edit_outlined, size: 18),
+                                        SizedBox(width: 8),
+                                        Text('Edit'),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'delete',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.delete_outline,
+                                            size: 18,
+                                            color: VillageTheme.danger),
+                                        SizedBox(width: 8),
+                                        Text('Delete',
+                                            style: TextStyle(
+                                                color: VillageTheme.danger)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 12),
                         Text(

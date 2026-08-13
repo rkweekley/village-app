@@ -110,6 +110,32 @@ class RewardsService {
     return res.data as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> updateReward(
+    String id, {
+    String? name,
+    String? description,
+    int? pointCost,
+    String? category,
+    int? maxRedemptions,
+    bool? requiresApproval,
+    bool? isActive,
+  }) async {
+    final res = await _dio.put('/api/rewards/$id', data: {
+      'name': name,
+      'description': description,
+      'pointCost': pointCost,
+      'category': category,
+      'maxRedemptions': maxRedemptions,
+      'requiresApproval': requiresApproval,
+      'isActive': isActive,
+    });
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<void> deleteReward(String id) async {
+    await _dio.delete('/api/rewards/$id');
+  }
+
   Future<Map<String, dynamic>> redeemReward(String rewardId) async {
     final res = await _dio.post('/api/rewards/$rewardId/redeem');
     return res.data as Map<String, dynamic>;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/features/meals/meals_service.dart';
@@ -644,6 +645,14 @@ class _RecipeCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (ref.watch(authProvider).canManage)
+                          IconButton(
+                            icon: const Icon(Icons.edit_rounded, size: 20),
+                            color: Colors.grey[500],
+                            onPressed: () =>
+                                _showEditRecipeSheet(context, ref, recipe),
+                            visualDensity: VisualDensity.compact,
+                          ),
                         IconButton(
                           icon: Icon(
                             r.isFamilyFavorite
@@ -1316,6 +1325,238 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   backgroundColor: VillageTheme.danger,
                 ),
                 child: const Text('Create Recipe',
+                    style: TextStyle(fontSize: 16)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
+  final titleCtrl = TextEditingController(text: recipe.title);
+  final descCtrl = TextEditingController(text: recipe.description ?? '');
+  final ingredientsCtrl = TextEditingController(text: recipe.ingredients);
+  final instructionsCtrl = TextEditingController(text: recipe.instructions);
+  final prepCtrl = TextEditingController(text: '${recipe.prepTimeMinutes}');
+  final servingsCtrl = TextEditingController(text: '${recipe.servings}');
+  String difficulty = recipe.difficulty;
+  final tagsCtrl = TextEditingController(text: recipe.tags ?? '');
+  bool isFamilyFavorite = recipe.isFamilyFavorite;
+
+  showAdaptiveModalSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setDialogState) => Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: VillageTheme.danger.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.menu_book_rounded,
+                        color: VillageTheme.danger, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Edit Recipe',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: titleCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Recipe title',
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Description (optional)',
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: ingredientsCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Ingredients',
+                  hintText: 'Comma-separated list',
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: instructionsCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Instructions',
+                  hintText: 'Step-by-step instructions',
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                maxLines: 4,
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: prepCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Prep time (min)',
+                        filled: true,
+                        fillColor: VillageTheme.surfaceBase,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: servingsCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Servings',
+                        filled: true,
+                        fillColor: VillageTheme.surfaceBase,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: difficulty,
+                decoration: InputDecoration(
+                  labelText: 'Difficulty',
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                items: ['Easy', 'Medium', 'Hard']
+                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                    .toList(),
+                onChanged: (v) => setDialogState(() => difficulty = v!),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: tagsCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Tags (optional)',
+                  hintText: 'e.g. Italian, Quick, Vegetarian',
+                  filled: true,
+                  fillColor: VillageTheme.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                title: const Text('Family favorite'),
+                value: isFamilyFavorite,
+                activeColor: VillageTheme.danger,
+                onChanged: (v) =>
+                    setDialogState(() => isFamilyFavorite = v),
+                contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: () async {
+                  if (titleCtrl.text.isEmpty) return;
+                  try {
+                    await ref.read(mealsServiceProvider).updateRecipe(
+                          recipe.id,
+                          title: titleCtrl.text,
+                          description: descCtrl.text.isNotEmpty
+                              ? descCtrl.text
+                              : null,
+                          ingredients: ingredientsCtrl.text,
+                          instructions: instructionsCtrl.text,
+                          prepTimeMinutes: int.tryParse(prepCtrl.text) ??
+                              recipe.prepTimeMinutes,
+                          servings:
+                              int.tryParse(servingsCtrl.text) ?? recipe.servings,
+                          difficulty: difficulty,
+                          tags: tagsCtrl.text.isNotEmpty ? tagsCtrl.text : null,
+                          isFamilyFavorite: isFamilyFavorite,
+                        );
+                    ref.invalidate(recipesListProvider);
+                    ref.invalidate(familyFavoritesListProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  } catch (e) {
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                            content: Text('Failed: $e'),
+                            backgroundColor: Colors.red.shade700,
+                            behavior: SnackBarBehavior.floating),
+                      );
+                    }
+                  }
+                },
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  backgroundColor: VillageTheme.danger,
+                ),
+                child: const Text('Save Changes',
                     style: TextStyle(fontSize: 16)),
               ),
             ],
