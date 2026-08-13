@@ -178,3 +178,11 @@ final shoppingServiceProvider = Provider<ShoppingService>((ref) {
 final shoppingListsProvider = FutureProvider<List<ShoppingListSummary>>((ref) {
   return ref.watch(shoppingServiceProvider).getLists();
 });
+
+/// Detail provider for a single shopping list (used by the detail page AND
+/// invalidated by the SignalR connector on shopping events, so a deleted or
+/// changed list can't linger as a stale "ghost" list).
+final shoppingListDetailProvider =
+    FutureProvider.family<ShoppingListDetail, String>((ref, listId) {
+  return ref.watch(shoppingServiceProvider).getList(listId);
+});

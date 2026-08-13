@@ -718,8 +718,3 @@ class _ItemTile extends StatelessWidget {
     }
   }
 }
-
-final shoppingListDetailProvider =
-    FutureProvider.family<ShoppingListDetail, String>((ref, listId) {
-  return ref.watch(shoppingServiceProvider).getList(listId);
-});

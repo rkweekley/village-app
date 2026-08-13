@@ -96,6 +96,15 @@ class SignalRConnector {
 
           // Listen for shopping list changes
           _shoppingSub ??= _signalR.shoppingMessages.listen((msg) {
+            // Extract the affected list id from the broadcast payload so we can
+            // also invalidate the detail page for that list. Without this, a
+            // deleted/changed list lingers on the detail page and every item
+            // toggle 404s because the list no longer exists.
+            String? listId;
+            if (msg.arguments.isNotEmpty && msg.arguments[0] is Map<String, dynamic>) {
+              final arg = msg.arguments[0] as Map<String, dynamic>;
+              listId = (arg['ListId'] ?? arg['Id'] ?? arg['listId'] ?? arg['id']) as String?;
+            }
             switch (msg.target) {
               case 'ShoppingListCreated':
               case 'ShoppingListDeleted':
@@ -104,6 +113,9 @@ class SignalRConnector {
               case 'ShoppingItemUpdated':
               case 'ShoppingItemDeleted':
                 _ref.invalidate(shoppingListsProvider);
+                if (listId != null && listId.isNotEmpty) {
+                  _ref.invalidate(shoppingListDetailProvider(listId));
+                }
                 break;
             }
           });
