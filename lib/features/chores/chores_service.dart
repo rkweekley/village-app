@@ -14,6 +14,8 @@ class Chore {
   final bool requiresApproval;
   final bool requiresPhoto;
   final String? createdById;
+  final String? parentChoreId;
+  final bool hasChildren;
 
   Chore({
     required this.id,
@@ -25,6 +27,8 @@ class Chore {
     required this.requiresApproval,
     required this.requiresPhoto,
     this.createdById,
+    this.parentChoreId,
+    this.hasChildren = false,
   });
 
   factory Chore.fromJson(Map<String, dynamic> json) => Chore(
@@ -37,6 +41,8 @@ class Chore {
         requiresApproval: json['requiresApproval'] as bool,
         requiresPhoto: json['requiresPhoto'] as bool,
         createdById: json['createdById'] as String?,
+        parentChoreId: json['parentChoreId'] as String?,
+        hasChildren: json['hasChildren'] as bool? ?? false,
       );
 }
 
@@ -139,6 +145,7 @@ class ChoresService {
     String difficulty = 'Easy',
     bool requiresApproval = true,
     bool requiresPhoto = false,
+    String? parentChoreId,
   }) async {
     final res = await _dio.post('/api/chores', data: {
       'name': name,
@@ -148,6 +155,7 @@ class ChoresService {
       'difficulty': difficulty,
       'requiresApproval': requiresApproval,
       'requiresPhoto': requiresPhoto,
+      if (parentChoreId != null) 'parentChoreId': parentChoreId,
     });
     return res.data as Map<String, dynamic>;
   }

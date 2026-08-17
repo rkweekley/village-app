@@ -95,7 +95,9 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
   void _showCreateAssignmentDialog(BuildContext context) {
     final familyState = ref.read(familyProvider);
     final members = familyState.family?.members ?? [];
-    final choresData = ref.read(choresListProvider).asData?.value ?? [];
+    final allChores = ref.read(choresListProvider).asData?.value ?? [];
+    // Projects/containers group subtasks and can't be assigned directly.
+    final choresData = allChores.where((c) => !c.hasChildren).toList();
 
     if (members.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -110,7 +112,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
     if (choresData.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No chores exist yet. Create some chores first.'),
+          content: Text('No assignable chores yet. Create some chores first.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -444,39 +446,71 @@ class _ChoresTab extends StatelessWidget {
             subtitle: isParent ? 'Tap + to create one' : 'Ask a parent to create chores',
           );
         }
+        final topLevel = chores.where((c) => c.parentChoreId == null).toList();
+        final rows = <Widget>[];
+        for (final parent in topLevel) {
+          final children =
+              chores.where((c) => c.parentChoreId == parent.id).toList();
+          rows.add(_choreTile(context, parent,
+              isContainer: parent.hasChildren, childCount: children.length));
+          for (final child in children) {
+            rows.add(_choreTile(context, child, isChild: true));
+          }
+        }
+
         return RefreshIndicator(
           onRefresh: () => ref.refresh(choresListProvider.future),
-          child: ListView.builder(
-            itemCount: chores.length,
-            itemBuilder: (ctx, i) {
-              final chore = chores[i];
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: difficultyColor(chore.difficulty),
-                  child: Text('${chore.pointValue}',
-                      style: const TextStyle(fontSize: 12)),
-                ),
-                title: Text(chore.name),
-                subtitle: Text(
-                    '${chore.recurrence} · ${chore.difficulty}${chore.requiresApproval ? ' · Needs approval' : ''}'),
-                trailing: PopupMenuButton(
-                  itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'assign', child: Text('Assign'))
-                  ],
-                  onSelected: (action) {
-                    if (action == 'assign') {
-                      _showAssignDialog(context, chore.id);
-                    }
-                  },
-                ),
-                onTap: ref.read(authProvider).canManage
-                    ? () => _showEditChoreDialog(context, chore)
-                    : null,
-              );
-            },
-          ),
+          child: ListView(children: rows),
         );
       },
+    );
+  }
+
+  Widget _choreTile(
+    BuildContext context,
+    Chore chore, {
+    bool isContainer = false,
+    bool isChild = false,
+    int childCount = 0,
+  }) {
+    final canManage = ref.read(authProvider).canManage;
+
+    // Project/container chore: groups subtasks, not itself assignable.
+    if (isContainer) {
+      return ListTile(
+        leading: CircleAvatar(
+          backgroundColor: VillageTheme.positive.withValues(alpha: 0.15),
+          child: const Icon(Icons.folder_outlined,
+              color: VillageTheme.positive),
+        ),
+        title: Text(chore.name,
+            style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text('$childCount subtask${childCount == 1 ? '' : 's'}'),
+        onTap: canManage ? () => _showEditChoreDialog(context, chore) : null,
+      );
+    }
+
+    return ListTile(
+      contentPadding: EdgeInsets.only(left: isChild ? 36 : 16, right: 16),
+      leading: CircleAvatar(
+        backgroundColor: difficultyColor(chore.difficulty),
+        child: Text('${chore.pointValue}',
+            style: const TextStyle(fontSize: 12)),
+      ),
+      title: Text(chore.name),
+      subtitle: Text(
+          '${chore.recurrence} · ${chore.difficulty}${chore.requiresApproval ? ' · Needs approval' : ''}'),
+      trailing: PopupMenuButton<String>(
+        itemBuilder: (_) => [
+          const PopupMenuItem(value: 'assign', child: Text('Assign')),
+        ],
+        onSelected: (action) {
+          if (action == 'assign') {
+            _showAssignDialog(context, chore.id);
+          }
+        },
+      ),
+      onTap: canManage ? () => _showEditChoreDialog(context, chore) : null,
     );
   }
 
