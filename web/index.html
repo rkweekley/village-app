@@ -99,23 +99,11 @@
           }
     }
   </style>
-  <script id="splash-screen-script">
-    function removeSplashFromWeb() {
-      document.getElementById("splash")?.remove();
-      document.getElementById("splash-branding")?.remove();
-      document.body.style.background = "transparent";
-    }
-  </script>
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
-  <!-- Google Analytics -->
+  <!-- Google Analytics (config kept in external analytics.js so the CSP can stay strict) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-EZ6VK01WFM"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-EZ6VK01WFM');
-  </script>
+  <script src="analytics.js"></script>
 </head>
 <body>
   <picture id="splash">
