@@ -38,8 +38,6 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
   bool _requiresApproval = true;
   bool _requiresPhoto = false;
   bool _submitting = false;
-  static const _noParent = '__none__';
-  String _parentSelection = _noParent;
 
   @override
   void dispose() {
@@ -51,11 +49,6 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final choresAsync = ref.watch(choresListProvider);
-    final parentCandidates = choresAsync.maybeWhen(
-      data: (chores) => chores.where((c) => c.parentChoreId == null).toList(),
-      orElse: () => <Chore>[],
-    );
     return Padding(
       padding: EdgeInsets.only(
         left: 24,
@@ -120,31 +113,6 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 ),
               ),
               maxLines: 2,
-            ),
-            const SizedBox(height: 12),
-
-            // Parent chore (optional — makes this a subtask of a project)
-            DropdownButtonFormField<String>(
-              value: _parentSelection,
-              decoration: InputDecoration(
-                labelText: 'Parent chore',
-                prefixIcon: const Icon(Icons.folder_outlined),
-                filled: true,
-                fillColor: VillageTheme.surfaceBase,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              items: [
-                const DropdownMenuItem(
-                    value: _noParent, child: Text('None — top-level chore')),
-                ...parentCandidates.map(
-                  (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
-                ),
-              ],
-              onChanged: (v) =>
-                  setState(() => _parentSelection = v ?? _noParent),
             ),
             const SizedBox(height: 12),
 
@@ -259,8 +227,6 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
             difficulty: _difficulty,
             requiresApproval: _requiresApproval,
             requiresPhoto: _requiresPhoto,
-            parentChoreId:
-                _parentSelection == _noParent ? null : _parentSelection,
           );
       widget.ref.invalidate(choresListProvider);
       if (mounted) Navigator.pop(context);

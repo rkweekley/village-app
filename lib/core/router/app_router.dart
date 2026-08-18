@@ -15,6 +15,7 @@ import 'package:village_app/features/calendar/pages/calendar_page.dart';
 import 'package:village_app/features/shopping/pages/shopping_lists_page.dart';
 import 'package:village_app/features/meals/pages/meals_page.dart';
 import 'package:village_app/features/chores/pages/chores_page.dart';
+import 'package:village_app/features/chores/pages/project_detail_page.dart';
 import 'package:village_app/features/school/pages/school_page.dart';
 import 'package:village_app/features/notifications/pages/notifications_page.dart';
 import 'package:village_app/features/profile/pages/edit_profile_page.dart';
@@ -165,6 +166,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/chores',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ChoresPage(),
+      ),
+      GoRoute(
+        path: '/chores/projects/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => ProjectDetailPage(
+          projectId: state.pathParameters['id'] ?? '',
+        ),
       ),
       GoRoute(
         path: '/school',

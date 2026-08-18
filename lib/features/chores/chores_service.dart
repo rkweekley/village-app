@@ -16,6 +16,8 @@ class Chore {
   final String? createdById;
   final String? parentChoreId;
   final bool hasChildren;
+  final bool isProject;
+  final String? completedAt;
 
   Chore({
     required this.id,
@@ -29,6 +31,8 @@ class Chore {
     this.createdById,
     this.parentChoreId,
     this.hasChildren = false,
+    this.isProject = false,
+    this.completedAt,
   });
 
   factory Chore.fromJson(Map<String, dynamic> json) => Chore(
@@ -43,6 +47,8 @@ class Chore {
         createdById: json['createdById'] as String?,
         parentChoreId: json['parentChoreId'] as String?,
         hasChildren: json['hasChildren'] as bool? ?? false,
+        isProject: json['isProject'] as bool? ?? false,
+        completedAt: json['completedAt'] as String?,
       );
 }
 
@@ -146,6 +152,7 @@ class ChoresService {
     bool requiresApproval = true,
     bool requiresPhoto = false,
     String? parentChoreId,
+    bool isProject = false,
   }) async {
     final res = await _dio.post('/api/chores', data: {
       'name': name,
@@ -155,6 +162,7 @@ class ChoresService {
       'difficulty': difficulty,
       'requiresApproval': requiresApproval,
       'requiresPhoto': requiresPhoto,
+      'isProject': isProject,
       if (parentChoreId != null) 'parentChoreId': parentChoreId,
     });
     return res.data as Map<String, dynamic>;
@@ -220,6 +228,12 @@ class ChoresService {
   /// Soft-delete a chore (parent only).
   Future<void> deleteChore(String choreId) async {
     await _dio.delete('/api/chores/$choreId');
+  }
+
+  /// Flip a project task's completed state (lightweight checklist).
+  Future<Map<String, dynamic>> toggleChoreComplete(String choreId) async {
+    final res = await _dio.post('/api/chores/$choreId/toggle-complete');
+    return res.data as Map<String, dynamic>;
   }
 }
 

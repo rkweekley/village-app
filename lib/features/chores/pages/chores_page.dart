@@ -9,6 +9,8 @@ import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
 import 'package:village_app/shared/widgets/create_chore_sheet.dart';
+import 'package:village_app/shared/widgets/create_project_sheet.dart';
+import 'package:go_router/go_router.dart';
 import 'package:village_app/shared/utils/status_color.dart';
 
 class ChoresPage extends ConsumerStatefulWidget {
@@ -69,7 +71,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
           : FloatingActionButton(
               onPressed: () {
                 if (_currentTab == 0) {
-                  showCreateChoreSheet(context, ref);
+                  _showCreateMenu(context);
                 } else if (_currentTab == 1) {
                   _showCreateAssignmentDialog(context);
                 }
@@ -88,6 +90,46 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
         ],
       ),
     );
+  }
+
+  // ── Create Menu (Project vs Chore) ──
+
+  Future<void> _showCreateMenu(BuildContext context) async {
+    final choice = await showAdaptiveModalSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.folder_outlined,
+                  color: VillageTheme.positive),
+              title: const Text('New Project'),
+              subtitle: const Text('A container with its own task list'),
+              onTap: () => Navigator.pop(ctx, 'project'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.cleaning_services_rounded,
+                  color: VillageTheme.positive),
+              title: const Text('New Chore'),
+              subtitle: const Text('A standalone chore'),
+              onTap: () => Navigator.pop(ctx, 'chore'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+
+    if (!context.mounted) return;
+    if (choice == 'project') {
+      final projectId = await showCreateProjectSheet(context, ref);
+      if (projectId != null && context.mounted) {
+        context.push('/chores/projects/$projectId');
+      }
+    } else if (choice == 'chore') {
+      await showCreateChoreSheet(context, ref);
+    }
   }
 
   // ── Create Assignment ──
@@ -451,8 +493,11 @@ class _ChoresTab extends StatelessWidget {
         for (final parent in topLevel) {
           final children =
               chores.where((c) => c.parentChoreId == parent.id).toList();
+          final doneCount = children.where((c) => c.completedAt != null).length;
           rows.add(_choreTile(context, parent,
-              isContainer: parent.hasChildren, childCount: children.length));
+              isContainer: parent.isProject || parent.hasChildren,
+              childCount: children.length,
+              doneCount: doneCount));
           for (final child in children) {
             rows.add(_choreTile(context, child, isChild: true));
           }
@@ -472,6 +517,7 @@ class _ChoresTab extends StatelessWidget {
     bool isContainer = false,
     bool isChild = false,
     int childCount = 0,
+    int doneCount = 0,
   }) {
     final canManage = ref.read(authProvider).canManage;
 
@@ -485,8 +531,9 @@ class _ChoresTab extends StatelessWidget {
         ),
         title: Text(chore.name,
             style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text('$childCount subtask${childCount == 1 ? '' : 's'}'),
-        onTap: canManage ? () => _showEditChoreDialog(context, chore) : null,
+        subtitle: Text(
+            childCount == 0 ? 'No tasks yet' : '$doneCount of $childCount done'),
+        onTap: () => context.push('/chores/projects/${chore.id}'),
       );
     }
 
