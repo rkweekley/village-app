@@ -382,7 +382,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				DEVELOPMENT_TEAM = SC9H4SQJR2;
+				DEVELOPMENT_TEAM = R9U8JNTV28;
 				PRODUCT_BUNDLE_IDENTIFIER = app.villagefamily.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -562,7 +562,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				DEVELOPMENT_TEAM = SC9H4SQJR2;
+				DEVELOPMENT_TEAM = R9U8JNTV28;
 				PRODUCT_BUNDLE_IDENTIFIER = app.villagefamily.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -585,7 +585,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				DEVELOPMENT_TEAM = SC9H4SQJR2;
+				DEVELOPMENT_TEAM = R9U8JNTV28;
 				PRODUCT_BUNDLE_IDENTIFIER = app.villagefamily.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
