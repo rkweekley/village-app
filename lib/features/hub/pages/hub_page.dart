@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:village_app/core/theme/village_theme.dart';
+import 'package:village_app/core/config.dart';
 import 'package:village_app/features/chores/chores_service.dart';
 import 'package:village_app/features/school/school_service.dart';
 import 'package:village_app/features/family/family_provider.dart';
@@ -42,7 +43,7 @@ class _HubPageState extends ConsumerState<HubPage> {
     final authState = ref.watch(authProvider);
 
     // Redirect new users to subscription (once per session)
-    if (!_didRedirect) {
+    if (!_didRedirect && AppConfig.subscriptionEnabled) {
       final family = familyState.family;
       if (family != null && !familyState.isLoading) {
         final status = family.subscriptionStatus ?? 'trial';
@@ -996,6 +997,7 @@ class _HubPageState extends ConsumerState<HubPage> {
   }
 
   Widget _buildSubscriptionBanner(BuildContext context, FamilyInfo family) {
+    if (!AppConfig.subscriptionEnabled) return const SizedBox.shrink();
     final status = family.subscriptionStatus ?? 'trial';
     if (status == 'active') return const SizedBox.shrink();
     if (status == 'canceled') return const SizedBox.shrink();
@@ -1119,6 +1121,7 @@ class _BentoActionCardState extends State<_BentoActionCard> {
   }
 
   Widget _buildSubscriptionBanner(BuildContext context, FamilyInfo family) {
+    if (!AppConfig.subscriptionEnabled) return const SizedBox.shrink();
     final status = family.subscriptionStatus ?? 'trial';
     if (status == 'active') return const SizedBox.shrink();
     if (status == 'canceled') return const SizedBox.shrink();

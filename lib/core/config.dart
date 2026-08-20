@@ -8,6 +8,13 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 class AppConfig {
   AppConfig._();
 
+  /// v1.0 ships FREE: all subscription/payment UI is hidden and billing is not
+  /// enforced. Flip to true once In-App Purchase lands (StoreKit 2 on iOS,
+  /// Play Billing on Android) in v1.1. The Stripe checkout path in
+  /// subscription_page.dart stays in place but is simply unreachable while
+  /// this is false.
+  static const bool subscriptionEnabled = false;
+
   /// Public API hostname — served by Nginx Proxy Manager on the Mac Mini
   /// via a Cloudflare-tunneled or port-forwarded public IP.
   static const _apiHost = 'api.villagefamily.app';

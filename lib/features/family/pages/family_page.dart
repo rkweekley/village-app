@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/theme/village_theme.dart';
+import 'package:village_app/core/config.dart';
 import 'package:village_app/features/family/family_provider.dart';
 import 'package:village_app/features/family/family_service.dart';
 import 'package:village_app/features/family/models.dart';
@@ -613,6 +614,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
   }
 
   Widget _buildSubscriptionCard(BuildContext context, FamilyInfo family) {
+    if (!AppConfig.subscriptionEnabled) return const SizedBox.shrink();
     final status = family.subscriptionStatus ?? 'trial';
     final tier = family.subscriptionTier;
     final isTrial = status == 'trial';
