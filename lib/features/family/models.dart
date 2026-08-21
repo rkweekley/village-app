@@ -46,10 +46,11 @@ class FamilyInfo {
 class MemberInfo {
   final String id;
   final String displayName;
-  final String email;
+  final String? email;
   final String role;
   final int pointsBalance;
   final String? birthDate;
+  final bool isManaged;
 
   MemberInfo({
     required this.id,
@@ -58,16 +59,18 @@ class MemberInfo {
     required this.role,
     required this.pointsBalance,
     this.birthDate,
+    this.isManaged = false,
   });
 
   factory MemberInfo.fromJson(Map<String, dynamic> json) {
     return MemberInfo(
       id: json['id'] as String,
       displayName: json['displayName'] as String,
-      email: json['email'] as String,
+      email: json['email'] as String?,
       role: json['role'] as String,
       pointsBalance: json['pointsBalance'] as int? ?? 0,
       birthDate: json['birthDate'] as String?,
+      isManaged: json['isManaged'] as bool? ?? false,
     );
   }
 }

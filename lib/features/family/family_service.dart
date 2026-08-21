@@ -53,6 +53,31 @@ class FamilyService {
     await _dio.delete('/api/families/mine/members/$userId');
   }
 
+  /// Create a parent-managed child profile (Parent/Caregiver only).
+  Future<MemberInfo> createChild({
+    required String displayName,
+    String? birthDate,
+  }) async {
+    final response = await _dio.post('/api/families/mine/children', data: {
+      'displayName': displayName,
+      if (birthDate != null && birthDate.isNotEmpty) 'birthDate': birthDate,
+    });
+    return MemberInfo.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Update a managed child's name or birth date.
+  Future<void> updateManagedChild(
+    String userId, {
+    String? displayName,
+    String? birthDate,
+  }) async {
+    await _dio.patch('/api/families/mine/members/$userId', data: {
+      if (displayName != null && displayName.isNotEmpty)
+        'displayName': displayName,
+      if (birthDate != null && birthDate.isNotEmpty) 'birthDate': birthDate,
+    });
+  }
+
   /// Send an invite email to join this family.
   Future<Map<String, dynamic>> sendInviteEmail(String email) async {
     final response = await _dio.post('/api/families/mine/invite',

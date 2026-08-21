@@ -254,7 +254,26 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     isCurrentUser: member.id == currentUserId,
                     role: authState.userInfo?.role ?? '',
                     onChanged: () => ref.invalidate(familyProvider),
+                    onEdit: (m) => _showEditChildSheet(m),
                   )),
+
+            // Add Child (Parent/Caregiver only)
+            if (familyState.family != null && authState.canManage) ...[
+              const SizedBox(height: 4),
+              OutlinedButton.icon(
+                onPressed: () => _showAddChildSheet(),
+                icon: const Icon(Icons.child_care_rounded, size: 20),
+                label: const Text('Add Child Profile'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  foregroundColor: VillageTheme.primary,
+                  side: BorderSide(
+                      color: VillageTheme.primary.withValues(alpha: 0.4)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ],
 
             // Error
             if (familyState.error != null)
@@ -388,6 +407,182 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
     );
     if (confirmed == true && mounted) {
       await ref.read(authProvider.notifier).logout();
+    }
+  }
+
+  String _isoDate(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Future<(String, DateTime?)?> _showChildSheet(
+    BuildContext context, {
+    String? initialName,
+    DateTime? initialBirthDate,
+  }) async {
+    final nameCtrl = TextEditingController(text: initialName ?? '');
+    var birthDate = initialBirthDate;
+
+    final submitted = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: VillageTheme.surfaceBase,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  initialName == null ? 'Add Child Profile' : 'Edit Child',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  initialName == null
+                      ? 'Create a profile for your child. You manage this '
+                          'profile and your child does not sign in. By adding a '
+                          'child you confirm you are their parent or legal '
+                          'guardian.'
+                      : 'Update this child profile.',
+                  style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: nameCtrl,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: "Child's name",
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: birthDate ??
+                          now.subtract(const Duration(days: 365 * 8)),
+                      firstDate: DateTime(now.year - 18),
+                      lastDate: now,
+                      helpText: "Child's birth date",
+                    );
+                    if (picked != null) {
+                      setModalState(() => birthDate = picked);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(VillageTheme.radiusMd),
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Birth date (optional)',
+                      prefixIcon: Icon(Icons.cake_outlined),
+                    ),
+                    child: Text(
+                      birthDate != null
+                          ? '${birthDate!.month}/${birthDate!.day}/${birthDate!.year}'
+                          : 'Select date',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: birthDate != null
+                            ? null
+                            : VillageTheme.textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: () {
+                      if (nameCtrl.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text("Please enter your child's name.")),
+                        );
+                        return;
+                      }
+                      Navigator.pop(ctx, true);
+                    },
+                    child: Text(
+                        initialName == null ? 'Add Child' : 'Save Changes'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    if (submitted == true) {
+      return (nameCtrl.text.trim(), birthDate);
+    }
+    return null;
+  }
+
+  Future<void> _showAddChildSheet() async {
+    final result = await _showChildSheet(context);
+    if (result == null || !mounted) return;
+    try {
+      await ref.read(familyServiceProvider).createChild(
+            displayName: result.$1,
+            birthDate: result.$2 != null ? _isoDate(result.$2!) : null,
+          );
+      ref.invalidate(familyProvider);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Could not add child. Please try again.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _showEditChildSheet(MemberInfo member) async {
+    DateTime? initial;
+    if (member.birthDate != null) {
+      final parts = member.birthDate!.split('-');
+      if (parts.length == 3) {
+        initial = DateTime(
+          int.tryParse(parts[0]) ?? 2000,
+          int.tryParse(parts[1]) ?? 1,
+          int.tryParse(parts[2]) ?? 1,
+        );
+      }
+    }
+    final result = await _showChildSheet(
+      context,
+      initialName: member.displayName,
+      initialBirthDate: initial,
+    );
+    if (result == null || !mounted) return;
+    try {
+      await ref.read(familyServiceProvider).updateManagedChild(
+            member.id,
+            displayName: result.$1,
+            birthDate: result.$2 != null ? _isoDate(result.$2!) : null,
+          );
+      ref.invalidate(familyProvider);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Could not update child. Please try again.')),
+        );
+      }
     }
   }
 
@@ -799,12 +994,14 @@ class _MemberCard extends ConsumerWidget {
   final bool isCurrentUser;
   final String role;
   final VoidCallback onChanged;
+  final void Function(MemberInfo member)? onEdit;
 
   const _MemberCard({
     required this.member,
     required this.isCurrentUser,
     required this.role,
     required this.onChanged,
+    this.onEdit,
   });
 
   @override
@@ -889,7 +1086,11 @@ class _MemberCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    member.role,
+                    member.isManaged
+                        ? (member.birthDate != null
+                            ? 'Child · ${_ageLabel(member.birthDate!)}'
+                            : 'Child · Managed by parent')
+                        : member.role,
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.grey[500],
@@ -926,6 +1127,9 @@ class _MemberCard extends ConsumerWidget {
                       final newRole =
                           member.role == 'Parent' ? 'Child' : 'Parent';
                       await service.changeMemberRole(member.id, newRole);
+                    } else if (value == 'edit') {
+                      onEdit?.call(member);
+                      return;
                     } else if (value == 'remove') {
                       final confirmed = await showDialog<bool>(
                         context: context,
@@ -957,16 +1161,28 @@ class _MemberCard extends ConsumerWidget {
                   } catch (_) {}
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'promote',
-                    child: Row(
-                      children: [
-                        Icon(Icons.star_rounded, size: 20),
-                        SizedBox(width: 8),
-                        Text('Promote to Admin'),
-                      ],
+                  if (member.isManaged)
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_rounded, size: 20),
+                          SizedBox(width: 8),
+                          Text('Edit Child'),
+                        ],
+                      ),
+                    )
+                  else
+                    const PopupMenuItem(
+                      value: 'promote',
+                      child: Row(
+                        children: [
+                          Icon(Icons.star_rounded, size: 20),
+                          SizedBox(width: 8),
+                          Text('Promote to Admin'),
+                        ],
+                      ),
                     ),
-                  ),
                   const PopupMenuItem(
                     value: 'remove',
                     child: Row(
@@ -987,4 +1203,17 @@ class _MemberCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _ageLabel(String birthDate) {
+  final parts = birthDate.split('-');
+  if (parts.length != 3) return 'Managed';
+  final year = int.tryParse(parts[0]);
+  final month = int.tryParse(parts[1]);
+  final day = int.tryParse(parts[2]);
+  if (year == null || month == null || day == null) return 'Managed';
+  final now = DateTime.now();
+  var age = now.year - year;
+  if (now.month < month || (now.month == month && now.day < day)) age--;
+  return age <= 0 ? 'Baby' : 'Age $age';
 }
