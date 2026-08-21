@@ -134,6 +134,7 @@ class AuthNotifier extends Notifier<AuthState> {
     required String displayName,
     required String password,
     String? inviteCode,
+    String? birthDate,
   }) async {
     try {
       state = state.copyWith(error: null);
@@ -142,6 +143,7 @@ class AuthNotifier extends Notifier<AuthState> {
         displayName: displayName,
         password: password,
         inviteCode: inviteCode,
+        birthDate: birthDate,
       );
       state = state.copyWith(
         status: AuthStatus.authenticated,

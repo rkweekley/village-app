@@ -615,6 +615,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
 
   Widget _buildSubscriptionCard(BuildContext context, FamilyInfo family) {
     if (!AppConfig.subscriptionEnabled) return const SizedBox.shrink();
+    if (!ref.read(authProvider).canManage) return const SizedBox.shrink();
     final status = family.subscriptionStatus ?? 'trial';
     final tier = family.subscriptionTier;
     final isTrial = status == 'trial';

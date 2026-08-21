@@ -8,12 +8,20 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 class AppConfig {
   AppConfig._();
 
-  /// v1.0 ships FREE: all subscription/payment UI is hidden and billing is not
-  /// enforced. Flip to true once In-App Purchase lands (StoreKit 2 on iOS,
-  /// Play Billing on Android) in v1.1. The Stripe checkout path in
-  /// subscription_page.dart stays in place but is simply unreachable while
-  /// this is false.
-  static const bool subscriptionEnabled = false;
+  /// Subscriptions are required after the 30-day trial (no free tier).
+  /// Web uses Stripe Checkout; native iOS/Android use StoreKit 2 / Play Billing
+  /// with server-side receipt verification.
+  static const bool subscriptionEnabled = true;
+
+  /// StoreKit 2 product identifiers (iOS). Must match App Store Connect and the
+  /// backend `Apple:MonthlyProductId` / `Apple:AnnualProductId` settings.
+  static const String appleMonthlyProductId = 'village.monthly';
+  static const String appleAnnualProductId = 'village.annual';
+
+  /// Play Billing product identifiers (Android). Must match Play Console and the
+  /// backend `Google:MonthlyProductId` / `Google:AnnualProductId` settings.
+  static const String googleMonthlyProductId = 'village_monthly';
+  static const String googleAnnualProductId = 'village_annual';
 
   /// Public API hostname — served by Nginx Proxy Manager on the Mac Mini
   /// via a Cloudflare-tunneled or port-forwarded public IP.

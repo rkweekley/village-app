@@ -21,6 +21,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _inviteCtrl = TextEditingController();
   bool _obscurePassword = true;
   bool _loading = false;
+  DateTime? _birthDate;
 
   @override
   void initState() {
@@ -42,6 +43,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Age gate: block under-13 self-registration before calling the API.
+    if (_birthDate != null && _ageInYears(_birthDate!) < 13) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'You must be at least 13 to create an account. Ask a parent or guardian to create the family account and add you.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     setState(() => _loading = true);
     ref.read(authProvider.notifier).clearError();
 
@@ -53,12 +66,40 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             inviteCode: _inviteCtrl.text.trim().isEmpty
                 ? null
                 : _inviteCtrl.text.trim(),
+            birthDate: _birthDate != null ? _formatIso(_birthDate!) : null,
           );
       if (mounted) context.go('/hub');
     } catch (_) {
       // error handled in auth state
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  int _ageInYears(DateTime birthDate) {
+    final now = DateTime.now();
+    var age = now.year - birthDate.year;
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+
+  String _formatIso(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate ?? now.subtract(const Duration(days: 365 * 30)),
+      firstDate: DateTime(1900),
+      lastDate: now,
+      helpText: 'Select your birth date',
+    );
+    if (picked != null) {
+      setState(() => _birthDate = picked);
     }
   }
 
@@ -227,6 +268,33 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             prefixIcon: Icon(Icons.group_add_outlined),
                             helperText:
                                 'Leave blank to create a new family',
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Birth date (age gate)
+                        InkWell(
+                          onTap: _pickBirthDate,
+                          borderRadius:
+                              BorderRadius.circular(VillageTheme.radiusMd),
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'Birth date',
+                              prefixIcon: Icon(Icons.cake_outlined),
+                              helperText:
+                                  'You must be 13 or older to create an account.',
+                            ),
+                            child: Text(
+                              _birthDate != null
+                                  ? '${_birthDate!.month}/${_birthDate!.day}/${_birthDate!.year}'
+                                  : 'Select your birth date',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: _birthDate != null
+                                    ? null
+                                    : VillageTheme.textSecondary,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 28),

@@ -19,6 +19,7 @@ class AuthService {
     required String displayName,
     required String password,
     String? inviteCode,
+    String? birthDate,
   }) async {
     final response = await _dio.post('/api/auth/register', data: {
       'email': email,
@@ -26,6 +27,7 @@ class AuthService {
       'password': password,
       if (inviteCode != null && inviteCode.isNotEmpty)
         'inviteCode': inviteCode,
+      if (birthDate != null && birthDate.isNotEmpty) 'birthDate': birthDate,
     });
     final data = AuthResponse.fromJson(response.data);
     await _saveTokens(data.accessToken, data.refreshToken);
@@ -125,6 +127,11 @@ class AuthService {
       if (birthDate != null) 'birthDate': birthDate,
     });
     return UserInfo.fromJson(response.data);
+  }
+
+  /// Deactivate the account and anonymize personal data (GDPR right-to-delete).
+  Future<void> deactivateAccount() async {
+    await _dio.post('/api/users/me/deactivate');
   }
 
   Future<void> _saveTokens(String accessToken, String refreshToken) async {

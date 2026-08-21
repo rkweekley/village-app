@@ -129,6 +129,48 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     }
   }
 
+  Future<void> _confirmDeleteAccount() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Delete Account'),
+        content: const Text(
+            'This permanently deletes your account and anonymizes your personal data. This cannot be undone.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(dialogCtx, false),
+              child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogCtx, true),
+              style: TextButton.styleFrom(foregroundColor: VillageTheme.danger),
+              child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    await _deleteAccount();
+  }
+
+  Future<void> _deleteAccount() async {
+    setState(() => _submitting = true);
+    try {
+      await ref.read(authServiceProvider).deactivateAccount();
+      await ref.read(authProvider.notifier).logout();
+      if (mounted) context.go('/login');
+    } catch (e) {
+      setState(() => _submitting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete account: $e'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userInfo = ref.watch(authProvider).userInfo;
@@ -336,6 +378,18 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             onTap: () => context.push('/legal'),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading:
+                const Icon(Icons.delete_outline, color: VillageTheme.danger),
+            title: const Text('Delete Account',
+                style: TextStyle(color: VillageTheme.danger)),
+            subtitle: const Text(
+                'Permanently delete your account and personal data.'),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            onTap: _confirmDeleteAccount,
           ),
         ],
       ),

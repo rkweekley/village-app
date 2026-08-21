@@ -43,7 +43,7 @@ class _HubPageState extends ConsumerState<HubPage> {
     final authState = ref.watch(authProvider);
 
     // Redirect new users to subscription (once per session)
-    if (!_didRedirect && AppConfig.subscriptionEnabled) {
+    if (!_didRedirect && AppConfig.subscriptionEnabled && authState.canManage) {
       final family = familyState.family;
       if (family != null && !familyState.isLoading) {
         final status = family.subscriptionStatus ?? 'trial';
@@ -998,6 +998,7 @@ class _HubPageState extends ConsumerState<HubPage> {
 
   Widget _buildSubscriptionBanner(BuildContext context, FamilyInfo family) {
     if (!AppConfig.subscriptionEnabled) return const SizedBox.shrink();
+    if (!ref.read(authProvider).canManage) return const SizedBox.shrink();
     final status = family.subscriptionStatus ?? 'trial';
     if (status == 'active') return const SizedBox.shrink();
     if (status == 'canceled') return const SizedBox.shrink();

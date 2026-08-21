@@ -1,10 +1,17 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/network/authenticated_client.dart';
 import 'package:village_app/core/theme/village_theme.dart';
-import 'package:village_app/features/family/family_service.dart';
+import 'package:village_app/features/billing/billing_service.dart';
 import 'package:village_app/shared/utils/date_utils.dart';
 import 'package:village_app/shared/utils/status_color.dart';
 
@@ -20,19 +27,33 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   bool _loading = true;
   bool _actionLoading = false;
   String? _error;
+  List<ProductDetails> _products = const [];
+  StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
+
+  bool get _isStoreBilling => !kIsWeb;
 
   @override
   void initState() {
     super.initState();
     _loadStatus();
+    if (_isStoreBilling) {
+      _loadProducts();
+      _purchaseSub =
+          ref.read(billingServiceProvider).purchaseStream.listen(_onPurchases);
+    }
+  }
+
+  @override
+  void dispose() {
+    _purchaseSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadStatus() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final dio = ref.read(authenticatedDioProvider);
-      final res = await dio.get('/api/stripe/status');
-      if (mounted) setState(() { _status = res.data as Map<String, dynamic>; _loading = false; });
+      final res = await ref.read(billingServiceProvider).getStatus();
+      if (mounted) setState(() { _status = res; _loading = false; });
     } on DioException catch (_) {
       if (mounted) setState(() { _error = 'Unable to load subscription info. Please check your connection.'; _loading = false; });
     } catch (e) {
@@ -40,7 +61,24 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     }
   }
 
-  Future<void> _startCheckout(String tier) async {
+  Future<void> _loadProducts() async {
+    try {
+      final products = await ref.read(billingServiceProvider).fetchProducts();
+      if (mounted) setState(() => _products = products);
+    } catch (_) {
+      // Products unavailable — plan cards fall back to a disabled state.
+    }
+  }
+
+  Future<void> _purchase(String tier) async {
+    if (_isStoreBilling) {
+      await _buyViaStore(tier);
+    } else {
+      await _startStripeCheckout(tier);
+    }
+  }
+
+  Future<void> _startStripeCheckout(String tier) async {
     setState(() => _actionLoading = true);
     try {
       final dio = ref.read(authenticatedDioProvider);
@@ -48,23 +86,114 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       final url = res.data['url'] as String;
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } on DioException catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to load subscription info. Please check your connection.')),
-        );
-      }
+      _showSnack('Unable to load subscription info. Please check your connection.');
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to start checkout: $e')),
-        );
-      }
+      _showSnack('Failed to start checkout: $e');
     } finally {
       if (mounted) setState(() => _actionLoading = false);
     }
   }
 
+  ProductDetails? _findProduct(String tier) {
+    final ids = BillingService.storeProductIds();
+    final targetId = tier == 'annual' ? ids[1] : ids[0];
+    for (final p in _products) {
+      if (p.id == targetId) return p;
+    }
+    return null;
+  }
+
+  Future<void> _buyViaStore(String tier) async {
+    final product = _findProduct(tier);
+    if (product == null) {
+      _showSnack('Subscription product unavailable. Please try again shortly.');
+      return;
+    }
+    setState(() => _actionLoading = true);
+    try {
+      await ref.read(billingServiceProvider).buy(product);
+      // The purchaseStream listener handles verification + completion.
+    } catch (e) {
+      _showSnack('Purchase failed: $e');
+      if (mounted) setState(() => _actionLoading = false);
+    }
+  }
+
+  Future<void> _restorePurchases() async {
+    setState(() => _actionLoading = true);
+    try {
+      await ref.read(billingServiceProvider).restorePurchases();
+    } catch (e) {
+      _showSnack('Restore failed: $e');
+    } finally {
+      if (mounted) setState(() => _actionLoading = false);
+    }
+  }
+
+  Future<void> _onPurchases(List<PurchaseDetails> purchases) async {
+    for (final purchase in purchases) {
+      if (purchase.status == PurchaseStatus.purchased ||
+          purchase.status == PurchaseStatus.restored) {
+        await _verifyAndComplete(purchase);
+      } else if (purchase.status == PurchaseStatus.error) {
+        _showSnack(purchase.error?.message ?? 'Purchase failed.');
+      }
+    }
+  }
+
+  Future<void> _verifyAndComplete(PurchaseDetails purchase) async {
+    final raw = purchase.verificationData.serverVerificationData;
+    final productId = purchase.productID;
+    if (raw == null || raw.isEmpty) {
+      _showSnack('Could not verify purchase (no receipt).');
+      return;
+    }
+    final billing = ref.read(billingServiceProvider);
+    try {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        await billing.verifyApple(raw, productId);
+      } else {
+        final map = jsonDecode(raw) as Map<String, dynamic>;
+        final token = map['purchaseToken'] as String?;
+        if (token == null || token.isEmpty) {
+          _showSnack('Could not verify purchase (missing token).');
+          return;
+        }
+        await billing.verifyGoogle(token, productId);
+      }
+      await billing.completePurchase(purchase);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Subscription activated!'),
+            backgroundColor: VillageTheme.positive,
+          ),
+        );
+        _loadStatus();
+      }
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final msg = data is Map
+          ? (data['error'] as String?) ?? 'Verification failed'
+          : 'Verification failed';
+      _showSnack(msg);
+    } catch (e) {
+      _showSnack('Verification failed: $e');
+    }
+  }
+
+  void _showSnack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   Future<void> _openPortal() async {
+    if (_isStoreBilling) {
+      await _openStoreSubscriptions();
+      return;
+    }
     setState(() => _actionLoading = true);
     try {
       final dio = ref.read(authenticatedDioProvider);
@@ -72,19 +201,22 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       final url = res.data['url'] as String;
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } on DioException catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to load subscription info. Please check your connection.')),
-        );
-      }
+      _showSnack('Unable to load subscription info. Please check your connection.');
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to open portal: $e')),
-        );
-      }
+      _showSnack('Failed to open portal: $e');
     } finally {
       if (mounted) setState(() => _actionLoading = false);
+    }
+  }
+
+  Future<void> _openStoreSubscriptions() async {
+    final url = defaultTargetPlatform == TargetPlatform.iOS
+        ? 'https://apps.apple.com/account/subscriptions'
+        : 'https://play.google.com/store/account/subscriptions';
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (e) {
+      _showSnack('Could not open subscription settings: $e');
     }
   }
 
@@ -114,6 +246,10 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   }
 
   Future<void> _cancelSubscription() async {
+    if (_isStoreBilling) {
+      await _openStoreSubscriptions();
+      return;
+    }
     setState(() => _actionLoading = true);
     try {
       final dio = ref.read(authenticatedDioProvider);
@@ -129,18 +265,13 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         _loadStatus();
       }
     } on DioException catch (e) {
-      if (mounted) {
-        final msg = e.response?.data is Map
-            ? e.response!.data['error'] as String? ?? 'Failed to cancel'
-            : 'Failed to cancel. Please try again.';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-      }
+      final data = e.response?.data;
+      final msg = data is Map
+          ? (data['error'] as String?) ?? 'Failed to cancel'
+          : 'Failed to cancel. Please try again.';
+      _showSnack(msg);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      _showSnack('Error: $e');
     } finally {
       if (mounted) setState(() => _actionLoading = false);
     }
@@ -180,6 +311,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     final tier = _status!['tier'] as String?;
     final isInTrial = _status!['isInTrial'] as bool;
     final isExpiringSoon = _status!['isExpiringSoon'] as bool;
+
+    // Role gate: children never see or trigger the paywall.
+    if (!ref.read(authProvider).canManage) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lock_outline, size: 40, color: VillageTheme.textSecondary),
+              SizedBox(height: 12),
+              Text(
+                'Only a parent or caregiver can manage the subscription.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: VillageTheme.textSecondary),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -252,7 +404,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             highlighted: tier == 'monthly',
             isCurrent: tier == 'monthly' && !isInTrial,
             isLoading: _actionLoading,
-            onTap: () => _startCheckout('monthly'),
+            onTap: () => _purchase('monthly'),
           ),
           const SizedBox(height: 12),
           _PlanCard(
@@ -263,8 +415,25 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             highlighted: tier == 'annual',
             isCurrent: tier == 'annual' && !isInTrial,
             isLoading: _actionLoading,
-            onTap: () => _startCheckout('annual'),
+            onTap: () => _purchase('annual'),
           ),
+          const SizedBox(height: 16),
+          Text(
+            'Payment will be charged to your account when you subscribe. '
+            'Subscriptions automatically renew unless auto-renew is turned off '
+            'at least 24 hours before the end of the current period. You can '
+            'manage and cancel anytime in your account settings. The free trial '
+            'is for new subscribers only.',
+            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+          ),
+          if (_isStoreBilling) ...[
+            const SizedBox(height: 4),
+            TextButton.icon(
+              onPressed: _actionLoading ? null : _restorePurchases,
+              icon: const Icon(Icons.restore, size: 18),
+              label: const Text('Restore Purchases'),
+            ),
+          ],
         ],
 
         if (status == 'active' || status == 'past_due') ...[
@@ -307,7 +476,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Opens Stripe Customer Portal — update payment method, view invoices, or cancel.',
+            _isStoreBilling
+                ? 'Manage your subscription in your device\'s App Store or Google Play settings.'
+                : 'Opens Stripe Customer Portal — update payment method, view invoices, or cancel.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey[500], fontSize: 12),
           ),
@@ -318,9 +489,14 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               width: double.infinity,
               height: 48,
               child: OutlinedButton.icon(
-                onPressed: _actionLoading ? null : () => _confirmCancel(context),
+                onPressed: _actionLoading
+                    ? null
+                    : (_isStoreBilling
+                        ? _openStoreSubscriptions
+                        : () => _confirmCancel(context)),
                 icon: const Icon(Icons.cancel_outlined, size: 20),
-                label: const Text('Cancel Subscription'),
+                label: Text(
+                    _isStoreBilling ? 'Manage in Store Settings' : 'Cancel Subscription'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.red,
                   side: const BorderSide(color: Colors.red),
@@ -330,7 +506,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Your access continues until the end of your billing period.',
+              _isStoreBilling
+                  ? 'Cancel your subscription from your device\'s subscription settings.'
+                  : 'Your access continues until the end of your billing period.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey[500], fontSize: 12),
             ),
