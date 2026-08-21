@@ -55,8 +55,8 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Invite code card
-            if (familyState.family != null) ...[
+            // Invite code card (Parent only — the invite is the consent act)
+            if (familyState.family != null && authState.isParent) ...[
               Card(
                 elevation: 0,
                 color: VillageTheme.surfaceCard,
@@ -257,8 +257,8 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     onEdit: (m) => _showEditChildSheet(m),
                   )),
 
-            // Add Child (Parent/Caregiver only)
-            if (familyState.family != null && authState.canManage) ...[
+            // Add Child (Parent only — parental consent)
+            if (familyState.family != null && authState.isParent) ...[
               const SizedBox(height: 4),
               OutlinedButton.icon(
                 onPressed: () => _showAddChildSheet(),
@@ -1006,7 +1006,7 @@ class _MemberCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isAdmin = role == 'Parent' || role == 'Caregiver';
+    final isAdmin = role == 'Parent';
     final canManage = isAdmin && !isCurrentUser;
 
     // Generate avatar color from name

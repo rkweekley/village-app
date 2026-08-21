@@ -41,6 +41,10 @@ class AuthState {
   /// Whether the current user can manage chores, rewards, tasks, etc.
   bool get canManage =>
       userInfo?.role == 'Parent' || userInfo?.role == 'Caregiver';
+
+  /// Whether the current user is the family Parent — the only role that can
+  /// invite members or add child profiles (the parental-consent authority).
+  bool get isParent => userInfo?.role == 'Parent';
 }
 
 class AuthNotifier extends Notifier<AuthState> {
