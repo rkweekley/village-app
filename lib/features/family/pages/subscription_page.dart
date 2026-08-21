@@ -144,7 +144,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   Future<void> _verifyAndComplete(PurchaseDetails purchase) async {
     final raw = purchase.verificationData.serverVerificationData;
     final productId = purchase.productID;
-    if (raw == null || raw.isEmpty) {
+    if (raw.isEmpty) {
       _showSnack('Could not verify purchase (no receipt).');
       return;
     }
