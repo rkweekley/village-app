@@ -80,11 +80,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.items.isEmpty
-              ? const EmptyState(
+              ? EmptyState(
                   icon: Icons.notifications_off_rounded,
                   title: 'No notifications yet',
-                  iconBgColor: VillageTheme.primary,
-                  iconColor: VillageTheme.primary,
+                  iconBgColor: context.palette.primary,
+                  iconColor: context.palette.primary,
                 )
               : NotificationListener<ScrollNotification>(
                   onNotification: (scrollInfo) {

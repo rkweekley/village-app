@@ -99,11 +99,11 @@ class SchoolPage extends ConsumerWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: VillageTheme.info.withValues(alpha: 0.12),
+                      color: context.palette.info.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.book_rounded,
-                        color: VillageTheme.info, size: 22),
+                    child: Icon(Icons.book_rounded,
+                        color: context.palette.info, size: 22),
                   ),
                   const SizedBox(width: 12),
                   const Text('New Subject',
@@ -251,11 +251,11 @@ class SchoolPage extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.info.withValues(alpha: 0.12),
+                        color: context.palette.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.assignment_rounded,
-                          color: VillageTheme.info, size: 22),
+                      child: Icon(Icons.assignment_rounded,
+                          color: context.palette.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Assignment',
@@ -497,11 +497,11 @@ class _SubjectsTab extends ConsumerWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: VillageTheme.info.withValues(alpha: 0.1),
+                    color: context.palette.info.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: const Icon(Icons.book_rounded,
-                      size: 40, color: VillageTheme.info),
+                  child: Icon(Icons.book_rounded,
+                      size: 40, color: context.palette.info),
                 ),
                 const SizedBox(height: 16),
                 const Text('No subjects yet.',
@@ -567,12 +567,12 @@ class _SubjectsTab extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 11,
                             color: subject.isActive
-                                ? VillageTheme.positive
+                                ? context.palette.positive
                                 : Colors.grey,
                           ),
                         ),
                         backgroundColor: subject.isActive
-                            ? VillageTheme.positive.withValues(alpha: 0.1)
+                            ? context.palette.positive.withValues(alpha: 0.1)
                             : Colors.grey.withValues(alpha: 0.1),
                         padding: EdgeInsets.zero,
                         labelPadding:
@@ -695,11 +695,11 @@ class _AssignmentsTab extends ConsumerWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: VillageTheme.info.withValues(alpha: 0.1),
+                    color: context.palette.info.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: const Icon(Icons.assignment_rounded,
-                      size: 40, color: VillageTheme.info),
+                  child: Icon(Icons.assignment_rounded,
+                      size: 40, color: context.palette.info),
                 ),
                 const SizedBox(height: 16),
                 const Text('No assignments yet.',
@@ -795,7 +795,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                         horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: a.gradePointsEarned != null
-                                          ? VillageTheme.positive
+                                          ? context.palette.positive
                                               .withValues(alpha: 0.1)
                                           : Colors.grey.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
@@ -808,7 +808,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                         fontSize: 11,
                                         fontWeight: FontWeight.w500,
                                         color: a.gradePointsEarned != null
-                                            ? VillageTheme.positive
+                                            ? context.palette.positive
                                             : context.palette.textTertiary,
                                       ),
                                     ),
@@ -835,7 +835,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                           style: TextStyle(fontSize: 12)),
                                       style: TextButton.styleFrom(
                                         foregroundColor:
-                                            VillageTheme.info,
+                                            context.palette.info,
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8),
                                         visualDensity: VisualDensity.compact,
@@ -934,11 +934,11 @@ class _AssignmentsTab extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.info.withValues(alpha: 0.12),
+                        color: context.palette.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.edit_rounded,
-                          color: VillageTheme.info, size: 22),
+                      child: Icon(Icons.edit_rounded,
+                          color: context.palette.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('Edit Assignment',
@@ -1228,11 +1228,11 @@ class _AssignmentsTab extends ConsumerWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.info.withValues(alpha: 0.12),
+                    color: context.palette.info.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.send_rounded,
-                      color: VillageTheme.info, size: 22),
+                  child: Icon(Icons.send_rounded,
+                      color: context.palette.info, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('Submit Assignment',
@@ -1326,11 +1326,11 @@ class _AssignmentsTab extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.info.withValues(alpha: 0.12),
+                        color: context.palette.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.assignment_rounded,
-                          color: VillageTheme.info, size: 22),
+                      child: Icon(Icons.assignment_rounded,
+                          color: context.palette.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1427,11 +1427,11 @@ class _AssignmentsTab extends ConsumerWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.positive.withValues(alpha: 0.12),
+                    color: context.palette.positive.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.grading,
-                      color: VillageTheme.positive, size: 22),
+                  child: Icon(Icons.grading,
+                      color: context.palette.positive, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('Grade Assignment',

@@ -23,7 +23,7 @@ class LegalPage extends StatelessWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: VillageTheme.primary,
+                    color: context.palette.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(Icons.people_alt_rounded,
@@ -92,7 +92,7 @@ class LegalPage extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: ListTile(
-        leading: Icon(icon, color: VillageTheme.primary),
+        leading: Icon(icon, color: context.palette.primary),
         title: Text(title, style: const TextStyle(fontSize: 14)),
         subtitle: subtitle != null
             ? Text(subtitle, style: const TextStyle(fontSize: 12))

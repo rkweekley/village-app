@@ -123,8 +123,8 @@ class _HubPageState extends ConsumerState<HubPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    VillageTheme.primary,
-                    VillageTheme.primary.withValues(alpha: 0.85),
+                    context.palette.primary,
+                    context.palette.primary.withValues(alpha: 0.85),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -176,13 +176,13 @@ class _HubPageState extends ConsumerState<HubPage> {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: VillageTheme.warning.withValues(alpha: 0.15),
+                        color: context.palette.warning.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
                         Icons.stars_rounded,
                         size: 32,
-                        color: VillageTheme.warning,
+                        color: context.palette.warning,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -201,7 +201,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                             familyState.isLoading ? '...' : myPoints.toString(),
                             style: theme.textTheme.displaySmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: VillageTheme.primary,
+                              color: context.palette.primary,
                             ),
                           ),
                         ],
@@ -236,7 +236,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               Row(
                 children: [
                   Icon(Icons.leaderboard_rounded,
-                      size: 22, color: VillageTheme.warning),
+                      size: 22, color: context.palette.warning),
                   const SizedBox(width: 8),
                   Text(
                     'Family Leaderboard',
@@ -316,12 +316,12 @@ class _HubPageState extends ConsumerState<HubPage> {
 
   Widget _buildMobileGrid(BuildContext context) {
     final items = [
-      (Icons.checklist_rounded, 'Chores', VillageTheme.positive, () => context.push('/chores')),
-      (Icons.stars_rounded, 'Rewards', VillageTheme.warning, () => context.push('/rewards')),
+      (Icons.checklist_rounded, 'Chores', context.palette.positive, () => context.push('/chores')),
+      (Icons.stars_rounded, 'Rewards', context.palette.warning, () => context.push('/rewards')),
       (Icons.calendar_month_rounded, 'Calendar', VillageTheme.primaryLight, () => context.go('/calendar')),
-      (Icons.shopping_cart_rounded, 'Shopping', VillageTheme.primary, () => context.go('/shopping')),
-      (Icons.school_rounded, 'School', VillageTheme.info, () => context.push('/school')),
-      (Icons.restaurant_rounded, 'Meals', VillageTheme.danger, () => context.push('/meals')),
+      (Icons.shopping_cart_rounded, 'Shopping', context.palette.primary, () => context.go('/shopping')),
+      (Icons.school_rounded, 'School', context.palette.info, () => context.push('/school')),
+      (Icons.restaurant_rounded, 'Meals', context.palette.danger, () => context.push('/meals')),
     ];
 
     return Column(
@@ -368,7 +368,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.checklist_rounded,
                 label: 'Chores',
-                color: VillageTheme.positive,
+                color: context.palette.positive,
                 onTap: () => context.push('/chores'),
               ),
             ),
@@ -378,7 +378,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.stars_rounded,
                 label: 'Rewards',
-                color: VillageTheme.warning,
+                color: context.palette.warning,
                 onTap: () => context.push('/rewards'),
               ),
             ),
@@ -403,7 +403,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.shopping_cart_rounded,
                 label: 'Shopping',
-                color: VillageTheme.primary,
+                color: context.palette.primary,
                 onTap: () => context.go('/shopping'),
               ),
             ),
@@ -413,7 +413,7 @@ class _HubPageState extends ConsumerState<HubPage> {
               child: _BentoActionCard(
                 icon: Icons.school_rounded,
                 label: 'School',
-                color: VillageTheme.info,
+                color: context.palette.info,
                 onTap: () => context.push('/school'),
               ),
             ),
@@ -424,7 +424,7 @@ class _HubPageState extends ConsumerState<HubPage> {
         _BentoActionCard(
           icon: Icons.restaurant_rounded,
           label: 'Meals',
-          color: VillageTheme.danger,
+          color: context.palette.danger,
           onTap: () => context.push('/meals'),
         ),
       ],
@@ -454,7 +454,7 @@ class _HubPageState extends ConsumerState<HubPage> {
             return Container(
               decoration: BoxDecoration(
                 color: isMe
-                    ? VillageTheme.primary.withValues(alpha: 0.08)
+                    ? context.palette.primary.withValues(alpha: 0.08)
                     : null,
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -481,14 +481,14 @@ class _HubPageState extends ConsumerState<HubPage> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: VillageTheme.warning.withValues(alpha: 0.12),
+                    color: context.palette.warning.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${member.pointsBalance} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: VillageTheme.warning,
+                      color: context.palette.warning,
                     ),
                   ),
                 ),
@@ -576,11 +576,11 @@ class _HubPageState extends ConsumerState<HubPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.positive.withValues(alpha: 0.12),
+                        color: context.palette.positive.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.cleaning_services_rounded,
-                          color: VillageTheme.positive, size: 22),
+                      child: Icon(Icons.cleaning_services_rounded,
+                          color: context.palette.positive, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Chore',
@@ -674,14 +674,14 @@ class _HubPageState extends ConsumerState<HubPage> {
                   title: const Text('Requires approval'),
                   value: requiresApproval,
                   onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.positive,
+                  activeColor: context.palette.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 SwitchListTile(
                   title: const Text('Requires photo'),
                   value: requiresPhoto,
                   onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.positive,
+                  activeColor: context.palette.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 16),
@@ -758,11 +758,11 @@ class _HubPageState extends ConsumerState<HubPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.info.withValues(alpha: 0.12),
+                        color: context.palette.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.assignment_rounded,
-                          color: VillageTheme.info, size: 22),
+                      child: Icon(Icons.assignment_rounded,
+                          color: context.palette.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Assignment',
@@ -849,7 +849,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
                       'No subjects yet — create one in School first.',
-                      style: TextStyle(color: VillageTheme.warning, fontSize: 13),
+                      style: TextStyle(color: context.palette.warning, fontSize: 13),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1003,11 +1003,11 @@ class _HubPageState extends ConsumerState<HubPage> {
     if (status == 'active') return const SizedBox.shrink();
     if (status == 'canceled') return const SizedBox.shrink();
     if (status == 'past_due') {
-      return _banner(VillageTheme.warning, Icons.error_outline_rounded,
+      return _banner(context.palette.warning, Icons.error_outline_rounded,
           'Payment Past Due', 'Update payment method to keep access', 'Update');
     }
     final isNew = status == 'trial' && family.subscriptionExpiresAt == null;
-    return _banner(VillageTheme.primary, Icons.rocket_launch_rounded,
+    return _banner(context.palette.primary, Icons.rocket_launch_rounded,
         'First month free', isNew ? 'Add a card — cancel anytime' : 'Subscribe to restore access', 'Subscribe');
   }
 
@@ -1128,12 +1128,12 @@ class _BentoActionCardState extends State<_BentoActionCard> {
     if (status == 'canceled') return const SizedBox.shrink();
 
     if (status == 'past_due') {
-      return _banner(VillageTheme.warning, Icons.error_outline_rounded,
+      return _banner(context.palette.warning, Icons.error_outline_rounded,
           'Payment Past Due', 'Update payment method to keep access', 'Update');
     }
 
     final isNew = status == 'trial' && family.subscriptionExpiresAt == null;
-    return _banner(VillageTheme.primary, Icons.rocket_launch_rounded,
+    return _banner(context.palette.primary, Icons.rocket_launch_rounded,
         'First month free', isNew ? 'Add a card to get started — cancel anytime' : 'Subscribe to restore access', 'Subscribe');
   }
 

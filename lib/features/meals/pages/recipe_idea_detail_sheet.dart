@@ -54,10 +54,10 @@ class _RecipeIdeaDetailSheetState
                       errorBuilder: (_, __, ___) => Container(
                         height: 220,
                         color:
-                            VillageTheme.primary.withValues(alpha: 0.15),
-                        child: const Center(
+                            context.palette.primary.withValues(alpha: 0.15),
+                        child: Center(
                           child: Icon(Icons.restaurant_rounded,
-                              size: 48, color: VillageTheme.primary),
+                              size: 48, color: context.palette.primary),
                         ),
                       ),
                     ),
@@ -117,11 +117,11 @@ class _RecipeIdeaDetailSheetState
                             children: [
                               if (recipe.category != null)
                                 _badge(recipe.category!,
-                                    VillageTheme.primary),
+                                    context.palette.primary),
                               if (recipe.area != null) ...[
                                 const SizedBox(width: 6),
                                 _badge(
-                                    recipe.area!, VillageTheme.warning),
+                                    recipe.area!, context.palette.warning),
                               ],
                             ],
                           ),

@@ -153,13 +153,13 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
         Icon(
           Icons.family_restroom,
           size: 80,
-          color: VillageTheme.primary,
+          color: context.palette.primary,
         ),
         const SizedBox(height: 24),
         Text(
           'Welcome to Village!',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: VillageTheme.primary,
+                color: context.palette.primary,
                 fontWeight: FontWeight.bold,
               ),
           textAlign: TextAlign.center,
@@ -372,13 +372,13 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: VillageTheme.info.withValues(alpha: 0.1),
+                        color: context.palette.info.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.info_outline,
-                              color: VillageTheme.info, size: 20),
+                          Icon(Icons.info_outline,
+                              color: context.palette.info, size: 20),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(

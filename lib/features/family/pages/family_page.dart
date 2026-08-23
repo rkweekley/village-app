@@ -74,12 +74,12 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: VillageTheme.primary
+                              color: context.palette.primary
                                   .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.share_rounded,
-                                size: 20, color: VillageTheme.primary),
+                            child: Icon(Icons.share_rounded,
+                                size: 20, color: context.palette.primary),
                           ),
                           const SizedBox(width: 10),
                           const Text('Invite Members',
@@ -95,18 +95,18 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
-                          color: VillageTheme.primary.withValues(alpha: 0.08),
+                          color: context.palette.primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: VillageTheme.primary.withValues(alpha: 0.2),
+                            color: context.palette.primary.withValues(alpha: 0.2),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                            const Icon(Icons.tag_rounded,
-                                color: VillageTheme.primary, size: 20),
+                            Icon(Icons.tag_rounded,
+                                color: context.palette.primary, size: 20),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -121,7 +121,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             IconButton(
                               icon: const Icon(Icons.copy_rounded),
                               tooltip: 'Copy invite code',
-                              color: VillageTheme.primary,
+                              color: context.palette.primary,
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(
                                     text: familyState.family!.inviteCode));
@@ -173,12 +173,12 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: VillageTheme.primary
+                              color: context.palette.primary
                                   .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.settings_rounded,
-                                size: 20, color: VillageTheme.primary),
+                            child: Icon(Icons.settings_rounded,
+                                size: 20, color: context.palette.primary),
                           ),
                           const SizedBox(width: 10),
                           const Expanded(
@@ -188,8 +188,8 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                           ),
                           if (authState.canManage)
                             IconButton(
-                              icon: const Icon(Icons.edit_outlined,
-                                  size: 20, color: VillageTheme.primary),
+                              icon: Icon(Icons.edit_outlined,
+                                  size: 20, color: context.palette.primary),
                               tooltip: 'Edit family settings',
                               onPressed: () =>
                                   _showEditFamilySheet(context, familyState.family!),
@@ -225,12 +225,12 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: VillageTheme.primary
+                      color: context.palette.primary
                           .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.people_rounded,
-                        size: 16, color: VillageTheme.primary),
+                    child: Icon(Icons.people_rounded,
+                        size: 16, color: context.palette.primary),
                   ),
                   const SizedBox(width: 10),
                   const Text('Family Members',
@@ -266,9 +266,9 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                 label: const Text('Add Child Profile'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 48),
-                  foregroundColor: VillageTheme.primary,
+                  foregroundColor: context.palette.primary,
                   side: BorderSide(
-                      color: VillageTheme.primary.withValues(alpha: 0.4)),
+                      color: context.palette.primary.withValues(alpha: 0.4)),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14)),
                 ),
@@ -282,22 +282,22 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: VillageTheme.danger.withValues(alpha: 0.1),
+                    color: context.palette.danger.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: VillageTheme.danger.withValues(alpha: 0.2),
+                      color: context.palette.danger.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline_rounded,
-                          color: VillageTheme.danger, size: 20),
+                      Icon(Icons.error_outline_rounded,
+                          color: context.palette.danger, size: 20),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           familyState.error!,
-                          style: const TextStyle(
-                              color: VillageTheme.danger, fontSize: 14),
+                          style: TextStyle(
+                              color: context.palette.danger, fontSize: 14),
                         ),
                       ),
                     ],
@@ -315,11 +315,11 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: VillageTheme.primary.withValues(alpha: 0.1),
+                      color: context.palette.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.person_rounded,
-                        size: 16, color: VillageTheme.primary),
+                    child: Icon(Icons.person_rounded,
+                        size: 16, color: context.palette.primary),
                   ),
                   const SizedBox(width: 10),
                   const Text('Account',
@@ -341,11 +341,11 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: VillageTheme.primary.withValues(alpha: 0.12),
+                        color: context.palette.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.edit_rounded,
-                          size: 20, color: VillageTheme.primary),
+                      child: Icon(Icons.edit_rounded,
+                          size: 20, color: context.palette.primary),
                     ),
                     title: const Text('Edit Profile',
                         style: TextStyle(
@@ -630,11 +630,11 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.primary.withValues(alpha: 0.12),
+                        color: context.palette.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.settings_rounded,
-                          color: VillageTheme.primary, size: 22),
+                      child: Icon(Icons.settings_rounded,
+                          color: context.palette.primary, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('Edit Family Settings',
@@ -979,8 +979,8 @@ class _InviteEmailFieldState extends ConsumerState<_InviteEmailField> {
                 width: 20, height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2))
             : IconButton(
-                icon: const Icon(Icons.send_rounded,
-                    color: VillageTheme.primary, size: 22),
+                icon: Icon(Icons.send_rounded,
+                    color: context.palette.primary, size: 22),
                 tooltip: 'Send invite',
                 onPressed: _send,
               ),
@@ -1012,11 +1012,11 @@ class _MemberCard extends ConsumerWidget {
     // Generate avatar color from name
     final nameHash = member.displayName.hashCode;
     final avatarColors = [
-      VillageTheme.primary,
-      VillageTheme.warning,
-      VillageTheme.danger,
+      context.palette.primary,
+      context.palette.warning,
+      context.palette.danger,
       VillageTheme.primaryLight,
-      VillageTheme.primary,
+      context.palette.primary,
     ];
     final avatarColor = avatarColors[nameHash.abs() % avatarColors.length];
 
@@ -1068,16 +1068,16 @@ class _MemberCard extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
-                            color: VillageTheme.primary
+                            color: context.palette.primary
                                 .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
+                          child: Text(
                             'You',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
-                              color: VillageTheme.primary,
+                              color: context.palette.primary,
                             ),
                           ),
                         ),
@@ -1103,15 +1103,15 @@ class _MemberCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: VillageTheme.primary.withValues(alpha: 0.08),
+                color: context.palette.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 '${member.pointsBalance} pts',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
-                  color: VillageTheme.primary,
+                  color: context.palette.primary,
                 ),
               ),
             ),

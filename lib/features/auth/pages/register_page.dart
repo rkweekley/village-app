@@ -172,7 +172,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: VillageTheme.danger
+                              color: context.palette.danger
                                   .withValues(alpha: 0.08),
                               borderRadius:
                                   BorderRadius.circular(VillageTheme.radiusSm),
@@ -180,13 +180,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             child: Row(
                               children: [
                                 Icon(Icons.error_outline,
-                                    size: 18, color: VillageTheme.danger),
+                                    size: 18, color: context.palette.danger),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     state.error!,
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: VillageTheme.danger,
+                                      color: context.palette.danger,
                                     ),
                                   ),
                                 ),
@@ -336,7 +336,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     TextButton(
                       onPressed: () => context.go('/login'),
                       style: TextButton.styleFrom(
-                        foregroundColor: VillageTheme.primary,
+                        foregroundColor: context.palette.primary,
                       ),
                       child: const Text('Sign in'),
                     ),

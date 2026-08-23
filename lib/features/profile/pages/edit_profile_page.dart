@@ -205,7 +205,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           Center(
             child: CircleAvatar(
               radius: 48,
-              backgroundColor: VillageTheme.primary.withValues(alpha: 0.12),
+              backgroundColor: context.palette.primary.withValues(alpha: 0.12),
               child: Text(
                 (userInfo?.displayName ?? '?')[0].toUpperCase(),
                 style: TextStyle(

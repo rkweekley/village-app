@@ -81,7 +81,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                 style: IconButton.styleFrom(
                   backgroundColor: VillageTheme.warning
                       .withValues(alpha: 0.15),
-                  foregroundColor: VillageTheme.warning,
+                  foregroundColor: context.palette.warning,
                 ),
                 tooltip: 'Surprise Me',
               ),
@@ -109,7 +109,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                     },
                     showCheckmark: false,
                     selectedColor:
-                        VillageTheme.primary.withValues(alpha: 0.15),
+                        context.palette.primary.withValues(alpha: 0.15),
                   );
                 }
                 final cat =
@@ -127,7 +127,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                   },
                   showCheckmark: false,
                   selectedColor:
-                      VillageTheme.primary.withValues(alpha: 0.15),
+                      context.palette.primary.withValues(alpha: 0.15),
                 );
               },
             ),
@@ -233,10 +233,10 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
-                  color: VillageTheme.primary.withValues(alpha: 0.12),
-                  child: const Center(
+                  color: context.palette.primary.withValues(alpha: 0.12),
+                  child: Center(
                     child: Icon(Icons.restaurant_rounded,
-                        size: 32, color: VillageTheme.primary),
+                        size: 32, color: context.palette.primary),
                   ),
                 ),
               ),
@@ -265,7 +265,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: VillageTheme.primary
+                          color: context.palette.primary
                               .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -273,7 +273,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                           recipe.category!,
                           style: TextStyle(
                             fontSize: 11,
-                            color: VillageTheme.primary,
+                            color: context.palette.primary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

@@ -375,11 +375,11 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: VillageTheme.warning.withValues(alpha: 0.15),
+                    color: context.palette.warning.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text('Trial ending soon — subscribe now!',
-                      style: TextStyle(color: VillageTheme.warning, fontSize: 13, fontWeight: FontWeight.w600)),
+                  child: Text('Trial ending soon — subscribe now!',
+                      style: TextStyle(color: context.palette.warning, fontSize: 13, fontWeight: FontWeight.w600)),
                 ),
               ],
             ],
@@ -442,16 +442,16 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: VillageTheme.danger.withValues(alpha: 0.1),
+                color: context.palette.danger.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: VillageTheme.danger),
+                  Icon(Icons.warning_amber_rounded, color: context.palette.danger),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text('Payment failed. Update your payment method to keep access.',
-                        style: TextStyle(color: VillageTheme.danger, fontSize: 14)),
+                        style: TextStyle(color: context.palette.danger, fontSize: 14)),
                   ),
                 ],
               ),
@@ -569,7 +569,7 @@ class _PlanCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: highlighted ? VillageTheme.primary : Colors.transparent,
+          color: highlighted ? context.palette.primary : Colors.transparent,
           width: highlighted ? 2 : 0,
         ),
       ),
@@ -586,8 +586,8 @@ class _PlanCard extends StatelessWidget {
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                 ),
                 Text(price,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
-                        color: VillageTheme.primary)),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
+                        color: context.palette.primary)),
                 Text(period,
                     style: TextStyle(fontSize: 14, color: context.palette.textSecondary)),
               ],
@@ -597,7 +597,7 @@ class _PlanCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_rounded, size: 16, color: VillageTheme.positive),
+                      Icon(Icons.check_rounded, size: 16, color: context.palette.positive),
                       const SizedBox(width: 8),
                       Text(f, style: const TextStyle(fontSize: 14)),
                     ],
