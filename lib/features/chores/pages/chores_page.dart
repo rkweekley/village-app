@@ -321,7 +321,7 @@ class _CreateAssignmentSheetState extends State<_CreateAssignmentSheet> {
                                     VillageTheme.positive.withValues(alpha: 0.15),
                                 child: Text('${chore.pointValue}',
                                     style: const TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 11,
                                         color: VillageTheme.positive)),
                               ),
                               title: Text(chore.name,

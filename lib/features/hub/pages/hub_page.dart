@@ -89,7 +89,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 isLabelVisible: state.unreadCount > 0,
                 label: Text(
                   state.unreadCount > 99 ? '99+' : state.unreadCount.toString(),
-                  style: const TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 11),
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.notifications_outlined),
