@@ -377,7 +377,7 @@ class _MealSlot extends StatelessWidget {
                 size: 18,
                 color: entry != null
                     ? VillageTheme.danger
-                    : Colors.grey[500],
+                    : Colors.grey[700],
               ),
             ),
             const SizedBox(width: 12),
@@ -403,7 +403,7 @@ class _MealSlot extends StatelessWidget {
                           ? FontWeight.w600
                           : FontWeight.normal,
                       fontSize: 14,
-                      color: entry != null ? null : Colors.grey[400],
+                      color: entry != null ? null : Colors.grey[600],
                     ),
                   ),
                 ],
@@ -412,7 +412,7 @@ class _MealSlot extends StatelessWidget {
             if (entry != null)
               IconButton(
                 icon: const Icon(Icons.close_rounded, size: 18),
-                color: Colors.grey[400],
+                color: Colors.grey[600],
                 onPressed: () async {
                   await ref
                       .read(mealsServiceProvider)
@@ -498,7 +498,7 @@ class _MealSlot extends StatelessWidget {
                             child: Text(
                               'No favorites yet — star a recipe below',
                               style: TextStyle(
-                                color: Colors.grey[500],
+                                color: Colors.grey[700],
                                 fontSize: 13,
                               ),
                             ),
@@ -648,7 +648,7 @@ class _RecipeCard extends StatelessWidget {
                         if (ref.watch(authProvider).canManage)
                           IconButton(
                             icon: const Icon(Icons.edit_rounded, size: 20),
-                            color: Colors.grey[500],
+                            color: Colors.grey[700],
                             onPressed: () =>
                                 _showEditRecipeSheet(context, ref, recipe),
                             visualDensity: VisualDensity.compact,
@@ -696,7 +696,7 @@ class _RecipeCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         // Prep time
                         Icon(Icons.schedule_rounded,
-                            size: 14, color: Colors.grey[500]),
+                            size: 14, color: Colors.grey[700]),
                         const SizedBox(width: 3),
                         Text(
                           _formatMinutes(r.prepTimeMinutes),
@@ -706,7 +706,7 @@ class _RecipeCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         // Servings
                         Icon(Icons.people_rounded,
-                            size: 14, color: Colors.grey[500]),
+                            size: 14, color: Colors.grey[700]),
                         const SizedBox(width: 3),
                         Text(
                           '${r.servings}',
@@ -720,7 +720,7 @@ class _RecipeCard extends StatelessWidget {
                       Text(
                         r.tags!,
                         style: TextStyle(
-                            fontSize: 11, color: Colors.grey[400]),
+                            fontSize: 11, color: Colors.grey[600]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -774,7 +774,7 @@ class _RecipeCard extends StatelessWidget {
                               : Icons.star_border_rounded,
                           color: r.isFamilyFavorite
                               ? VillageTheme.warning
-                              : Colors.grey[400],
+                              : Colors.grey[600],
                           size: 28,
                         ),
                         onPressed: () async {
@@ -805,7 +805,7 @@ class _RecipeCard extends StatelessWidget {
                   if (r.tags != null && r.tags!.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(r.tags!,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700])),
                   ],
 
                   // Description

@@ -91,7 +91,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         const SizedBox(height: 8),
         Text(
           'The link expires in 1 hour.',
-          style: TextStyle(color: Colors.grey[500], fontSize: 13),
+          style: TextStyle(color: Colors.grey[700], fontSize: 13),
         ),
         const SizedBox(height: 32),
         OutlinedButton(
@@ -111,7 +111,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             ));
           },
           child: Text('Enter reset code manually',
-              style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+              style: TextStyle(color: Colors.grey[700], fontSize: 13)),
         ),
       ],
     );

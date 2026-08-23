@@ -424,7 +424,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             'at least 24 hours before the end of the current period. You can '
             'manage and cancel anytime in your account settings. The free trial '
             'is for new subscribers only.',
-            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            style: TextStyle(color: Colors.grey[700], fontSize: 12),
           ),
           if (_isStoreBilling) ...[
             const SizedBox(height: 4),
@@ -480,7 +480,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 ? 'Manage your subscription in your device\'s App Store or Google Play settings.'
                 : 'Opens Stripe Customer Portal — update payment method, view invoices, or cancel.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            style: TextStyle(color: Colors.grey[700], fontSize: 12),
           ),
           // Cancel button — only for active subscriptions
           if (status == 'active') ...[
@@ -510,7 +510,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   ? 'Cancel your subscription from your device\'s subscription settings.'
                   : 'Your access continues until the end of your billing period.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+              style: TextStyle(color: Colors.grey[700], fontSize: 12),
             ),
           ],
         ],
@@ -589,7 +589,7 @@ class _PlanCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
                         color: VillageTheme.primary)),
                 Text(period,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700])),
               ],
             ),
             const SizedBox(height: 12),

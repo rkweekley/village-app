@@ -562,7 +562,7 @@ class _EventDateTimeField extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      color: timeEnabled ? null : Colors.grey[400],
+                      color: timeEnabled ? null : Colors.grey[600],
                     ),
                   ),
                 ],
@@ -825,7 +825,7 @@ class _DayEventsList extends ConsumerWidget {
                   trailing: PopupMenuButton<String>(
                     icon: Icon(
                       Icons.more_horiz_rounded,
-                      color: Colors.grey[400],
+                      color: Colors.grey[600],
                     ),
                     onSelected: (value) async {
                       if (value == 'edit') {

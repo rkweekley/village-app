@@ -145,7 +145,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       Text(
                         'New members enter this code when creating their account.',
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey[500]),
+                            fontSize: 12, color: Colors.grey[700]),
                       ),
                     ],
                   ),
@@ -352,10 +352,10 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             fontWeight: FontWeight.w600, fontSize: 15)),
                     subtitle: Text(
                       authState.userInfo?.email ?? '',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                     ),
                     trailing: Icon(Icons.chevron_right_rounded,
-                        color: Colors.grey[400]),
+                        color: Colors.grey[600]),
                     onTap: () => context.go('/profile/edit'),
                   ),
                   const Divider(height: 1, indent: 72),
@@ -454,7 +454,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                           'child you confirm you are their parent or legal '
                           'guardian.'
                       : 'Update this child profile.',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -885,7 +885,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
+              Icon(Icons.chevron_right_rounded, color: Colors.grey[600]),
             ],
           ),
         ),
@@ -1093,7 +1093,7 @@ class _MemberCard extends ConsumerWidget {
                         : member.role,
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[500],
+                      color: Colors.grey[700],
                     ),
                   ),
                 ],
@@ -1119,7 +1119,7 @@ class _MemberCard extends ConsumerWidget {
               const SizedBox(width: 4),
               PopupMenuButton<String>(
                 icon: Icon(Icons.more_horiz_rounded,
-                    color: Colors.grey[400]),
+                    color: Colors.grey[600]),
                 onSelected: (value) async {
                   final service = ref.read(familyServiceProvider);
                   try {

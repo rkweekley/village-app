@@ -599,7 +599,7 @@ class _SubjectsTab extends ConsumerWidget {
                   ),
                   trailing: Text(
                     '${subject.sortOrder}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ),
               );
@@ -765,7 +765,7 @@ class _AssignmentsTab extends ConsumerWidget {
                               Row(
                                 children: [
                                   Icon(Icons.person_outline,
-                                      size: 14, color: Colors.grey[500]),
+                                      size: 14, color: Colors.grey[700]),
                                   const SizedBox(width: 4),
                                   Text(
                                     a.assignedToName,
@@ -774,7 +774,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 12),
                                   Icon(Icons.calendar_today,
-                                      size: 13, color: Colors.grey[500]),
+                                      size: 13, color: Colors.grey[700]),
                                   const SizedBox(width: 4),
                                   Text(
                                     a.dueDate,

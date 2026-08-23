@@ -372,7 +372,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             leading: const Icon(Icons.info_outline),
             title: const Text('About & Privacy'),
             subtitle:
-                Text('Version 1.0.0', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                Text('Version 1.0.0', style: TextStyle(fontSize: 12, color: Colors.grey[700])),
             trailing: const Icon(Icons.chevron_right_rounded,
                 color: VillageTheme.textTertiary),
             shape:

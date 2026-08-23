@@ -241,7 +241,7 @@ class _ChoreCard extends ConsumerWidget {
               ),
               // More button — available to everyone
               PopupMenuButton<String>(
-                icon: Icon(Icons.more_horiz, color: Colors.grey[500]),
+                icon: Icon(Icons.more_horiz, color: Colors.grey[700]),
                 itemBuilder: (_) => [
                   const PopupMenuItem(value: 'complete', child: Text('Mark Complete')),
                   if (isParent) ...[
@@ -365,7 +365,7 @@ class _ChoreCard extends ConsumerWidget {
                         Text(m.displayName),
                         const Spacer(),
                         Text('${m.pointsBalance} pts',
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                            style: TextStyle(color: Colors.grey[700], fontSize: 12)),
                       ],
                     ),
                   )).toList(),
@@ -491,7 +491,7 @@ class _ChoreCard extends ConsumerWidget {
                         Text(m.displayName),
                         const Spacer(),
                         Text('${m.pointsBalance} pts',
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                            style: TextStyle(color: Colors.grey[700], fontSize: 12)),
                       ],
                     ),
                   )).toList(),

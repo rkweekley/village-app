@@ -184,7 +184,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: n.isRead
-                                                ? Colors.grey[500]
+                                                ? Colors.grey[700]
                                                 : Colors.grey[700],
                                           ),
                                         ),
@@ -194,7 +194,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                                         _timeAgo(n.createdAt),
                                         style: TextStyle(
                                           fontSize: 11,
-                                          color: Colors.grey[400],
+                                          color: Colors.grey[600],
                                         ),
                                       ),
                                     ],

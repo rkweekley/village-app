@@ -21,14 +21,16 @@ class VillageTheme {
   // Neutrals — single gray family (warm-tinted)
   static const Color textPrimary = Color(0xFF1E1B18);
   static const Color textSecondary = Color(0xFF6B6560);
-  static const Color textTertiary = Color(0xFF9E9893);
+  static const Color textTertiary = Color(0xFF6F6963);
   static const Color borderSubtle = Color(0xFFE8E3DE);
 
-  // Semantic (derived from primary — desaturated)
-  static const Color positive = Color(0xFF2EAF7D);
-  static const Color warning = Color(0xFFD4950A);
-  static const Color danger = Color(0xFFDC5C4A);
-  static const Color info = Color(0xFF4A8FE7);
+  // Semantic (derived from primary — desaturated).
+  // Darkened to meet WCAG 2.1 AA: >=4.5:1 as text on light surfaces AND
+  // >=4.5:1 for white text on these as filled backgrounds.
+  static const Color positive = Color(0xFF1B7A55);
+  static const Color warning = Color(0xFF8A6200);
+  static const Color danger = Color(0xFFB23B2A);
+  static const Color info = Color(0xFF2A5FA8);
 
   // ── Typography: Outfit ──
   static TextTheme textTheme = GoogleFonts.outfitTextTheme().copyWith(

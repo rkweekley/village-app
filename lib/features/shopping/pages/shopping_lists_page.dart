@@ -129,7 +129,7 @@ class ShoppingListsPage extends ConsumerWidget {
                           // Delete button
                           PopupMenuButton<String>(
                             icon: Icon(Icons.more_vert_rounded,
-                                color: Colors.grey[400], size: 20),
+                                color: Colors.grey[600], size: 20),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),

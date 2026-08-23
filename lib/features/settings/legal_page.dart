@@ -35,7 +35,7 @@ class LegalPage extends StatelessWidget {
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 4),
                 Text('Version 1.0.0',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700])),
               ],
             ),
           ),
@@ -73,7 +73,7 @@ class LegalPage extends StatelessWidget {
           const SizedBox(height: 32),
           Text('© 2026 Village. All rights reserved.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         ],
       ),
     );
