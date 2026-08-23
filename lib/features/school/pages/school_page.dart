@@ -722,7 +722,7 @@ class _AssignmentsTab extends ConsumerWidget {
             itemCount: assignments.length,
             itemBuilder: (ctx, i) {
               final a = assignments[i];
-              final sc = statusColor(a.status);
+              final sc = statusColor(ctx, a.status);
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
@@ -787,7 +787,7 @@ class _AssignmentsTab extends ConsumerWidget {
                               Row(
                                 children: [
                                   // Status chip
-                                  _statusChip(a.status),
+                                  _statusChip(context, a.status),
                                   const SizedBox(width: 8),
                                   // Points chip
                                   Container(
@@ -858,8 +858,8 @@ class _AssignmentsTab extends ConsumerWidget {
     );
   }
 
-  Widget _statusChip(String status) {
-    final color = statusColor(status);
+  Widget _statusChip(BuildContext context, String status) {
+    final color = statusColor(context, status);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(

@@ -181,7 +181,7 @@ class _ChoreCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final diffColor = difficultyColor(chore.difficulty);
+    final diffColor = difficultyColor(context, chore.difficulty);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -288,7 +288,7 @@ class _ChoreCard extends ConsumerWidget {
             const SizedBox(height: 16),
             _detailChip('${chore.pointValue} pts', VillageTheme.warning),
             const SizedBox(width: 8),
-            _detailChip(chore.difficulty, difficultyColor(chore.difficulty)),
+            _detailChip(chore.difficulty, difficultyColor(context, chore.difficulty)),
             const SizedBox(width: 8),
             _detailChip(chore.recurrence, VillageTheme.primary),
           ],
@@ -862,7 +862,7 @@ class _AssignmentCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final sc = statusColor(assignment.status);
+    final sc = statusColor(context, assignment.status);
     final statusIcon = _statusIcon(assignment.status);
 
     return Card(
@@ -1003,7 +1003,7 @@ class _AssignmentCard extends ConsumerWidget {
           children: [
             Text(a.title, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
-            _infoRow('Status', a.status, statusColor(a.status)),
+            _infoRow('Status', a.status, statusColor(context, a.status)),
             _infoRow('Assigned to', a.assignedToName, null),
             _infoRow('Due date', a.dueDate, null),
             _infoRow('Points possible', '${a.pointsPossible}', null),

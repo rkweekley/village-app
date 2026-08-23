@@ -147,6 +147,14 @@ class VillageTheme {
           surfaceContainerHighest: const Color(0xFFD8D3CE),
           error: danger,
         ),
+        extensions: const [
+          VillageSemanticColors(
+            positive: Color(0xFF1B7A55),
+            warning: Color(0xFF8A6200),
+            info: Color(0xFF2A5FA8),
+            danger: Color(0xFFB23B2A),
+          ),
+        ],
         scaffoldBackgroundColor: surfaceBase,
         textTheme: textTheme,
 
@@ -334,6 +342,14 @@ class VillageTheme {
           surfaceContainerHighest: const Color(0xFF343230),
           error: const Color(0xFFFF8A80),
         ),
+        extensions: const [
+          VillageSemanticColors(
+            positive: Color(0xFF2EAF7D),
+            warning: Color(0xFFD4950A),
+            info: Color(0xFF4A8FE7),
+            danger: Color(0xFFDC5C4A),
+          ),
+        ],
         scaffoldBackgroundColor: const Color(0xFF141210),
         textTheme: textTheme.apply(
           bodyColor: const Color(0xFFDDD8D3),
@@ -431,4 +447,54 @@ class VillageTheme {
           ),
         ),
       );
+}
+
+/// Theme-aware semantic status colors.
+///
+/// Light mode uses darker shades so they clear WCAG AA (>=4.5:1) when drawn
+/// as text/icons on light surfaces; dark mode uses brighter shades so they
+/// clear the same bar against the dark background. Registered on both light
+/// and dark [ThemeData] via `extensions`; resolve with
+/// [VillageSemanticColors.of].
+class VillageSemanticColors extends ThemeExtension<VillageSemanticColors> {
+  const VillageSemanticColors({
+    required this.positive,
+    required this.warning,
+    required this.info,
+    required this.danger,
+  });
+
+  final Color positive;
+  final Color warning;
+  final Color info;
+  final Color danger;
+
+  @override
+  VillageSemanticColors copyWith({
+    Color? positive,
+    Color? warning,
+    Color? info,
+    Color? danger,
+  }) {
+    return VillageSemanticColors(
+      positive: positive ?? this.positive,
+      warning: warning ?? this.warning,
+      info: info ?? this.info,
+      danger: danger ?? this.danger,
+    );
+  }
+
+  @override
+  VillageSemanticColors lerp(VillageSemanticColors? other, double t) {
+    if (other is! VillageSemanticColors) return this;
+    return VillageSemanticColors(
+      positive: Color.lerp(positive, other.positive, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      info: Color.lerp(info, other.info, t)!,
+      danger: Color.lerp(danger, other.danger, t)!,
+    );
+  }
+
+  static VillageSemanticColors of(BuildContext context) =>
+      Theme.of(context).extension<VillageSemanticColors>()!;
 }

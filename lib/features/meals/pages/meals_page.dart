@@ -599,7 +599,7 @@ class _RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = recipe;
-    final diffColor = difficultyColor(r.difficulty);
+    final diffColor = difficultyColor(context, r.difficulty);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -795,7 +795,7 @@ class _RecipeCard extends StatelessWidget {
                     runSpacing: 6,
                     children: [
                       _metaChip(r.difficulty, Icons.flag_rounded,
-                          difficultyColor(r.difficulty)),
+                          difficultyColor(context, r.difficulty)),
                       _metaChip(_formatMinutes(r.prepTimeMinutes),
                           Icons.schedule_rounded, Colors.grey),
                       _metaChip('${r.servings} servings', Icons.people_rounded,

@@ -540,9 +540,9 @@ class _ChoresTab extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.only(left: isChild ? 36 : 16, right: 16),
       leading: CircleAvatar(
-        backgroundColor: difficultyColor(chore.difficulty),
+        backgroundColor: difficultyColorFilled(chore.difficulty),
         child: Text('${chore.pointValue}',
-            style: const TextStyle(fontSize: 12)),
+            style: const TextStyle(fontSize: 12, color: Colors.white)),
       ),
       title: Text(chore.name),
       subtitle: Text(

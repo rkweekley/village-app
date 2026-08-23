@@ -340,20 +340,20 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: statusColor(status).withValues(alpha: 0.1),
+            color: statusColor(context, status).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: statusColor(status).withValues(alpha: 0.3)),
+            border: Border.all(color: statusColor(context, status).withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
-              Icon(_statusIcon(status), size: 40, color: statusColor(status)),
+              Icon(_statusIcon(status), size: 40, color: statusColor(context, status)),
               const SizedBox(height: 12),
               Text(
                 _statusLabel(status, tier),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: statusColor(status),
+                  color: statusColor(context, status),
                 ),
               ),
               if (isInTrial) ...[

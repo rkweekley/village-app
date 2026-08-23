@@ -1,8 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 
-/// Returns the semantic color for a chore/meal difficulty level.
-Color difficultyColor(String difficulty) {
+/// Returns the on-surface semantic color for a chore/meal difficulty level.
+///
+/// Theme-aware: bright on dark surfaces, dark on light surfaces, so the label
+/// always clears WCAG AA against the background it is drawn on.
+Color difficultyColor(BuildContext context, String difficulty) {
+  final c = VillageSemanticColors.of(context);
+  switch (difficulty) {
+    case 'Easy':
+      return c.positive;
+    case 'Medium':
+      return c.warning;
+    case 'Hard':
+      return c.danger;
+    default:
+      return Colors.grey;
+  }
+}
+
+/// Returns a filled-background difficulty color.
+///
+/// Always the darker shade so white text passes on it in both light and dark
+/// mode. Use for filled chips/avatars, not for text drawn on a surface.
+Color difficultyColorFilled(String difficulty) {
   switch (difficulty) {
     case 'Easy':
       return VillageTheme.positive;
@@ -15,30 +36,32 @@ Color difficultyColor(String difficulty) {
   }
 }
 
-/// Returns the semantic color for a subscription or assignment status string.
+/// Returns the on-surface semantic color for a subscription or assignment
+/// status string. Theme-aware (see [difficultyColor]).
 ///
 /// Handles subscription statuses (active, trial, past_due, expired, canceled)
 /// and school-assignment statuses (Pending, Submitted, Graded, Excused).
-Color statusColor(String status) {
+Color statusColor(BuildContext context, String status) {
+  final c = VillageSemanticColors.of(context);
   switch (status) {
     // Subscription domain
     case 'active':
-      return VillageTheme.positive;
+      return c.positive;
     case 'trial':
-      return VillageTheme.primary;
+      return Theme.of(context).colorScheme.primary;
     case 'past_due':
-      return VillageTheme.warning;
+      return c.warning;
     case 'expired':
-      return VillageTheme.danger;
+      return c.danger;
     case 'canceled':
       return Colors.grey;
     // Assignment domain
     case 'Pending':
-      return VillageTheme.warning;
+      return c.warning;
     case 'Submitted':
-      return VillageTheme.info;
+      return c.info;
     case 'Graded':
-      return VillageTheme.positive;
+      return c.positive;
     case 'Excused':
       return Colors.grey;
     default:
