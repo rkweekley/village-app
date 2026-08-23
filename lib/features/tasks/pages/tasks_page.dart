@@ -241,7 +241,7 @@ class _ChoreCard extends ConsumerWidget {
               ),
               // More button — available to everyone
               PopupMenuButton<String>(
-                icon: Icon(Icons.more_horiz, color: Colors.grey[700]),
+                icon: Icon(Icons.more_horiz, color: context.palette.textSecondary),
                 itemBuilder: (_) => [
                   const PopupMenuItem(value: 'complete', child: Text('Mark Complete')),
                   if (isParent) ...[
@@ -365,7 +365,7 @@ class _ChoreCard extends ConsumerWidget {
                         Text(m.displayName),
                         const Spacer(),
                         Text('${m.pointsBalance} pts',
-                            style: TextStyle(color: Colors.grey[700], fontSize: 12)),
+                            style: TextStyle(color: context.palette.textSecondary, fontSize: 12)),
                       ],
                     ),
                   )).toList(),
@@ -491,7 +491,7 @@ class _ChoreCard extends ConsumerWidget {
                         Text(m.displayName),
                         const Spacer(),
                         Text('${m.pointsBalance} pts',
-                            style: TextStyle(color: Colors.grey[700], fontSize: 12)),
+                            style: TextStyle(color: context.palette.textSecondary, fontSize: 12)),
                       ],
                     ),
                   )).toList(),
@@ -898,7 +898,7 @@ class _AssignmentCard extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Text(
                           'Due: ${assignment.dueDate}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 12, color: context.palette.textTertiary),
                         ),
                       ],
                     ),
@@ -1003,10 +1003,10 @@ class _AssignmentCard extends ConsumerWidget {
           children: [
             Text(a.title, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
-            _infoRow('Status', a.status, statusColor(context, a.status)),
-            _infoRow('Assigned to', a.assignedToName, null),
-            _infoRow('Due date', a.dueDate, null),
-            _infoRow('Points possible', '${a.pointsPossible}', null),
+            _infoRow(context, 'Status', a.status, statusColor(context, a.status)),
+            _infoRow(context, 'Assigned to', a.assignedToName, null),
+            _infoRow(context, 'Due date', a.dueDate, null),
+            _infoRow(context, 'Points possible', '${a.pointsPossible}', null),
             if (a.description != null && a.description!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
@@ -1059,7 +1059,7 @@ class _AssignmentCard extends ConsumerWidget {
     );
   }
 
-  Widget _infoRow(String label, String value, Color? color) {
+  Widget _infoRow(BuildContext context, String label, String value, Color? color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -1072,7 +1072,7 @@ class _AssignmentCard extends ConsumerWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 13,
-                color: Colors.grey[600],
+                color: context.palette.textTertiary,
               ),
             ),
           ),

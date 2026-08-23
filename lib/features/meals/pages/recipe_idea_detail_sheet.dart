@@ -220,7 +220,7 @@ class _RecipeIdeaDetailSheetState
                             ? Text(ing.measure,
                                 style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.grey[600]))
+                                    color: context.palette.textTertiary))
                             : null,
                         contentPadding:
                             const EdgeInsets.symmetric(horizontal: 20),
@@ -287,15 +287,15 @@ class _RecipeIdeaDetailSheetState
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.shopping_bag_outlined,
-                      size: 48, color: VillageTheme.textTertiary),
+                  Icon(Icons.shopping_bag_outlined,
+                      size: 48, color: context.palette.textTertiary),
                   const SizedBox(height: 12),
                   const Text('No shopping lists yet',
                       style: TextStyle(fontSize: 16)),
                   const SizedBox(height: 4),
                   Text('Create one in the Shopping tab first.',
                       style: TextStyle(
-                          color: Colors.grey[600], fontSize: 13)),
+                          color: context.palette.textTertiary, fontSize: 13)),
                   const SizedBox(height: 20),
                   FilledButton(
                     onPressed: () => Navigator.pop(ctx),

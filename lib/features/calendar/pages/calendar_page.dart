@@ -516,7 +516,7 @@ class _EventDateTimeField extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 11, color: context.palette.textTertiary),
           ),
           const SizedBox(height: 8),
           InkWell(
@@ -562,7 +562,7 @@ class _EventDateTimeField extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      color: timeEnabled ? null : Colors.grey[600],
+                      color: timeEnabled ? null : context.palette.textTertiary,
                     ),
                   ),
                 ],
@@ -825,7 +825,7 @@ class _DayEventsList extends ConsumerWidget {
                   trailing: PopupMenuButton<String>(
                     icon: Icon(
                       Icons.more_horiz_rounded,
-                      color: Colors.grey[600],
+                      color: context.palette.textTertiary,
                     ),
                     onSelected: (value) async {
                       if (value == 'edit') {
@@ -1380,7 +1380,7 @@ class _RsvpButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? selectedColor : Colors.grey[600],
+                color: isSelected ? selectedColor : context.palette.textTertiary,
               ),
             ),
           ],

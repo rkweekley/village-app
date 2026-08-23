@@ -183,8 +183,8 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.menu_book_rounded,
-                  size: 48, color: VillageTheme.textTertiary),
+              Icon(Icons.menu_book_rounded,
+                  size: 48, color: context.palette.textTertiary),
               const SizedBox(height: 12),
               Text(emptyMessage ?? 'No recipes yet',
                   style: const TextStyle(fontSize: 16)),
@@ -315,8 +315,8 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.cloud_off_rounded,
-                  size: 48, color: VillageTheme.textTertiary),
+              Icon(Icons.cloud_off_rounded,
+                  size: 48, color: context.palette.textTertiary),
               const SizedBox(height: 12),
               const Text("Recipe ideas aren't available right now",
                   textAlign: TextAlign.center),

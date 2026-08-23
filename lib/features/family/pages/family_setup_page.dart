@@ -168,7 +168,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
         Text(
           'Set up your family to get started.',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey[600],
+                color: context.palette.textTertiary,
               ),
           textAlign: TextAlign.center,
         ),
@@ -365,7 +365,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                     Text(
                       '${_lookedUpFamily!.memberCount} member${_lookedUpFamily!.memberCount == 1 ? '' : 's'}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
+                            color: context.palette.textTertiary,
                           ),
                     ),
                     const SizedBox(height: 16),
@@ -387,7 +387,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                               'Joining after registration is coming soon.',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[700],
+                                color: context.palette.textSecondary,
                               ),
                             ),
                           ),

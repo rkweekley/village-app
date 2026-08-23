@@ -192,13 +192,13 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
     return ListTile(
       leading: Icon(
         done ? Icons.check_circle : Icons.radio_button_unchecked,
-        color: done ? VillageTheme.positive : VillageTheme.textTertiary,
+        color: done ? VillageTheme.positive : context.palette.textTertiary,
       ),
       title: Text(
         task.name,
         style: TextStyle(
           decoration: done ? TextDecoration.lineThrough : null,
-          color: done ? VillageTheme.textTertiary : null,
+          color: done ? context.palette.textTertiary : null,
         ),
       ),
       onTap: () => _toggle(task),

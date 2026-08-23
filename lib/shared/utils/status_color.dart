@@ -6,7 +6,7 @@ import 'package:village_app/core/theme/village_theme.dart';
 /// Theme-aware: bright on dark surfaces, dark on light surfaces, so the label
 /// always clears WCAG AA against the background it is drawn on.
 Color difficultyColor(BuildContext context, String difficulty) {
-  final c = VillageSemanticColors.of(context);
+  final c = context.palette;
   switch (difficulty) {
     case 'Easy':
       return c.positive;
@@ -42,7 +42,7 @@ Color difficultyColorFilled(String difficulty) {
 /// Handles subscription statuses (active, trial, past_due, expired, canceled)
 /// and school-assignment statuses (Pending, Submitted, Graded, Excused).
 Color statusColor(BuildContext context, String status) {
-  final c = VillageSemanticColors.of(context);
+  final c = context.palette;
   switch (status) {
     // Subscription domain
     case 'active':

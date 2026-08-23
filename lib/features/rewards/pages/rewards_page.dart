@@ -762,7 +762,7 @@ class _RedemptionsTab extends StatelessWidget {
                               '${r.userName} · ${r.status}',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[600],
+                                color: context.palette.textTertiary,
                               ),
                             ),
                           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:village_app/core/theme/village_theme.dart';
 
 /// A consistent empty-state placeholder used across the app.
 ///
@@ -53,7 +54,7 @@ class EmptyState extends StatelessWidget {
               Text(
                 subtitle!,
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: context.palette.textTertiary,
                   fontSize: 14,
                 ),
                 textAlign: TextAlign.center,

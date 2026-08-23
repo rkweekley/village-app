@@ -296,7 +296,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Error loading subscription', style: TextStyle(color: Colors.grey[600])),
+                      Text('Error loading subscription', style: TextStyle(color: context.palette.textTertiary)),
                       const SizedBox(height: 12),
                       OutlinedButton(onPressed: _loadStatus, child: const Text('Retry')),
                     ],
@@ -314,18 +314,18 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
     // Role gate: children never see or trigger the paywall.
     if (!ref.read(authProvider).canManage) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.lock_outline, size: 40, color: VillageTheme.textSecondary),
+              Icon(Icons.lock_outline, size: 40, color: context.palette.textSecondary),
               SizedBox(height: 12),
               Text(
                 'Only a parent or caregiver can manage the subscription.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: VillageTheme.textSecondary),
+                style: TextStyle(color: context.palette.textSecondary),
               ),
             ],
           ),
@@ -360,14 +360,14 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 const SizedBox(height: 4),
                 Text(
                   'Trial ends ${formatDate(_status!['trialEndsAt'] as String)}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
                 ),
               ],
               if (!isInTrial && _status!['expiresAt'] != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   'Next billing: ${formatDate(_status!['expiresAt'] as String)}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
                 ),
               ],
               if (isExpiringSoon) ...[
@@ -394,7 +394,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text('Cancel anytime during your trial — you won\'t be charged.',
-              style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+              style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
           const SizedBox(height: 16),
           _PlanCard(
             title: 'Monthly',
@@ -424,7 +424,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             'at least 24 hours before the end of the current period. You can '
             'manage and cancel anytime in your account settings. The free trial '
             'is for new subscribers only.',
-            style: TextStyle(color: Colors.grey[700], fontSize: 12),
+            style: TextStyle(color: context.palette.textSecondary, fontSize: 12),
           ),
           if (_isStoreBilling) ...[
             const SizedBox(height: 4),
@@ -480,7 +480,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 ? 'Manage your subscription in your device\'s App Store or Google Play settings.'
                 : 'Opens Stripe Customer Portal — update payment method, view invoices, or cancel.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[700], fontSize: 12),
+            style: TextStyle(color: context.palette.textSecondary, fontSize: 12),
           ),
           // Cancel button — only for active subscriptions
           if (status == 'active') ...[
@@ -510,7 +510,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   ? 'Cancel your subscription from your device\'s subscription settings.'
                   : 'Your access continues until the end of your billing period.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[700], fontSize: 12),
+              style: TextStyle(color: context.palette.textSecondary, fontSize: 12),
             ),
           ],
         ],
@@ -589,7 +589,7 @@ class _PlanCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
                         color: VillageTheme.primary)),
                 Text(period,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                    style: TextStyle(fontSize: 14, color: context.palette.textSecondary)),
               ],
             ),
             const SizedBox(height: 12),

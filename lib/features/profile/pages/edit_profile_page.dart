@@ -222,7 +222,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               userInfo?.role ?? '',
               style: TextStyle(
                 fontSize: 14,
-                color: VillageTheme.textSecondary,
+                color: context.palette.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -235,7 +235,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: VillageTheme.textSecondary,
+                  color: context.palette.textSecondary,
                   letterSpacing: 1.2,
                 )),
             const SizedBox(height: 12),
@@ -258,7 +258,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: VillageTheme.textSecondary,
+                  color: context.palette.textSecondary,
                   letterSpacing: 1.2,
                 )),
             const SizedBox(height: 12),
@@ -320,7 +320,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 16,
                   color:
-                      _birthDate != null ? null : VillageTheme.textSecondary,
+                      _birthDate != null ? null : context.palette.textSecondary,
                 ),
               ),
             ),
@@ -372,9 +372,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             leading: const Icon(Icons.info_outline),
             title: const Text('About & Privacy'),
             subtitle:
-                Text('Version 1.0.0', style: TextStyle(fontSize: 12, color: Colors.grey[700])),
-            trailing: const Icon(Icons.chevron_right_rounded,
-                color: VillageTheme.textTertiary),
+                Text('Version 1.0.0', style: TextStyle(fontSize: 12, color: context.palette.textSecondary)),
+            trailing: Icon(Icons.chevron_right_rounded,
+                color: context.palette.textTertiary),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             onTap: () => context.push('/legal'),

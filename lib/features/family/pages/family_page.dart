@@ -90,7 +90,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       const SizedBox(height: 12),
                       Text(
                         'Share this code with family members to join:',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        style: TextStyle(color: context.palette.textTertiary, fontSize: 13),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -145,7 +145,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       Text(
                         'New members enter this code when creating their account.',
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey[700]),
+                            fontSize: 12, color: context.palette.textSecondary),
                       ),
                     ],
                   ),
@@ -352,10 +352,10 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             fontWeight: FontWeight.w600, fontSize: 15)),
                     subtitle: Text(
                       authState.userInfo?.email ?? '',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                      style: TextStyle(fontSize: 13, color: context.palette.textSecondary),
                     ),
                     trailing: Icon(Icons.chevron_right_rounded,
-                        color: Colors.grey[600]),
+                        color: context.palette.textTertiary),
                     onTap: () => context.go('/profile/edit'),
                   ),
                   const Divider(height: 1, indent: 72),
@@ -454,7 +454,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                           'child you confirm you are their parent or legal '
                           'guardian.'
                       : 'Update this child profile.',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 13, color: context.palette.textSecondary),
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -495,7 +495,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                         fontSize: 16,
                         color: birthDate != null
                             ? null
-                            : VillageTheme.textSecondary,
+                            : context.palette.textSecondary,
                       ),
                     ),
                   ),
@@ -793,7 +793,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey[600],
+            color: context.palette.textTertiary,
             fontSize: 14,
           ),
         ),
@@ -875,17 +875,17 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                             color: statusColor)),
                     if (isTrial && family.trialEndsAt != null)
                       Text('Ends ${formatDate(family.trialEndsAt!, includeYear: false)}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                          style: TextStyle(fontSize: 12, color: context.palette.textTertiary)),
                     if (!isTrial && family.subscriptionExpiresAt != null)
                       Text('Renews ${formatDate(family.subscriptionExpiresAt!, includeYear: false)}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                          style: TextStyle(fontSize: 12, color: context.palette.textTertiary)),
                     if (isPastDue)
                       const Text('Update payment method →',
                           style: TextStyle(fontSize: 12, color: VillageTheme.warning, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.grey[600]),
+              Icon(Icons.chevron_right_rounded, color: context.palette.textTertiary),
             ],
           ),
         ),
@@ -1093,7 +1093,7 @@ class _MemberCard extends ConsumerWidget {
                         : member.role,
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[700],
+                      color: context.palette.textSecondary,
                     ),
                   ),
                 ],
@@ -1119,7 +1119,7 @@ class _MemberCard extends ConsumerWidget {
               const SizedBox(width: 4),
               PopupMenuButton<String>(
                 icon: Icon(Icons.more_horiz_rounded,
-                    color: Colors.grey[600]),
+                    color: context.palette.textTertiary),
                 onSelected: (value) async {
                   final service = ref.read(familyServiceProvider);
                   try {

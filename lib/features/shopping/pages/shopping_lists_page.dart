@@ -120,7 +120,7 @@ class ShoppingListsPage extends ConsumerWidget {
                                     fontSize: 13,
                                     color: isComplete
                                         ? VillageTheme.positive
-                                        : Colors.grey[600],
+                                        : context.palette.textTertiary,
                                   ),
                                 ),
                               ],
@@ -129,7 +129,7 @@ class ShoppingListsPage extends ConsumerWidget {
                           // Delete button
                           PopupMenuButton<String>(
                             icon: Icon(Icons.more_vert_rounded,
-                                color: Colors.grey[600], size: 20),
+                                color: context.palette.textTertiary, size: 20),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
@@ -404,7 +404,7 @@ class _ShoppingListDetailPageState
                               Text(
                                 '${detail.checkedCount} of ${detail.itemCount} items checked',
                                 style: TextStyle(
-                                    fontSize: 13, color: Colors.grey[600]),
+                                    fontSize: 13, color: context.palette.textTertiary),
                               ),
                             ],
                           ),
@@ -683,7 +683,7 @@ class _ItemTile extends StatelessWidget {
             const SizedBox(width: 4),
             IconButton(
               icon: const Icon(Icons.edit_outlined, size: 18),
-              color: Colors.grey[600],
+              color: context.palette.textTertiary,
               tooltip: 'Edit item',
               onPressed: () => _showEditItemSheet(context),
             ),

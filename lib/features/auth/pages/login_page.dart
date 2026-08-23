@@ -92,7 +92,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Text(
                   'It takes a village to raise a family',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: VillageTheme.textTertiary,
+                    color: context.palette.textTertiary,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -118,14 +118,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         Text(
                           'Welcome back',
                           style: theme.textTheme.headlineSmall?.copyWith(
-                            color: VillageTheme.textPrimary,
+                            color: context.palette.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Sign in to your family account',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: VillageTheme.textSecondary,
+                            color: context.palette.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -234,7 +234,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: TextButton(
                     onPressed: () => context.go('/forgot-password'),
                     style: TextButton.styleFrom(
-                      foregroundColor: VillageTheme.textSecondary,
+                      foregroundColor: context.palette.textSecondary,
                     ),
                     child: const Text('Forgot password?'),
                   ),
@@ -247,7 +247,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     Text(
                       "Don't have an account? ",
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: VillageTheme.textTertiary,
+                        color: context.palette.textTertiary,
                       ),
                     ),
                     TextButton(

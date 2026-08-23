@@ -148,11 +148,15 @@ class VillageTheme {
           error: danger,
         ),
         extensions: const [
-          VillageSemanticColors(
+          VillagePalette(
+            primary: Color(0xFF0D7C66),
             positive: Color(0xFF1B7A55),
             warning: Color(0xFF8A6200),
             info: Color(0xFF2A5FA8),
             danger: Color(0xFFB23B2A),
+            textPrimary: Color(0xFF1E1B18),
+            textSecondary: Color(0xFF6B6560),
+            textTertiary: Color(0xFF6F6963),
           ),
         ],
         scaffoldBackgroundColor: surfaceBase,
@@ -343,11 +347,15 @@ class VillageTheme {
           error: const Color(0xFFFF8A80),
         ),
         extensions: const [
-          VillageSemanticColors(
+          VillagePalette(
+            primary: Color(0xFF4DD0B5),
             positive: Color(0xFF2EAF7D),
             warning: Color(0xFFD4950A),
             info: Color(0xFF4A8FE7),
             danger: Color(0xFFDC5C4A),
+            textPrimary: Color(0xFFDDD8D3),
+            textSecondary: Color(0xFFC2BDB7),
+            textTertiary: Color(0xFFA8A39D),
           ),
         ],
         scaffoldBackgroundColor: const Color(0xFF141210),
@@ -449,52 +457,77 @@ class VillageTheme {
       );
 }
 
-/// Theme-aware semantic status colors.
+/// Theme-aware color palette.
 ///
-/// Light mode uses darker shades so they clear WCAG AA (>=4.5:1) when drawn
-/// as text/icons on light surfaces; dark mode uses brighter shades so they
-/// clear the same bar against the dark background. Registered on both light
-/// and dark [ThemeData] via `extensions`; resolve with
-/// [VillageSemanticColors.of].
-class VillageSemanticColors extends ThemeExtension<VillageSemanticColors> {
-  const VillageSemanticColors({
+/// Light mode uses darker shades so ink colors clear WCAG AA (>=4.5:1) on
+/// light surfaces; dark mode uses brighter shades for the same bar against
+/// the dark background. Registered on both [ThemeData]s via `extensions`;
+/// resolve with `context.palette` (see [VillagePaletteX]).
+class VillagePalette extends ThemeExtension<VillagePalette> {
+  const VillagePalette({
+    required this.primary,
     required this.positive,
     required this.warning,
     required this.info,
     required this.danger,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
   });
 
+  final Color primary;
   final Color positive;
   final Color warning;
   final Color info;
   final Color danger;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textTertiary;
 
   @override
-  VillageSemanticColors copyWith({
+  VillagePalette copyWith({
+    Color? primary,
     Color? positive,
     Color? warning,
     Color? info,
     Color? danger,
+    Color? textPrimary,
+    Color? textSecondary,
+    Color? textTertiary,
   }) {
-    return VillageSemanticColors(
+    return VillagePalette(
+      primary: primary ?? this.primary,
       positive: positive ?? this.positive,
       warning: warning ?? this.warning,
       info: info ?? this.info,
       danger: danger ?? this.danger,
+      textPrimary: textPrimary ?? this.textPrimary,
+      textSecondary: textSecondary ?? this.textSecondary,
+      textTertiary: textTertiary ?? this.textTertiary,
     );
   }
 
   @override
-  VillageSemanticColors lerp(VillageSemanticColors? other, double t) {
-    if (other is! VillageSemanticColors) return this;
-    return VillageSemanticColors(
+  VillagePalette lerp(VillagePalette? other, double t) {
+    if (other is! VillagePalette) return this;
+    return VillagePalette(
+      primary: Color.lerp(primary, other.primary, t)!,
       positive: Color.lerp(positive, other.positive, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       info: Color.lerp(info, other.info, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
+      textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
+      textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
     );
   }
 
-  static VillageSemanticColors of(BuildContext context) =>
-      Theme.of(context).extension<VillageSemanticColors>()!;
+  static VillagePalette of(BuildContext context) =>
+      Theme.of(context).extension<VillagePalette>()!;
+}
+
+/// Shorthand so widgets can write `context.palette.textSecondary` instead of
+/// `Theme.of(context).extension<VillagePalette>()!.textSecondary`.
+extension VillagePaletteX on BuildContext {
+  VillagePalette get palette => Theme.of(this).extension<VillagePalette>()!;
 }

@@ -199,7 +199,7 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
                           fontWeight: FontWeight.w500,
                           color: isSelected
                               ? Colors.white
-                              : Colors.grey[600],
+                              : context.palette.textTertiary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -311,7 +311,7 @@ class _EmptyWeekPlaceholder extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('Tap below to create one',
-              style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+              style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
           const SizedBox(height: 16),
           FilledButton.icon(
             icon: const Icon(Icons.add_rounded),
@@ -377,7 +377,7 @@ class _MealSlot extends StatelessWidget {
                 size: 18,
                 color: entry != null
                     ? VillageTheme.danger
-                    : Colors.grey[700],
+                    : context.palette.textSecondary,
               ),
             ),
             const SizedBox(width: 12),
@@ -390,7 +390,7 @@ class _MealSlot extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
+                      color: context.palette.textTertiary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -403,7 +403,7 @@ class _MealSlot extends StatelessWidget {
                           ? FontWeight.w600
                           : FontWeight.normal,
                       fontSize: 14,
-                      color: entry != null ? null : Colors.grey[600],
+                      color: entry != null ? null : context.palette.textTertiary,
                     ),
                   ),
                 ],
@@ -412,7 +412,7 @@ class _MealSlot extends StatelessWidget {
             if (entry != null)
               IconButton(
                 icon: const Icon(Icons.close_rounded, size: 18),
-                color: Colors.grey[600],
+                color: context.palette.textTertiary,
                 onPressed: () async {
                   await ref
                       .read(mealsServiceProvider)
@@ -498,7 +498,7 @@ class _MealSlot extends StatelessWidget {
                             child: Text(
                               'No favorites yet — star a recipe below',
                               style: TextStyle(
-                                color: Colors.grey[700],
+                                color: context.palette.textSecondary,
                                 fontSize: 13,
                               ),
                             ),
@@ -648,7 +648,7 @@ class _RecipeCard extends StatelessWidget {
                         if (ref.watch(authProvider).canManage)
                           IconButton(
                             icon: const Icon(Icons.edit_rounded, size: 20),
-                            color: Colors.grey[700],
+                            color: context.palette.textSecondary,
                             onPressed: () =>
                                 _showEditRecipeSheet(context, ref, recipe),
                             visualDensity: VisualDensity.compact,
@@ -696,22 +696,22 @@ class _RecipeCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         // Prep time
                         Icon(Icons.schedule_rounded,
-                            size: 14, color: Colors.grey[700]),
+                            size: 14, color: context.palette.textSecondary),
                         const SizedBox(width: 3),
                         Text(
                           _formatMinutes(r.prepTimeMinutes),
                           style: TextStyle(
-                              fontSize: 12, color: Colors.grey[600]),
+                              fontSize: 12, color: context.palette.textTertiary),
                         ),
                         const SizedBox(width: 8),
                         // Servings
                         Icon(Icons.people_rounded,
-                            size: 14, color: Colors.grey[700]),
+                            size: 14, color: context.palette.textSecondary),
                         const SizedBox(width: 3),
                         Text(
                           '${r.servings}',
                           style: TextStyle(
-                              fontSize: 12, color: Colors.grey[600]),
+                              fontSize: 12, color: context.palette.textTertiary),
                         ),
                       ],
                     ),
@@ -720,7 +720,7 @@ class _RecipeCard extends StatelessWidget {
                       Text(
                         r.tags!,
                         style: TextStyle(
-                            fontSize: 11, color: Colors.grey[600]),
+                            fontSize: 11, color: context.palette.textTertiary),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -774,7 +774,7 @@ class _RecipeCard extends StatelessWidget {
                               : Icons.star_border_rounded,
                           color: r.isFamilyFavorite
                               ? VillageTheme.warning
-                              : Colors.grey[600],
+                              : context.palette.textTertiary,
                           size: 28,
                         ),
                         onPressed: () async {
@@ -805,7 +805,7 @@ class _RecipeCard extends StatelessWidget {
                   if (r.tags != null && r.tags!.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(r.tags!,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                        style: TextStyle(fontSize: 12, color: context.palette.textSecondary)),
                   ],
 
                   // Description
@@ -1721,7 +1721,7 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: selected ? Colors.white : Colors.grey[700],
+            color: selected ? Colors.white : context.palette.textSecondary,
           ),
         ),
       ),

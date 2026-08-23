@@ -86,12 +86,12 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         Text(
           'If an account exists for ${_emailCtrl.text.trim()}, we\'ve sent a password reset link.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+          style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         Text(
           'The link expires in 1 hour.',
-          style: TextStyle(color: Colors.grey[700], fontSize: 13),
+          style: TextStyle(color: context.palette.textSecondary, fontSize: 13),
         ),
         const SizedBox(height: 32),
         OutlinedButton(
@@ -111,7 +111,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             ));
           },
           child: Text('Enter reset code manually',
-              style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+              style: TextStyle(color: context.palette.textSecondary, fontSize: 13)),
         ),
       ],
     );
@@ -130,7 +130,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           const SizedBox(height: 8),
           Text(
             'Enter your email and we\'ll send you a reset link.',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -287,7 +287,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         Text('You can now log in with your new password.',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+            style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
         const SizedBox(height: 32),
         FilledButton(
           onPressed: () {

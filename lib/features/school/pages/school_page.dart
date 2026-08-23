@@ -512,7 +512,7 @@ class _SubjectsTab extends ConsumerWidget {
                     canManage
                         ? 'Tap + to create one'
                         : 'Ask a parent to create subjects',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                    style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
               ],
             ),
           );
@@ -591,7 +591,7 @@ class _SubjectsTab extends ConsumerWidget {
                             subject.description!,
                             overflow: TextOverflow.ellipsis,
                             style:
-                                TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                TextStyle(fontSize: 12, color: context.palette.textTertiary),
                           ),
                         ),
                       ],
@@ -599,7 +599,7 @@ class _SubjectsTab extends ConsumerWidget {
                   ),
                   trailing: Text(
                     '${subject.sortOrder}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 12, color: context.palette.textTertiary),
                   ),
                 ),
               );
@@ -710,7 +710,7 @@ class _AssignmentsTab extends ConsumerWidget {
                     canManage
                         ? 'Tap + to create one'
                         : 'Ask a parent to create assignments',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                    style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
               ],
             ),
           );
@@ -765,21 +765,21 @@ class _AssignmentsTab extends ConsumerWidget {
                               Row(
                                 children: [
                                   Icon(Icons.person_outline,
-                                      size: 14, color: Colors.grey[700]),
+                                      size: 14, color: context.palette.textSecondary),
                                   const SizedBox(width: 4),
                                   Text(
                                     a.assignedToName,
                                     style: TextStyle(
-                                        fontSize: 12, color: Colors.grey[600]),
+                                        fontSize: 12, color: context.palette.textTertiary),
                                   ),
                                   const SizedBox(width: 12),
                                   Icon(Icons.calendar_today,
-                                      size: 13, color: Colors.grey[700]),
+                                      size: 13, color: context.palette.textSecondary),
                                   const SizedBox(width: 4),
                                   Text(
                                     a.dueDate,
                                     style: TextStyle(
-                                        fontSize: 12, color: Colors.grey[600]),
+                                        fontSize: 12, color: context.palette.textTertiary),
                                   ),
                                 ],
                               ),
@@ -809,7 +809,7 @@ class _AssignmentsTab extends ConsumerWidget {
                                         fontWeight: FontWeight.w500,
                                         color: a.gradePointsEarned != null
                                             ? VillageTheme.positive
-                                            : Colors.grey[600],
+                                            : context.palette.textTertiary,
                                       ),
                                     ),
                                   ),
