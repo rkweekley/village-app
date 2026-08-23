@@ -142,7 +142,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               child: const Text('Cancel')),
           TextButton(
               onPressed: () => Navigator.pop(dialogCtx, true),
-              style: TextButton.styleFrom(foregroundColor: VillageTheme.danger),
+              style: TextButton.styleFrom(foregroundColor: context.palette.danger),
               child: const Text('Delete')),
         ],
       ),
@@ -182,12 +182,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           TextButton(
             onPressed: _submitting ? null : _save,
             child: _submitting
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: VillageTheme.primary,
+                      color: context.palette.primary,
                     ),
                   )
                 : const Text('Save',
@@ -208,10 +208,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               backgroundColor: VillageTheme.primary.withValues(alpha: 0.12),
               child: Text(
                 (userInfo?.displayName ?? '?')[0].toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.w700,
-                  color: VillageTheme.primary,
+                  color: context.palette.primary,
                 ),
               ),
             ),
@@ -382,9 +382,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           const SizedBox(height: 8),
           ListTile(
             leading:
-                const Icon(Icons.delete_outline, color: VillageTheme.danger),
-            title: const Text('Delete Account',
-                style: TextStyle(color: VillageTheme.danger)),
+                Icon(Icons.delete_outline, color: context.palette.danger),
+            title: Text('Delete Account',
+                style: TextStyle(color: context.palette.danger)),
             subtitle: const Text(
                 'Permanently delete your account and personal data.'),
             shape:

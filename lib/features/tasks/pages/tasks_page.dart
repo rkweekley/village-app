@@ -228,11 +228,11 @@ class _ChoreCard extends ConsumerWidget {
                         const SizedBox(width: 8),
                         _Tag(
                           chore.recurrence,
-                          VillageTheme.primary,
+                          context.palette.primary,
                         ),
                         if (chore.requiresApproval) ...[
                           const SizedBox(width: 8),
-                          _Tag('Needs approval', VillageTheme.danger),
+                          _Tag('Needs approval', context.palette.danger),
                         ],
                       ],
                     ),
@@ -286,11 +286,11 @@ class _ChoreCard extends ConsumerWidget {
             if (chore.description != null && chore.description!.isNotEmpty)
               Text(chore.description!, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 16),
-            _detailChip('${chore.pointValue} pts', VillageTheme.warning),
+            _detailChip('${chore.pointValue} pts', context.palette.warning),
             const SizedBox(width: 8),
             _detailChip(chore.difficulty, difficultyColor(context, chore.difficulty)),
             const SizedBox(width: 8),
-            _detailChip(chore.recurrence, VillageTheme.primary),
+            _detailChip(chore.recurrence, context.palette.primary),
           ],
         ),
       ),
@@ -358,7 +358,7 @@ class _ChoreCard extends ConsumerWidget {
                           m.role == 'Parent' ? Icons.star : Icons.person,
                           size: 18,
                           color: m.role == 'Parent'
-                              ? VillageTheme.warning
+                              ? context.palette.warning
                               : Colors.grey,
                         ),
                         const SizedBox(width: 8),
@@ -484,7 +484,7 @@ class _ChoreCard extends ConsumerWidget {
                           m.role == 'Parent' ? Icons.star : Icons.person,
                           size: 18,
                           color: m.role == 'Parent'
-                              ? VillageTheme.warning
+                              ? context.palette.warning
                               : Colors.grey,
                         ),
                         const SizedBox(width: 8),
@@ -921,8 +921,8 @@ class _AssignmentCard extends ConsumerWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: assignment.gradePointsEarned != null
-                            ? VillageTheme.positive
-                            : VillageTheme.info,
+                            ? context.palette.positive
+                            : context.palette.info,
                       ),
                     ),
                   ),
@@ -1020,7 +1020,7 @@ class _AssignmentCard extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: VillageTheme.positive,
+                    color: context.palette.positive,
                   ),
                 ),
               ),
@@ -1694,7 +1694,7 @@ class _CreateAssignmentSheetState
                   child: Text(
                     'No subjects yet — create one in School first.',
                     style: TextStyle(
-                        color: VillageTheme.warning, fontSize: 13),
+                        color: context.palette.warning, fontSize: 13),
                   ),
                 );
               },

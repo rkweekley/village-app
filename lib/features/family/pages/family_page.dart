@@ -822,17 +822,17 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
 
     switch (status) {
       case 'active':
-        statusColor = VillageTheme.positive;
+        statusColor = context.palette.positive;
         statusIcon = Icons.check_circle_rounded;
         label = tier == 'annual' ? 'Annual Plan' : 'Monthly Plan';
         break;
       case 'past_due':
-        statusColor = VillageTheme.warning;
+        statusColor = context.palette.warning;
         statusIcon = Icons.error_outline_rounded;
         label = 'Payment Past Due';
         break;
       case 'expired':
-        statusColor = VillageTheme.danger;
+        statusColor = context.palette.danger;
         statusIcon = Icons.cancel_rounded;
         label = 'Expired';
         break;
@@ -842,7 +842,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
         label = 'Canceled';
         break;
       default:
-        statusColor = VillageTheme.primary;
+        statusColor = context.palette.primary;
         statusIcon = Icons.timer_rounded;
         label = 'Free Trial';
         break;
@@ -880,8 +880,8 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       Text('Renews ${formatDate(family.subscriptionExpiresAt!, includeYear: false)}',
                           style: TextStyle(fontSize: 12, color: context.palette.textTertiary)),
                     if (isPastDue)
-                      const Text('Update payment method →',
-                          style: TextStyle(fontSize: 12, color: VillageTheme.warning, fontWeight: FontWeight.w600)),
+                      Text('Update payment method →',
+                          style: TextStyle(fontSize: 12, color: context.palette.warning, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),

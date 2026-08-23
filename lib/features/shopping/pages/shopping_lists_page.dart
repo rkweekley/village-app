@@ -667,7 +667,7 @@ class _ItemTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: _categoryColor(item.category!)
+                  color: _categoryColor(context, item.category!)
                       .withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -676,7 +676,7 @@ class _ItemTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: _categoryColor(item.category!),
+                    color: _categoryColor(context, item.category!),
                   ),
                 ),
               ),
@@ -870,18 +870,18 @@ class _ItemTile extends StatelessWidget {
     );
   }
 
-  Color _categoryColor(String category) {
+  Color _categoryColor(BuildContext context, String category) {
     switch (category) {
       case 'Produce':
-        return VillageTheme.positive;
+        return context.palette.positive;
       case 'Dairy':
-        return VillageTheme.info;
+        return context.palette.info;
       case 'Meat':
-        return VillageTheme.danger;
+        return context.palette.danger;
       case 'Bakery':
-        return VillageTheme.warning;
+        return context.palette.warning;
       case 'Pantry':
-        return VillageTheme.primary;
+        return context.palette.primary;
       default:
         return Colors.grey;
     }

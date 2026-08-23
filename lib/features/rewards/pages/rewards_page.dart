@@ -490,13 +490,13 @@ class _AvailableTab extends StatelessWidget {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: _categoryColor(reward.category)
+                                color: _categoryColor(ctx, reward.category)
                                     .withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Icon(
                                 _categoryIcon(reward.category),
-                                color: _categoryColor(reward.category),
+                                color: _categoryColor(ctx, reward.category),
                                 size: 22,
                               ),
                             ),
@@ -646,18 +646,18 @@ class _AvailableTab extends StatelessWidget {
     );
   }
 
-  Color _categoryColor(String category) {
+  Color _categoryColor(BuildContext context, String category) {
     switch (category) {
       case 'Screen Time':
-        return VillageTheme.info;
+        return context.palette.info;
       case 'Treat':
-        return VillageTheme.danger;
+        return context.palette.danger;
       case 'Outing':
         return VillageTheme.primaryLight;
       case 'Toy':
-        return VillageTheme.primary;
+        return context.palette.primary;
       default:
-        return VillageTheme.warning;
+        return context.palette.warning;
     }
   }
 

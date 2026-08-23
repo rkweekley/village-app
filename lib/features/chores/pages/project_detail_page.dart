@@ -153,7 +153,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
                     value: total == 0 ? 0 : done / total,
                     minHeight: 6,
                     backgroundColor: VillageTheme.borderSubtle,
-                    color: VillageTheme.positive,
+                    color: context.palette.positive,
                   ),
                 ),
               ],
@@ -192,7 +192,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
     return ListTile(
       leading: Icon(
         done ? Icons.check_circle : Icons.radio_button_unchecked,
-        color: done ? VillageTheme.positive : context.palette.textTertiary,
+        color: done ? context.palette.positive : context.palette.textTertiary,
       ),
       title: Text(
         task.name,

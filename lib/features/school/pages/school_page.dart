@@ -524,7 +524,7 @@ class _SubjectsTab extends ConsumerWidget {
             itemCount: subjects.length,
             itemBuilder: (ctx, i) {
               final subject = subjects[i];
-              final subjColor = _subjectColor(subject.color);
+              final subjColor = _subjectColor(ctx, subject.color);
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
@@ -610,7 +610,7 @@ class _SubjectsTab extends ConsumerWidget {
     );
   }
 
-  Color _subjectColor(String? color) {
+  Color _subjectColor(BuildContext context, String? color) {
     if (color == null || color.isEmpty) return VillageTheme.info;
     switch (color.toLowerCase()) {
       case 'red':
@@ -630,9 +630,9 @@ class _SubjectsTab extends ConsumerWidget {
       case 'cyan':
         return Colors.cyan;
       case 'teal':
-        return VillageTheme.positive;
+        return context.palette.positive;
       case 'green':
-        return VillageTheme.positive;
+        return context.palette.positive;
       case 'light_green':
         return Colors.lightGreen;
       case 'lime':
@@ -640,7 +640,7 @@ class _SubjectsTab extends ConsumerWidget {
       case 'yellow':
         return Colors.yellow;
       case 'amber':
-        return VillageTheme.warning;
+        return context.palette.warning;
       case 'orange':
         return Colors.orange;
       case 'deep_orange':
@@ -659,7 +659,7 @@ class _SubjectsTab extends ConsumerWidget {
             return Color(int.parse('FF$hex', radix: 16));
           }
         } catch (_) {}
-        return VillageTheme.info;
+        return context.palette.info;
     }
   }
 }
