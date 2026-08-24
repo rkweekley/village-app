@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:village_app/core/theme/village_theme.dart';
+import 'package:village_app/core/theme/theme_mode_provider.dart';
 import 'package:village_app/core/config.dart';
 import 'package:village_app/features/chores/chores_service.dart';
 import 'package:village_app/features/school/school_service.dart';
@@ -82,6 +83,20 @@ class _HubPageState extends ConsumerState<HubPage> {
         title: Text(familyState.isLoading ? 'Loading...' : familyName),
         centerTitle: true,
         actions: [
+          Consumer(
+            builder: (context, ref, _) {
+              final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+              return IconButton(
+                icon: Icon(
+                  isDark
+                      ? Icons.light_mode_outlined
+                      : Icons.dark_mode_outlined,
+                ),
+                tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+                onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
+              );
+            },
+          ),
           Consumer(
             builder: (context, ref, _) {
               final state = ref.watch(notificationProvider);

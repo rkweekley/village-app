@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/router/app_router.dart';
+import 'package:village_app/core/theme/theme_mode_provider.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 
 class VillageApp extends ConsumerWidget {
@@ -9,13 +10,14 @@ class VillageApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
       title: 'Village',
       debugShowCheckedModeBanner: false,
       theme: VillageTheme.light,
       darkTheme: VillageTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: router,
     );
   }
