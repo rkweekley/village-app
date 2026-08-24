@@ -111,6 +111,24 @@ class SchoolService {
     return res.data as Map<String, dynamic>;
   }
 
+  /// Edit an existing subject (parent/caregiver only).
+  /// Empty description/color strings clear the field (backend stores null).
+  Future<Map<String, dynamic>> updateSubject(
+    String id, {
+    required String name,
+    String? description,
+    String? color,
+    int sortOrder = 0,
+  }) async {
+    final res = await _dio.put('/api/school/subjects/$id', data: {
+      'name': name,
+      'description': description ?? '',
+      'color': color ?? '',
+      'sortOrder': sortOrder,
+    });
+    return res.data as Map<String, dynamic>;
+  }
+
   Future<List<SchoolWork>> getSchoolWork({String? statusFilter}) async {
     final queryParams = <String, dynamic>{};
     if (statusFilter != null && statusFilter.isNotEmpty) {
