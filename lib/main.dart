@@ -4,14 +4,17 @@ import 'package:village_app/app.dart';
 import 'package:village_app/core/auth/auth_provider.dart';
 import 'package:village_app/core/auth/secure_storage.dart';
 import 'package:village_app/core/signalr/signalr_provider.dart';
+import 'package:village_app/core/theme/theme_mode_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = await SecureStorage.create();
+  final themeMode = await loadThemeMode();
   runApp(
     ProviderScope(
       overrides: [
         secureStorageProvider.overrideWithValue(storage),
+        initialThemeModeProvider.overrideWithValue(themeMode),
       ],
       child: const AppBootstrap(),
     ),
