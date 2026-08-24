@@ -78,7 +78,7 @@ class _CreateProjectSheetState extends ConsumerState<_CreateProjectSheet> {
                 labelText: 'Project name',
                 prefixIcon: const Icon(Icons.folder_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -95,7 +95,7 @@ class _CreateProjectSheetState extends ConsumerState<_CreateProjectSheet> {
                 labelText: 'Description (optional)',
                 prefixIcon: const Icon(Icons.description_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,

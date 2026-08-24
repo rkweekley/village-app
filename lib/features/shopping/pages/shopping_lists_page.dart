@@ -56,7 +56,7 @@ class ShoppingListsPage extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 0,
-                  color: VillageTheme.surfaceCard,
+                  color: context.palette.surfaceCard,
                   child: InkWell(
                     onTap: () => context.push('/shopping-detail/${list.id}'),
                     borderRadius: BorderRadius.circular(20),
@@ -233,7 +233,7 @@ class ShoppingListsPage extends ConsumerWidget {
                 labelText: 'List name',
                 prefixIcon: const Icon(Icons.edit_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -358,7 +358,7 @@ class _ShoppingListDetailPageState
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 0,
-                  color: VillageTheme.surfaceCard,
+                  color: context.palette.surfaceCard,
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Row(
@@ -507,7 +507,7 @@ class _ShoppingListDetailPageState
                     labelText: 'Item name',
                     prefixIcon: const Icon(Icons.shopping_bag_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -525,7 +525,7 @@ class _ShoppingListDetailPageState
                           labelText: 'Quantity',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -541,7 +541,7 @@ class _ShoppingListDetailPageState
                         decoration: InputDecoration(
                           labelText: 'Category',
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -622,7 +622,7 @@ class _ItemTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       elevation: 0,
-      color: VillageTheme.surfaceCard,
+      color: context.palette.surfaceCard,
       child: ListTile(
         leading: Checkbox(
           value: item.isChecked,
@@ -777,7 +777,7 @@ class _ItemTile extends StatelessWidget {
                       labelText: 'Item name',
                       prefixIcon: const Icon(Icons.shopping_bag_outlined),
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -795,7 +795,7 @@ class _ItemTile extends StatelessWidget {
                             labelText: 'Quantity',
                             prefixIcon: const Icon(Icons.numbers_outlined),
                             filled: true,
-                            fillColor: VillageTheme.surfaceBase,
+                            fillColor: context.palette.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -811,7 +811,7 @@ class _ItemTile extends StatelessWidget {
                           decoration: InputDecoration(
                             labelText: 'Category',
                             filled: true,
-                            fillColor: VillageTheme.surfaceBase,
+                            fillColor: context.palette.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,

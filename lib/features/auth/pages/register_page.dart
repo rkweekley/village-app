@@ -109,7 +109,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: VillageTheme.surfaceBase,
+      backgroundColor: context.palette.surfaceBase,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -155,10 +155,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   constraints: const BoxConstraints(maxWidth: 420),
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
-                    color: VillageTheme.surfaceElevated,
+                    color: context.palette.surfaceElevated,
                     borderRadius: BorderRadius.circular(VillageTheme.radiusXl),
                     border: Border.all(
-                      color: VillageTheme.borderSubtle,
+                      color: context.palette.borderSubtle,
                       width: 0.5,
                     ),
                   ),

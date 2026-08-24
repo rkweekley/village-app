@@ -290,7 +290,7 @@ class _CreateAssignmentSheetState extends State<_CreateAssignmentSheet> {
                             )
                           : null,
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -348,7 +348,7 @@ class _CreateAssignmentSheetState extends State<_CreateAssignmentSheet> {
                   labelText: 'Assign to',
                   prefixIcon: const Icon(Icons.person_outline),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -411,7 +411,7 @@ class _CreateAssignmentSheetState extends State<_CreateAssignmentSheet> {
                     prefixIcon: const Icon(Icons.calendar_month_outlined),
                     suffixIcon: const Icon(Icons.arrow_drop_down),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -621,7 +621,7 @@ class _ChoresTab extends StatelessWidget {
                     labelText: 'Assign to',
                     prefixIcon: const Icon(Icons.person_outline),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -682,7 +682,7 @@ class _ChoresTab extends StatelessWidget {
                       prefixIcon: const Icon(Icons.calendar_month_outlined),
                       suffixIcon: const Icon(Icons.arrow_drop_down),
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -772,7 +772,7 @@ class _ChoresTab extends StatelessWidget {
                     labelText: 'Chore name',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -787,7 +787,7 @@ class _ChoresTab extends StatelessWidget {
                     labelText: 'Description',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -802,7 +802,7 @@ class _ChoresTab extends StatelessWidget {
                     labelText: 'Point value',
                     prefixIcon: const Icon(Icons.stars_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -817,7 +817,7 @@ class _ChoresTab extends StatelessWidget {
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -835,7 +835,7 @@ class _ChoresTab extends StatelessWidget {
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,

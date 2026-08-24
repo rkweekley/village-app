@@ -280,7 +280,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: VillageTheme.surfaceBase,
+      backgroundColor: context.palette.surfaceBase,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -573,7 +573,7 @@ class _PlanCard extends StatelessWidget {
           width: highlighted ? 2 : 0,
         ),
       ),
-      color: VillageTheme.surfaceCard,
+      color: context.palette.surfaceCard,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

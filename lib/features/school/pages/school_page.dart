@@ -119,7 +119,7 @@ class SchoolPage extends ConsumerWidget {
                   hintText: 'e.g. Math, Reading',
                   prefixIcon: const Icon(Icons.abc_outlined),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -134,7 +134,7 @@ class SchoolPage extends ConsumerWidget {
                   labelText: 'Description (optional)',
                   prefixIcon: const Icon(Icons.description_outlined),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -147,7 +147,7 @@ class SchoolPage extends ConsumerWidget {
                 decoration: InputDecoration(
                   labelText: 'Color',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -270,7 +270,7 @@ class SchoolPage extends ConsumerWidget {
                     labelText: 'Title',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -284,7 +284,7 @@ class SchoolPage extends ConsumerWidget {
                   decoration: InputDecoration(
                     labelText: 'Subject',
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -314,7 +314,7 @@ class SchoolPage extends ConsumerWidget {
                     decoration: InputDecoration(
                       labelText: 'Assign to',
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -352,7 +352,7 @@ class SchoolPage extends ConsumerWidget {
                     labelText: 'Description (optional)',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -370,7 +370,7 @@ class SchoolPage extends ConsumerWidget {
                           labelText: 'Points',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -399,7 +399,7 @@ class SchoolPage extends ConsumerWidget {
                           decoration: InputDecoration(
                             labelText: 'Due date',
                             filled: true,
-                            fillColor: VillageTheme.surfaceBase,
+                            fillColor: context.palette.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -532,7 +532,7 @@ class _SubjectsTab extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
-                color: VillageTheme.surfaceCard,
+                color: context.palette.surfaceCard,
                 child: ListTile(
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -730,7 +730,7 @@ class _AssignmentsTab extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
-                color: VillageTheme.surfaceCard,
+                color: context.palette.surfaceCard,
                 child: InkWell(
                   onTap: () => _showDetailSheet(context, a),
                   borderRadius: BorderRadius.circular(16),
@@ -953,7 +953,7 @@ class _AssignmentsTab extends ConsumerWidget {
                     labelText: 'Title',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -982,7 +982,7 @@ class _AssignmentsTab extends ConsumerWidget {
                       decoration: InputDecoration(
                         labelText: 'Subject',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1026,7 +1026,7 @@ class _AssignmentsTab extends ConsumerWidget {
                       decoration: InputDecoration(
                         labelText: 'Assign to',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1064,7 +1064,7 @@ class _AssignmentsTab extends ConsumerWidget {
                     labelText: 'Description (optional)',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -1082,7 +1082,7 @@ class _AssignmentsTab extends ConsumerWidget {
                           labelText: 'Points',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -1112,7 +1112,7 @@ class _AssignmentsTab extends ConsumerWidget {
                           decoration: InputDecoration(
                             labelText: 'Due date',
                             filled: true,
-                            fillColor: VillageTheme.surfaceBase,
+                            fillColor: context.palette.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -1246,7 +1246,7 @@ class _AssignmentsTab extends ConsumerWidget {
               decoration: InputDecoration(
                 labelText: 'Submission note (optional)',
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1447,7 +1447,7 @@ class _AssignmentsTab extends ConsumerWidget {
               controller: pointsCtrl,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,

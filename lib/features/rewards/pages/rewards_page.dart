@@ -101,7 +101,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Reward name',
                     prefixIcon: const Icon(Icons.emoji_events_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -115,7 +115,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Description',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -130,7 +130,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Point cost',
                     prefixIcon: const Icon(Icons.stars_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -145,7 +145,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Category',
                     prefixIcon: const Icon(Icons.category_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -163,7 +163,7 @@ class RewardsPage extends ConsumerWidget {
                     labelText: 'Max redemptions (optional)',
                     prefixIcon: const Icon(Icons.repeat_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -282,7 +282,7 @@ void _showEditRewardDialog(
                   labelText: 'Reward name',
                   prefixIcon: const Icon(Icons.emoji_events_outlined),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -296,7 +296,7 @@ void _showEditRewardDialog(
                   labelText: 'Description',
                   prefixIcon: const Icon(Icons.description_outlined),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -311,7 +311,7 @@ void _showEditRewardDialog(
                   labelText: 'Point cost',
                   prefixIcon: const Icon(Icons.stars_rounded),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -326,7 +326,7 @@ void _showEditRewardDialog(
                   labelText: 'Category',
                   prefixIcon: const Icon(Icons.category_outlined),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -344,7 +344,7 @@ void _showEditRewardDialog(
                   labelText: 'Max redemptions (optional)',
                   prefixIcon: const Icon(Icons.repeat_outlined),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -477,7 +477,7 @@ class _AvailableTab extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 0,
-                  color: VillageTheme.surfaceCard,
+                  color: context.palette.surfaceCard,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -713,7 +713,7 @@ class _RedemptionsTab extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
-                color: VillageTheme.surfaceCard,
+                color: context.palette.surfaceCard,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(

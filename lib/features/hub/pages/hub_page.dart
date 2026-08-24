@@ -167,7 +167,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               elevation: 0,
-              color: VillageTheme.surfaceCard,
+              color: context.palette.surfaceCard,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
@@ -444,7 +444,7 @@ class _HubPageState extends ConsumerState<HubPage> {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,
-      color: VillageTheme.surfaceCard,
+      color: context.palette.surfaceCard,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
@@ -595,7 +595,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Chore name',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -610,7 +610,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Description',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -625,7 +625,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Point value',
                     prefixIcon: const Icon(Icons.stars_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -640,7 +640,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -658,7 +658,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -777,7 +777,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Title',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -792,7 +792,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     decoration: InputDecoration(
                       labelText: 'Assign to',
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -830,7 +830,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     decoration: InputDecoration(
                       labelText: 'Subject',
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -859,7 +859,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                     labelText: 'Description (optional)',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -877,7 +877,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                           labelText: 'Points',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -906,7 +906,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                           decoration: InputDecoration(
                             labelText: 'Due date',
                             filled: true,
-                            fillColor: VillageTheme.surfaceBase,
+                            fillColor: context.palette.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -1070,7 +1070,7 @@ class _BentoActionCardState extends State<_BentoActionCard> {
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 0,
-        color: VillageTheme.surfaceCard,
+        color: context.palette.surfaceCard,
         child: InkWell(
           onTap: widget.onTap,
           borderRadius: BorderRadius.circular(20),

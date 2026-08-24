@@ -130,7 +130,7 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
                 icon: const Icon(Icons.chevron_left_rounded),
                 onPressed: _previousWeek,
                 style: IconButton.styleFrom(
-                  backgroundColor: VillageTheme.surfaceBase,
+                  backgroundColor: context.palette.surfaceBase,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -147,7 +147,7 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
                 icon: const Icon(Icons.chevron_right_rounded),
                 onPressed: _nextWeek,
                 style: IconButton.styleFrom(
-                  backgroundColor: VillageTheme.surfaceBase,
+                  backgroundColor: context.palette.surfaceBase,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -181,7 +181,7 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
                         ? context.palette.danger
                         : isToday
                             ? context.palette.danger.withValues(alpha: 0.1)
-                            : VillageTheme.surfaceBase,
+                            : context.palette.surfaceBase,
                     borderRadius: BorderRadius.circular(16),
                     border: isToday && !isSelected
                         ? Border.all(
@@ -355,7 +355,7 @@ class _MealSlot extends StatelessWidget {
         decoration: BoxDecoration(
           color: entry != null
               ? context.palette.danger.withValues(alpha: 0.08)
-              : VillageTheme.surfaceBase,
+              : context.palette.surfaceBase,
           borderRadius: BorderRadius.circular(14),
           border: entry == null
               ? Border.all(color: Colors.grey.withValues(alpha: 0.15))
@@ -540,7 +540,7 @@ class _MealSlot extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: 'e.g. Spaghetti Bolognese',
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -607,7 +607,7 @@ class _RecipeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       elevation: 0,
-      color: VillageTheme.surfaceCard,
+      color: context.palette.surfaceCard,
       child: InkWell(
         onTap: () => _showRecipeDetailSheet(context),
         borderRadius: BorderRadius.circular(18),
@@ -972,7 +972,7 @@ class _RecipeCard extends StatelessWidget {
                           decoration: InputDecoration(
                             labelText: 'Meal Plan',
                             filled: true,
-                            fillColor: VillageTheme.surfaceBase,
+                            fillColor: context.palette.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -997,7 +997,7 @@ class _RecipeCard extends StatelessWidget {
                                 decoration: InputDecoration(
                                   labelText: 'Day',
                                   filled: true,
-                                  fillColor: VillageTheme.surfaceBase,
+                                  fillColor: context.palette.surfaceBase,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                     borderSide: BorderSide.none,
@@ -1020,7 +1020,7 @@ class _RecipeCard extends StatelessWidget {
                                 decoration: InputDecoration(
                                   labelText: 'Meal',
                                   filled: true,
-                                  fillColor: VillageTheme.surfaceBase,
+                                  fillColor: context.palette.surfaceBase,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                     borderSide: BorderSide.none,
@@ -1161,7 +1161,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                 decoration: InputDecoration(
                   labelText: 'Recipe title',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1175,7 +1175,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                 decoration: InputDecoration(
                   labelText: 'Description (optional)',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1190,7 +1190,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   labelText: 'Ingredients',
                   hintText: 'Comma-separated list',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1205,7 +1205,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   labelText: 'Instructions',
                   hintText: 'Step-by-step instructions',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1222,7 +1222,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                       decoration: InputDecoration(
                         labelText: 'Prep time (min)',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1238,7 +1238,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                       decoration: InputDecoration(
                         labelText: 'Servings',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1255,7 +1255,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                 decoration: InputDecoration(
                   labelText: 'Difficulty',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1273,7 +1273,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   labelText: 'Tags (optional)',
                   hintText: 'e.g. Italian, Quick, Vegetarian',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1389,7 +1389,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                 decoration: InputDecoration(
                   labelText: 'Recipe title',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1403,7 +1403,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                 decoration: InputDecoration(
                   labelText: 'Description (optional)',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1418,7 +1418,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                   labelText: 'Ingredients',
                   hintText: 'Comma-separated list',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1433,7 +1433,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                   labelText: 'Instructions',
                   hintText: 'Step-by-step instructions',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1450,7 +1450,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                       decoration: InputDecoration(
                         labelText: 'Prep time (min)',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1466,7 +1466,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                       decoration: InputDecoration(
                         labelText: 'Servings',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1483,7 +1483,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                 decoration: InputDecoration(
                   labelText: 'Difficulty',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1501,7 +1501,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                   labelText: 'Tags (optional)',
                   hintText: 'e.g. Italian, Quick, Vegetarian',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1601,7 +1601,7 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
                 hintText: 'Search recipes...',
                 prefixIcon: const Icon(Icons.search_rounded),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1710,7 +1710,7 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
         decoration: BoxDecoration(
           color: selected
               ? context.palette.danger
-              : VillageTheme.surfaceBase,
+              : context.palette.surfaceBase,
           borderRadius: BorderRadius.circular(10),
           border: !selected
               ? Border.all(color: Colors.grey.withValues(alpha: 0.2))

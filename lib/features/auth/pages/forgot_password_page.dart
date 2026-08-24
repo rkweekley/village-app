@@ -45,7 +45,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: VillageTheme.surfaceBase,
+      backgroundColor: context.palette.surfaceBase,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -142,7 +142,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               hintText: 'you@example.com',
               prefixIcon: const Icon(Icons.email_outlined),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -248,7 +248,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
     final state = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: VillageTheme.surfaceBase,
+      backgroundColor: context.palette.surfaceBase,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -326,7 +326,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
               hintText: 'you@example.com',
               prefixIcon: const Icon(Icons.email_outlined),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -346,7 +346,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
               hintText: 'Paste the code from your email',
               prefixIcon: const Icon(Icons.key_rounded),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -372,7 +372,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                     setState(() => _obscurePassword = !_obscurePassword),
               ),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -392,7 +392,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
               labelText: 'Confirm password',
               prefixIcon: const Icon(Icons.lock_outlined),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,

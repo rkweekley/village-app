@@ -87,7 +87,7 @@ class LegalPage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Card(
-      color: VillageTheme.surfaceCard,
+      color: context.palette.surfaceCard,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

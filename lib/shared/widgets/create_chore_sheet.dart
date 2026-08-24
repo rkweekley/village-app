@@ -89,7 +89,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Chore name',
                 prefixIcon: const Icon(Icons.edit_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -106,7 +106,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Description',
                 prefixIcon: const Icon(Icons.description_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -123,7 +123,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Point value',
                 prefixIcon: const Icon(Icons.stars_rounded),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -140,7 +140,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Recurrence',
                 prefixIcon: const Icon(Icons.repeat_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -160,7 +160,7 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
                 labelText: 'Difficulty',
                 prefixIcon: const Icon(Icons.speed_rounded),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
