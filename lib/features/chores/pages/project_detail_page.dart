@@ -130,11 +130,11 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: VillageTheme.positive.withValues(alpha: 0.12),
+              color: context.palette.positive.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child:
-                const Icon(Icons.checklist_rounded, color: VillageTheme.positive),
+                Icon(Icons.checklist_rounded, color: context.palette.positive),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -153,7 +153,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
                     value: total == 0 ? 0 : done / total,
                     minHeight: 6,
                     backgroundColor: VillageTheme.borderSubtle,
-                    color: VillageTheme.positive,
+                    color: context.palette.positive,
                   ),
                 ),
               ],
@@ -192,13 +192,13 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
     return ListTile(
       leading: Icon(
         done ? Icons.check_circle : Icons.radio_button_unchecked,
-        color: done ? VillageTheme.positive : VillageTheme.textTertiary,
+        color: done ? context.palette.positive : context.palette.textTertiary,
       ),
       title: Text(
         task.name,
         style: TextStyle(
           decoration: done ? TextDecoration.lineThrough : null,
-          color: done ? VillageTheme.textTertiary : null,
+          color: done ? context.palette.textTertiary : null,
         ),
       ),
       onTap: () => _toggle(task),
@@ -322,11 +322,11 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.positive.withValues(alpha: 0.12),
+                        color: context.palette.positive.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.edit_outlined,
-                          color: VillageTheme.positive, size: 22),
+                      child: Icon(Icons.edit_outlined,
+                          color: context.palette.positive, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('Edit Project',

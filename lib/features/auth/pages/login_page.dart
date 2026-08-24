@@ -92,7 +92,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Text(
                   'It takes a village to raise a family',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: VillageTheme.textTertiary,
+                    color: context.palette.textTertiary,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -118,14 +118,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         Text(
                           'Welcome back',
                           style: theme.textTheme.headlineSmall?.copyWith(
-                            color: VillageTheme.textPrimary,
+                            color: context.palette.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Sign in to your family account',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: VillageTheme.textSecondary,
+                            color: context.palette.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -135,20 +135,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: VillageTheme.danger.withValues(alpha: 0.08),
+                              color: context.palette.danger.withValues(alpha: 0.08),
                               borderRadius:
                                   BorderRadius.circular(VillageTheme.radiusSm),
                             ),
                             child: Row(
                               children: [
                                 Icon(Icons.error_outline,
-                                    size: 18, color: VillageTheme.danger),
+                                    size: 18, color: context.palette.danger),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     state.error!,
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: VillageTheme.danger,
+                                      color: context.palette.danger,
                                     ),
                                   ),
                                 ),
@@ -234,7 +234,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: TextButton(
                     onPressed: () => context.go('/forgot-password'),
                     style: TextButton.styleFrom(
-                      foregroundColor: VillageTheme.textSecondary,
+                      foregroundColor: context.palette.textSecondary,
                     ),
                     child: const Text('Forgot password?'),
                   ),
@@ -247,13 +247,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     Text(
                       "Don't have an account? ",
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: VillageTheme.textTertiary,
+                        color: context.palette.textTertiary,
                       ),
                     ),
                     TextButton(
                       onPressed: () => context.go('/register'),
                       style: TextButton.styleFrom(
-                        foregroundColor: VillageTheme.primary,
+                        foregroundColor: context.palette.primary,
                       ),
                       child: const Text('Create one'),
                     ),

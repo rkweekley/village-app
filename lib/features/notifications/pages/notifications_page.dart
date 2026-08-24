@@ -43,16 +43,16 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     }
   }
 
-  Color _colorForNotification(String type, String priority) {
+  Color _colorForNotification(BuildContext context, String type, String priority) {
     // Use priority-based coloring
-    if (priority == 'High') return VillageTheme.danger;
+    if (priority == 'High') return context.palette.danger;
     if (priority == 'Low') return Colors.grey;
     // Type-based fallback
-    if (type.startsWith('Chore')) return VillageTheme.positive;
-    if (type.startsWith('Reward')) return VillageTheme.warning;
-    if (type == 'PointsChanged') return VillageTheme.warning;
-    if (type == 'FamilyMemberJoined') return VillageTheme.primary;
-    return VillageTheme.primary;
+    if (type.startsWith('Chore')) return context.palette.positive;
+    if (type.startsWith('Reward')) return context.palette.warning;
+    if (type == 'PointsChanged') return context.palette.warning;
+    if (type == 'FamilyMemberJoined') return context.palette.primary;
+    return context.palette.primary;
   }
 
   @override
@@ -80,11 +80,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.items.isEmpty
-              ? const EmptyState(
+              ? EmptyState(
                   icon: Icons.notifications_off_rounded,
                   title: 'No notifications yet',
-                  iconBgColor: VillageTheme.primary,
-                  iconColor: VillageTheme.primary,
+                  iconBgColor: context.palette.primary,
+                  iconColor: context.palette.primary,
                 )
               : NotificationListener<ScrollNotification>(
                   onNotification: (scrollInfo) {
@@ -100,7 +100,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                     itemBuilder: (context, i) {
                       final n = state.items[i];
                       final accentColor =
-                          _colorForNotification(n.type, n.priority);
+                          _colorForNotification(context, n.type, n.priority);
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -184,8 +184,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: n.isRead
-                                                ? Colors.grey[500]
-                                                : Colors.grey[700],
+                                                ? context.palette.textSecondary
+                                                : context.palette.textSecondary,
                                           ),
                                         ),
                                       ],
@@ -194,7 +194,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                                         _timeAgo(n.createdAt),
                                         style: TextStyle(
                                           fontSize: 11,
-                                          color: Colors.grey[400],
+                                          color: context.palette.textTertiary,
                                         ),
                                       ),
                                     ],

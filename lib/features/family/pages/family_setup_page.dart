@@ -153,13 +153,13 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
         Icon(
           Icons.family_restroom,
           size: 80,
-          color: VillageTheme.primary,
+          color: context.palette.primary,
         ),
         const SizedBox(height: 24),
         Text(
           'Welcome to Village!',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: VillageTheme.primary,
+                color: context.palette.primary,
                 fontWeight: FontWeight.bold,
               ),
           textAlign: TextAlign.center,
@@ -168,7 +168,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
         Text(
           'Set up your family to get started.',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey[600],
+                color: context.palette.textTertiary,
               ),
           textAlign: TextAlign.center,
         ),
@@ -365,20 +365,20 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                     Text(
                       '${_lookedUpFamily!.memberCount} member${_lookedUpFamily!.memberCount == 1 ? '' : 's'}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
+                            color: context.palette.textTertiary,
                           ),
                     ),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: VillageTheme.info.withValues(alpha: 0.1),
+                        color: context.palette.info.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.info_outline,
-                              color: VillageTheme.info, size: 20),
+                          Icon(Icons.info_outline,
+                              color: context.palette.info, size: 20),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
@@ -387,7 +387,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                               'Joining after registration is coming soon.',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[700],
+                                color: context.palette.textSecondary,
                               ),
                             ),
                           ),

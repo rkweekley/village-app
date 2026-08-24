@@ -23,7 +23,7 @@ class LegalPage extends StatelessWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: VillageTheme.primary,
+                    color: context.palette.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(Icons.people_alt_rounded,
@@ -35,7 +35,7 @@ class LegalPage extends StatelessWidget {
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 4),
                 Text('Version 1.0.0',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+                    style: TextStyle(fontSize: 14, color: context.palette.textSecondary)),
               ],
             ),
           ),
@@ -44,25 +44,25 @@ class LegalPage extends StatelessWidget {
           // Description
           Text(
             'Village helps families stay organized — chores, meals, shopping lists, rewards, and more, all in one place.',
-            style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
+            style: TextStyle(fontSize: 14, color: context.palette.textSecondary, height: 1.5),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
 
           // Legal links
-          _linkTile(
+          _linkTile(context,
             icon: Icons.privacy_tip_outlined,
             title: 'Privacy Policy',
             onTap: () => launchUrl(
                 Uri.parse('https://villagefamily.app/privacy')),
           ),
-          _linkTile(
+          _linkTile(context,
             icon: Icons.mail_outline,
             title: 'Contact Support',
             onTap: () => launchUrl(
                 Uri.parse('mailto:support@villagefamily.app')),
           ),
-          _linkTile(
+          _linkTile(context,
             icon: Icons.info_outline,
             title: 'Recipe data provided by TheMealDB',
             subtitle: 'A free, community-maintained recipe database',
@@ -73,13 +73,14 @@ class LegalPage extends StatelessWidget {
           const SizedBox(height: 32),
           Text('© 2026 Village. All rights reserved.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+              style: TextStyle(fontSize: 12, color: context.palette.textTertiary)),
         ],
       ),
     );
   }
 
-  Widget _linkTile({
+  Widget _linkTile(
+    BuildContext context, {
     required IconData icon,
     required String title,
     String? subtitle,
@@ -91,13 +92,13 @@ class LegalPage extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: ListTile(
-        leading: Icon(icon, color: VillageTheme.primary),
+        leading: Icon(icon, color: context.palette.primary),
         title: Text(title, style: const TextStyle(fontSize: 14)),
         subtitle: subtitle != null
             ? Text(subtitle, style: const TextStyle(fontSize: 12))
             : null,
-        trailing: const Icon(Icons.chevron_right_rounded,
-            color: VillageTheme.textTertiary),
+        trailing: Icon(Icons.chevron_right_rounded,
+            color: context.palette.textTertiary),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         onTap: onTap,
       ),

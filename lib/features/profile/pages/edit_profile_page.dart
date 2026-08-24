@@ -142,7 +142,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               child: const Text('Cancel')),
           TextButton(
               onPressed: () => Navigator.pop(dialogCtx, true),
-              style: TextButton.styleFrom(foregroundColor: VillageTheme.danger),
+              style: TextButton.styleFrom(foregroundColor: context.palette.danger),
               child: const Text('Delete')),
         ],
       ),
@@ -182,12 +182,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           TextButton(
             onPressed: _submitting ? null : _save,
             child: _submitting
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: VillageTheme.primary,
+                      color: context.palette.primary,
                     ),
                   )
                 : const Text('Save',
@@ -205,13 +205,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           Center(
             child: CircleAvatar(
               radius: 48,
-              backgroundColor: VillageTheme.primary.withValues(alpha: 0.12),
+              backgroundColor: context.palette.primary.withValues(alpha: 0.12),
               child: Text(
                 (userInfo?.displayName ?? '?')[0].toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.w700,
-                  color: VillageTheme.primary,
+                  color: context.palette.primary,
                 ),
               ),
             ),
@@ -222,7 +222,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               userInfo?.role ?? '',
               style: TextStyle(
                 fontSize: 14,
-                color: VillageTheme.textSecondary,
+                color: context.palette.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -235,7 +235,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: VillageTheme.textSecondary,
+                  color: context.palette.textSecondary,
                   letterSpacing: 1.2,
                 )),
             const SizedBox(height: 12),
@@ -258,7 +258,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: VillageTheme.textSecondary,
+                  color: context.palette.textSecondary,
                   letterSpacing: 1.2,
                 )),
             const SizedBox(height: 12),
@@ -320,7 +320,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 16,
                   color:
-                      _birthDate != null ? null : VillageTheme.textSecondary,
+                      _birthDate != null ? null : context.palette.textSecondary,
                 ),
               ),
             ),
@@ -372,9 +372,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             leading: const Icon(Icons.info_outline),
             title: const Text('About & Privacy'),
             subtitle:
-                Text('Version 1.0.0', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-            trailing: const Icon(Icons.chevron_right_rounded,
-                color: VillageTheme.textTertiary),
+                Text('Version 1.0.0', style: TextStyle(fontSize: 12, color: context.palette.textSecondary)),
+            trailing: Icon(Icons.chevron_right_rounded,
+                color: context.palette.textTertiary),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             onTap: () => context.push('/legal'),
@@ -382,9 +382,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           const SizedBox(height: 8),
           ListTile(
             leading:
-                const Icon(Icons.delete_outline, color: VillageTheme.danger),
-            title: const Text('Delete Account',
-                style: TextStyle(color: VillageTheme.danger)),
+                Icon(Icons.delete_outline, color: context.palette.danger),
+            title: Text('Delete Account',
+                style: TextStyle(color: context.palette.danger)),
             subtitle: const Text(
                 'Permanently delete your account and personal data.'),
             shape:

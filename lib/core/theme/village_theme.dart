@@ -21,14 +21,16 @@ class VillageTheme {
   // Neutrals — single gray family (warm-tinted)
   static const Color textPrimary = Color(0xFF1E1B18);
   static const Color textSecondary = Color(0xFF6B6560);
-  static const Color textTertiary = Color(0xFF9E9893);
+  static const Color textTertiary = Color(0xFF6F6963);
   static const Color borderSubtle = Color(0xFFE8E3DE);
 
-  // Semantic (derived from primary — desaturated)
-  static const Color positive = Color(0xFF2EAF7D);
-  static const Color warning = Color(0xFFD4950A);
-  static const Color danger = Color(0xFFDC5C4A);
-  static const Color info = Color(0xFF4A8FE7);
+  // Semantic (derived from primary — desaturated).
+  // Darkened to meet WCAG 2.1 AA: >=4.5:1 as text on light surfaces AND
+  // >=4.5:1 for white text on these as filled backgrounds.
+  static const Color positive = Color(0xFF1B7A55);
+  static const Color warning = Color(0xFF8A6200);
+  static const Color danger = Color(0xFFB23B2A);
+  static const Color info = Color(0xFF2A5FA8);
 
   // ── Typography: Outfit ──
   static TextTheme textTheme = GoogleFonts.outfitTextTheme().copyWith(
@@ -145,6 +147,18 @@ class VillageTheme {
           surfaceContainerHighest: const Color(0xFFD8D3CE),
           error: danger,
         ),
+        extensions: const [
+          VillagePalette(
+            primary: Color(0xFF0D7C66),
+            positive: Color(0xFF1B7A55),
+            warning: Color(0xFF8A6200),
+            info: Color(0xFF2A5FA8),
+            danger: Color(0xFFB23B2A),
+            textPrimary: Color(0xFF1E1B18),
+            textSecondary: Color(0xFF6B6560),
+            textTertiary: Color(0xFF6F6963),
+          ),
+        ],
         scaffoldBackgroundColor: surfaceBase,
         textTheme: textTheme,
 
@@ -332,6 +346,18 @@ class VillageTheme {
           surfaceContainerHighest: const Color(0xFF343230),
           error: const Color(0xFFFF8A80),
         ),
+        extensions: const [
+          VillagePalette(
+            primary: Color(0xFF4DD0B5),
+            positive: Color(0xFF2EAF7D),
+            warning: Color(0xFFD4950A),
+            info: Color(0xFF4A8FE7),
+            danger: Color(0xFFDC5C4A),
+            textPrimary: Color(0xFFDDD8D3),
+            textSecondary: Color(0xFFC2BDB7),
+            textTertiary: Color(0xFFA8A39D),
+          ),
+        ],
         scaffoldBackgroundColor: const Color(0xFF141210),
         textTheme: textTheme.apply(
           bodyColor: const Color(0xFFDDD8D3),
@@ -429,4 +455,79 @@ class VillageTheme {
           ),
         ),
       );
+}
+
+/// Theme-aware color palette.
+///
+/// Light mode uses darker shades so ink colors clear WCAG AA (>=4.5:1) on
+/// light surfaces; dark mode uses brighter shades for the same bar against
+/// the dark background. Registered on both [ThemeData]s via `extensions`;
+/// resolve with `context.palette` (see [VillagePaletteX]).
+class VillagePalette extends ThemeExtension<VillagePalette> {
+  const VillagePalette({
+    required this.primary,
+    required this.positive,
+    required this.warning,
+    required this.info,
+    required this.danger,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
+  });
+
+  final Color primary;
+  final Color positive;
+  final Color warning;
+  final Color info;
+  final Color danger;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textTertiary;
+
+  @override
+  VillagePalette copyWith({
+    Color? primary,
+    Color? positive,
+    Color? warning,
+    Color? info,
+    Color? danger,
+    Color? textPrimary,
+    Color? textSecondary,
+    Color? textTertiary,
+  }) {
+    return VillagePalette(
+      primary: primary ?? this.primary,
+      positive: positive ?? this.positive,
+      warning: warning ?? this.warning,
+      info: info ?? this.info,
+      danger: danger ?? this.danger,
+      textPrimary: textPrimary ?? this.textPrimary,
+      textSecondary: textSecondary ?? this.textSecondary,
+      textTertiary: textTertiary ?? this.textTertiary,
+    );
+  }
+
+  @override
+  VillagePalette lerp(VillagePalette? other, double t) {
+    if (other is! VillagePalette) return this;
+    return VillagePalette(
+      primary: Color.lerp(primary, other.primary, t)!,
+      positive: Color.lerp(positive, other.positive, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      info: Color.lerp(info, other.info, t)!,
+      danger: Color.lerp(danger, other.danger, t)!,
+      textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
+      textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
+    );
+  }
+
+  static VillagePalette of(BuildContext context) =>
+      Theme.of(context).extension<VillagePalette>()!;
+}
+
+/// Shorthand so widgets can write `context.palette.textSecondary` instead of
+/// `Theme.of(context).extension<VillagePalette>()!.textSecondary`.
+extension VillagePaletteX on BuildContext {
+  VillagePalette get palette => Theme.of(this).extension<VillagePalette>()!;
 }

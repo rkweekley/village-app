@@ -73,11 +73,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           width: 72,
           height: 72,
           decoration: BoxDecoration(
-            color: VillageTheme.positive.withValues(alpha: 0.12),
+            color: context.palette.positive.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.mark_email_read_rounded,
-              color: VillageTheme.positive, size: 36),
+          child: Icon(Icons.mark_email_read_rounded,
+              color: context.palette.positive, size: 36),
         ),
         const SizedBox(height: 24),
         const Text('Check your email',
@@ -86,12 +86,12 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         Text(
           'If an account exists for ${_emailCtrl.text.trim()}, we\'ve sent a password reset link.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+          style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         Text(
           'The link expires in 1 hour.',
-          style: TextStyle(color: Colors.grey[500], fontSize: 13),
+          style: TextStyle(color: context.palette.textSecondary, fontSize: 13),
         ),
         const SizedBox(height: 32),
         OutlinedButton(
@@ -111,7 +111,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             ));
           },
           child: Text('Enter reset code manually',
-              style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+              style: TextStyle(color: context.palette.textSecondary, fontSize: 13)),
         ),
       ],
     );
@@ -130,7 +130,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           const SizedBox(height: 8),
           Text(
             'Enter your email and we\'ll send you a reset link.',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -158,7 +158,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           if (state.error != null) ...[
             const SizedBox(height: 12),
             Text(state.error!,
-                style: const TextStyle(color: VillageTheme.danger, fontSize: 13),
+                style: TextStyle(color: context.palette.danger, fontSize: 13),
                 textAlign: TextAlign.center),
           ],
           const SizedBox(height: 24),
@@ -276,18 +276,18 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
           width: 72,
           height: 72,
           decoration: BoxDecoration(
-            color: VillageTheme.positive.withValues(alpha: 0.12),
+            color: context.palette.positive.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.check_rounded,
-              color: VillageTheme.positive, size: 36),
+          child: Icon(Icons.check_rounded,
+              color: context.palette.positive, size: 36),
         ),
         const SizedBox(height: 24),
         const Text('Password reset!',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         Text('You can now log in with your new password.',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+            style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
         const SizedBox(height: 32),
         FilledButton(
           onPressed: () {
@@ -406,7 +406,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
           if (state.error != null) ...[
             const SizedBox(height: 12),
             Text(state.error!,
-                style: const TextStyle(color: VillageTheme.danger, fontSize: 13),
+                style: TextStyle(color: context.palette.danger, fontSize: 13),
                 textAlign: TextAlign.center),
           ],
           const SizedBox(height: 24),

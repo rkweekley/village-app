@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 
 /// Shows a modal as a bottom sheet on mobile phones and as a centered dialog
@@ -46,7 +48,15 @@ Future<T?> showAdaptiveModalSheet<T>({
 }
 
 bool _isDesktopPlatform(BuildContext context) {
-  // Check actual screen width — mobile web (Chrome on Samsung, etc.)
-  // should get BottomSheet, not Dialog. kIsWeb alone isn't enough.
+  // Native iPads should get a sheet, not a centered dialog (Apple HIG uses
+  // sheets/popovers on iPad). Only true desktop platforms — and desktop-sized
+  // web viewports — should get the centered Dialog treatment.
+  if (!kIsWeb) {
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.macOS || TargetPlatform.windows || TargetPlatform.linux =>
+          true,
+      _ => false,
+    };
+  }
   return MediaQuery.of(context).size.width >= 768;
 }

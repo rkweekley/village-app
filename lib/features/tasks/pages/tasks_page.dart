@@ -34,7 +34,7 @@ class TasksPage extends ConsumerWidget {
                   children: [
                     Icon(Icons.cleaning_services_outlined,
                         size: 18,
-                        color: VillageTheme.positive),
+                        color: context.palette.positive),
                     const SizedBox(width: 6),
                     const Text('Chores'),
                   ],
@@ -46,7 +46,7 @@ class TasksPage extends ConsumerWidget {
                   children: [
                     Icon(Icons.school_outlined,
                         size: 18,
-                        color: VillageTheme.info),
+                        color: context.palette.info),
                     const SizedBox(width: 6),
                     const Text('School'),
                   ],
@@ -181,7 +181,7 @@ class _ChoreCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final diffColor = difficultyColor(chore.difficulty);
+    final diffColor = difficultyColor(context, chore.difficulty);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -228,11 +228,11 @@ class _ChoreCard extends ConsumerWidget {
                         const SizedBox(width: 8),
                         _Tag(
                           chore.recurrence,
-                          VillageTheme.primary,
+                          context.palette.primary,
                         ),
                         if (chore.requiresApproval) ...[
                           const SizedBox(width: 8),
-                          _Tag('Needs approval', VillageTheme.danger),
+                          _Tag('Needs approval', context.palette.danger),
                         ],
                       ],
                     ),
@@ -241,7 +241,7 @@ class _ChoreCard extends ConsumerWidget {
               ),
               // More button — available to everyone
               PopupMenuButton<String>(
-                icon: Icon(Icons.more_horiz, color: Colors.grey[500]),
+                icon: Icon(Icons.more_horiz, color: context.palette.textSecondary),
                 itemBuilder: (_) => [
                   const PopupMenuItem(value: 'complete', child: Text('Mark Complete')),
                   if (isParent) ...[
@@ -286,11 +286,11 @@ class _ChoreCard extends ConsumerWidget {
             if (chore.description != null && chore.description!.isNotEmpty)
               Text(chore.description!, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 16),
-            _detailChip('${chore.pointValue} pts', VillageTheme.warning),
+            _detailChip('${chore.pointValue} pts', context.palette.warning),
             const SizedBox(width: 8),
-            _detailChip(chore.difficulty, difficultyColor(chore.difficulty)),
+            _detailChip(chore.difficulty, difficultyColor(context, chore.difficulty)),
             const SizedBox(width: 8),
-            _detailChip(chore.recurrence, VillageTheme.primary),
+            _detailChip(chore.recurrence, context.palette.primary),
           ],
         ),
       ),
@@ -327,11 +327,11 @@ class _ChoreCard extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.positive.withValues(alpha: 0.12),
+                        color: context.palette.positive.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.check_circle_outline,
-                          color: VillageTheme.positive, size: 22),
+                      child: Icon(Icons.check_circle_outline,
+                          color: context.palette.positive, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Text('Complete "${chore.name}"',
@@ -358,14 +358,14 @@ class _ChoreCard extends ConsumerWidget {
                           m.role == 'Parent' ? Icons.star : Icons.person,
                           size: 18,
                           color: m.role == 'Parent'
-                              ? VillageTheme.warning
+                              ? context.palette.warning
                               : Colors.grey,
                         ),
                         const SizedBox(width: 8),
                         Text(m.displayName),
                         const Spacer(),
                         Text('${m.pointsBalance} pts',
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                            style: TextStyle(color: context.palette.textSecondary, fontSize: 12)),
                       ],
                     ),
                   )).toList(),
@@ -484,14 +484,14 @@ class _ChoreCard extends ConsumerWidget {
                           m.role == 'Parent' ? Icons.star : Icons.person,
                           size: 18,
                           color: m.role == 'Parent'
-                              ? VillageTheme.warning
+                              ? context.palette.warning
                               : Colors.grey,
                         ),
                         const SizedBox(width: 8),
                         Text(m.displayName),
                         const Spacer(),
                         Text('${m.pointsBalance} pts',
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                            style: TextStyle(color: context.palette.textSecondary, fontSize: 12)),
                       ],
                     ),
                   )).toList(),
@@ -597,11 +597,11 @@ class _ChoreCard extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.positive.withValues(alpha: 0.12),
+                        color: context.palette.positive.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.edit_outlined,
-                          color: VillageTheme.positive, size: 22),
+                      child: Icon(Icons.edit_outlined,
+                          color: context.palette.positive, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('Edit Chore',
@@ -697,14 +697,14 @@ class _ChoreCard extends ConsumerWidget {
                   title: const Text('Requires approval'),
                   value: requiresApproval,
                   onChanged: (v) => setState(() => requiresApproval = v),
-                  activeColor: VillageTheme.positive,
+                  activeColor: context.palette.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 SwitchListTile(
                   title: const Text('Requires photo'),
                   value: requiresPhoto,
                   onChanged: (v) => setState(() => requiresPhoto = v),
-                  activeColor: VillageTheme.positive,
+                  activeColor: context.palette.positive,
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 16),
@@ -862,7 +862,7 @@ class _AssignmentCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final sc = statusColor(assignment.status);
+    final sc = statusColor(context, assignment.status);
     final statusIcon = _statusIcon(assignment.status);
 
     return Card(
@@ -898,7 +898,7 @@ class _AssignmentCard extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Text(
                           'Due: ${assignment.dueDate}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 12, color: context.palette.textTertiary),
                         ),
                       ],
                     ),
@@ -912,7 +912,7 @@ class _AssignmentCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: VillageTheme.info.withValues(alpha: 0.1),
+                      color: context.palette.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -921,8 +921,8 @@ class _AssignmentCard extends ConsumerWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: assignment.gradePointsEarned != null
-                            ? VillageTheme.positive
-                            : VillageTheme.info,
+                            ? context.palette.positive
+                            : context.palette.info,
                       ),
                     ),
                   ),
@@ -934,12 +934,12 @@ class _AssignmentCard extends ConsumerWidget {
                         height: 40,
                         child: IconButton(
                           onPressed: () => _showEditSheet(context),
-                          icon: const Icon(Icons.edit_outlined,
-                              color: VillageTheme.info, size: 20),
+                          icon: Icon(Icons.edit_outlined,
+                              color: context.palette.info, size: 20),
                           tooltip: 'Edit assignment',
                           style: IconButton.styleFrom(
                             backgroundColor:
-                                VillageTheme.info.withValues(alpha: 0.1),
+                                context.palette.info.withValues(alpha: 0.1),
                           ),
                         ),
                       ),
@@ -950,10 +950,10 @@ class _AssignmentCard extends ConsumerWidget {
                       child: IconButton(
                         onPressed: () => _submitAssignment(context),
                         icon: Icon(Icons.send_rounded,
-                            color: VillageTheme.info, size: 20),
+                            color: context.palette.info, size: 20),
                         tooltip: 'Mark Submitted',
                         style: IconButton.styleFrom(
-                          backgroundColor: VillageTheme.info.withValues(alpha: 0.1),
+                          backgroundColor: context.palette.info.withValues(alpha: 0.1),
                         ),
                       ),
                     ),
@@ -1003,10 +1003,10 @@ class _AssignmentCard extends ConsumerWidget {
           children: [
             Text(a.title, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
-            _infoRow('Status', a.status, statusColor(a.status)),
-            _infoRow('Assigned to', a.assignedToName, null),
-            _infoRow('Due date', a.dueDate, null),
-            _infoRow('Points possible', '${a.pointsPossible}', null),
+            _infoRow(context, 'Status', a.status, statusColor(context, a.status)),
+            _infoRow(context, 'Assigned to', a.assignedToName, null),
+            _infoRow(context, 'Due date', a.dueDate, null),
+            _infoRow(context, 'Points possible', '${a.pointsPossible}', null),
             if (a.description != null && a.description!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
@@ -1020,7 +1020,7 @@ class _AssignmentCard extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: VillageTheme.positive,
+                    color: context.palette.positive,
                   ),
                 ),
               ),
@@ -1059,7 +1059,7 @@ class _AssignmentCard extends ConsumerWidget {
     );
   }
 
-  Widget _infoRow(String label, String value, Color? color) {
+  Widget _infoRow(BuildContext context, String label, String value, Color? color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -1072,7 +1072,7 @@ class _AssignmentCard extends ConsumerWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 13,
-                color: Colors.grey[600],
+                color: context.palette.textTertiary,
               ),
             ),
           ),
@@ -1115,11 +1115,11 @@ class _AssignmentCard extends ConsumerWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: VillageTheme.info.withValues(alpha: 0.12),
+                      color: context.palette.info.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.grading_rounded,
-                        color: VillageTheme.info, size: 22),
+                    child: Icon(Icons.grading_rounded,
+                        color: context.palette.info, size: 22),
                   ),
                   const SizedBox(width: 12),
                   const Text('Grade Assignment',
@@ -1239,11 +1239,11 @@ class _AssignmentCard extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.info.withValues(alpha: 0.12),
+                        color: context.palette.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.edit_rounded,
-                          color: VillageTheme.info, size: 22),
+                      child: Icon(Icons.edit_rounded,
+                          color: context.palette.info, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('Edit Assignment',
@@ -1588,11 +1588,11 @@ class _CreateAssignmentSheetState
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: VillageTheme.info.withValues(alpha: 0.12),
+                    color: context.palette.info.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.assignment_rounded,
-                      color: VillageTheme.info, size: 22),
+                  child: Icon(Icons.assignment_rounded,
+                      color: context.palette.info, size: 22),
                 ),
                 const SizedBox(width: 12),
                 const Text('New Assignment',
@@ -1694,7 +1694,7 @@ class _CreateAssignmentSheetState
                   child: Text(
                     'No subjects yet — create one in School first.',
                     style: TextStyle(
-                        color: VillageTheme.warning, fontSize: 13),
+                        color: context.palette.warning, fontSize: 13),
                   ),
                 );
               },

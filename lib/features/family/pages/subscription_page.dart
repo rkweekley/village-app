@@ -296,7 +296,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Error loading subscription', style: TextStyle(color: Colors.grey[600])),
+                      Text('Error loading subscription', style: TextStyle(color: context.palette.textTertiary)),
                       const SizedBox(height: 12),
                       OutlinedButton(onPressed: _loadStatus, child: const Text('Retry')),
                     ],
@@ -314,18 +314,18 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
     // Role gate: children never see or trigger the paywall.
     if (!ref.read(authProvider).canManage) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.lock_outline, size: 40, color: VillageTheme.textSecondary),
+              Icon(Icons.lock_outline, size: 40, color: context.palette.textSecondary),
               SizedBox(height: 12),
               Text(
                 'Only a parent or caregiver can manage the subscription.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: VillageTheme.textSecondary),
+                style: TextStyle(color: context.palette.textSecondary),
               ),
             ],
           ),
@@ -340,34 +340,34 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: statusColor(status).withValues(alpha: 0.1),
+            color: statusColor(context, status).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: statusColor(status).withValues(alpha: 0.3)),
+            border: Border.all(color: statusColor(context, status).withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
-              Icon(_statusIcon(status), size: 40, color: statusColor(status)),
+              Icon(_statusIcon(status), size: 40, color: statusColor(context, status)),
               const SizedBox(height: 12),
               Text(
                 _statusLabel(status, tier),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: statusColor(status),
+                  color: statusColor(context, status),
                 ),
               ),
               if (isInTrial) ...[
                 const SizedBox(height: 4),
                 Text(
                   'Trial ends ${formatDate(_status!['trialEndsAt'] as String)}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
                 ),
               ],
               if (!isInTrial && _status!['expiresAt'] != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   'Next billing: ${formatDate(_status!['expiresAt'] as String)}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
                 ),
               ],
               if (isExpiringSoon) ...[
@@ -375,11 +375,11 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: VillageTheme.warning.withValues(alpha: 0.15),
+                    color: context.palette.warning.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text('Trial ending soon — subscribe now!',
-                      style: TextStyle(color: VillageTheme.warning, fontSize: 13, fontWeight: FontWeight.w600)),
+                  child: Text('Trial ending soon — subscribe now!',
+                      style: TextStyle(color: context.palette.warning, fontSize: 13, fontWeight: FontWeight.w600)),
                 ),
               ],
             ],
@@ -394,7 +394,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text('Cancel anytime during your trial — you won\'t be charged.',
-              style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+              style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
           const SizedBox(height: 16),
           _PlanCard(
             title: 'Monthly',
@@ -424,7 +424,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             'at least 24 hours before the end of the current period. You can '
             'manage and cancel anytime in your account settings. The free trial '
             'is for new subscribers only.',
-            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            style: TextStyle(color: context.palette.textSecondary, fontSize: 12),
           ),
           if (_isStoreBilling) ...[
             const SizedBox(height: 4),
@@ -442,16 +442,16 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: VillageTheme.danger.withValues(alpha: 0.1),
+                color: context.palette.danger.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: VillageTheme.danger),
+                  Icon(Icons.warning_amber_rounded, color: context.palette.danger),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text('Payment failed. Update your payment method to keep access.',
-                        style: TextStyle(color: VillageTheme.danger, fontSize: 14)),
+                        style: TextStyle(color: context.palette.danger, fontSize: 14)),
                   ),
                 ],
               ),
@@ -480,7 +480,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 ? 'Manage your subscription in your device\'s App Store or Google Play settings.'
                 : 'Opens Stripe Customer Portal — update payment method, view invoices, or cancel.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            style: TextStyle(color: context.palette.textSecondary, fontSize: 12),
           ),
           // Cancel button — only for active subscriptions
           if (status == 'active') ...[
@@ -510,7 +510,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   ? 'Cancel your subscription from your device\'s subscription settings.'
                   : 'Your access continues until the end of your billing period.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+              style: TextStyle(color: context.palette.textSecondary, fontSize: 12),
             ),
           ],
         ],
@@ -569,7 +569,7 @@ class _PlanCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: highlighted ? VillageTheme.primary : Colors.transparent,
+          color: highlighted ? context.palette.primary : Colors.transparent,
           width: highlighted ? 2 : 0,
         ),
       ),
@@ -586,10 +586,10 @@ class _PlanCard extends StatelessWidget {
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                 ),
                 Text(price,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
-                        color: VillageTheme.primary)),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
+                        color: context.palette.primary)),
                 Text(period,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+                    style: TextStyle(fontSize: 14, color: context.palette.textSecondary)),
               ],
             ),
             const SizedBox(height: 12),
@@ -597,7 +597,7 @@ class _PlanCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_rounded, size: 16, color: VillageTheme.positive),
+                      Icon(Icons.check_rounded, size: 16, color: context.palette.positive),
                       const SizedBox(width: 8),
                       Text(f, style: const TextStyle(fontSize: 14)),
                     ],

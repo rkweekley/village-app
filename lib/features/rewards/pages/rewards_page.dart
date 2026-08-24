@@ -82,11 +82,11 @@ class RewardsPage extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: VillageTheme.warning.withValues(alpha: 0.12),
+                        color: context.palette.warning.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.card_giftcard_rounded,
-                          color: VillageTheme.warning, size: 22),
+                      child: Icon(Icons.card_giftcard_rounded,
+                          color: context.palette.warning, size: 22),
                     ),
                     const SizedBox(width: 12),
                     const Text('New Reward',
@@ -263,11 +263,11 @@ void _showEditRewardDialog(
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: VillageTheme.primary.withValues(alpha: 0.12),
+                      color: context.palette.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.edit_rounded,
-                        color: VillageTheme.primary, size: 22),
+                    child: Icon(Icons.edit_rounded,
+                        color: context.palette.primary, size: 22),
                   ),
                   const SizedBox(width: 12),
                   const Text('Edit Reward',
@@ -415,7 +415,7 @@ Future<void> _confirmDeleteReward(
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          style: TextButton.styleFrom(foregroundColor: VillageTheme.danger),
+          style: TextButton.styleFrom(foregroundColor: context.palette.danger),
           child: const Text('Delete'),
         ),
       ],
@@ -454,8 +454,8 @@ class _AvailableTab extends StatelessWidget {
             icon: Icons.card_giftcard_rounded,
             title: 'No rewards yet',
             subtitle: isParent ? 'Tap + to create one' : 'Ask a parent to create rewards',
-            iconBgColor: VillageTheme.warning,
-            iconColor: VillageTheme.warning,
+            iconBgColor: context.palette.warning,
+            iconColor: context.palette.warning,
           );
         }
         return RefreshIndicator(
@@ -490,13 +490,13 @@ class _AvailableTab extends StatelessWidget {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: _categoryColor(reward.category)
+                                color: _categoryColor(ctx, reward.category)
                                     .withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Icon(
                                 _categoryIcon(reward.category),
-                                color: _categoryColor(reward.category),
+                                color: _categoryColor(ctx, reward.category),
                                 size: 22,
                               ),
                             ),
@@ -517,7 +517,7 @@ class _AvailableTab extends StatelessWidget {
                                         context, ref, reward);
                                   }
                                 },
-                                itemBuilder: (ctx) => const [
+                                itemBuilder: (ctx) => [
                                   PopupMenuItem(
                                     value: 'edit',
                                     child: Row(
@@ -534,11 +534,11 @@ class _AvailableTab extends StatelessWidget {
                                       children: [
                                         Icon(Icons.delete_outline,
                                             size: 18,
-                                            color: VillageTheme.danger),
+                                            color: context.palette.danger),
                                         SizedBox(width: 8),
                                         Text('Delete',
                                             style: TextStyle(
-                                                color: VillageTheme.danger)),
+                                                color: context.palette.danger)),
                                       ],
                                     ),
                                   ),
@@ -562,22 +562,22 @@ class _AvailableTab extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: VillageTheme.warning
+                            color: context.palette.warning
                                 .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.stars_rounded,
-                                  size: 14, color: VillageTheme.warning),
+                              Icon(Icons.stars_rounded,
+                                  size: 14, color: context.palette.warning),
                               const SizedBox(width: 4),
                               Text(
                                 '${reward.pointCost} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: VillageTheme.warning,
+                                  color: context.palette.warning,
                                 ),
                               ),
                             ],
@@ -646,18 +646,18 @@ class _AvailableTab extends StatelessWidget {
     );
   }
 
-  Color _categoryColor(String category) {
+  Color _categoryColor(BuildContext context, String category) {
     switch (category) {
       case 'Screen Time':
-        return VillageTheme.info;
+        return context.palette.info;
       case 'Treat':
-        return VillageTheme.danger;
+        return context.palette.danger;
       case 'Outing':
         return VillageTheme.primaryLight;
       case 'Toy':
-        return VillageTheme.primary;
+        return context.palette.primary;
       default:
-        return VillageTheme.warning;
+        return context.palette.warning;
     }
   }
 
@@ -690,11 +690,11 @@ class _RedemptionsTab extends StatelessWidget {
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (redemptions) {
         if (redemptions.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.history_rounded,
             title: 'No redemptions yet',
-            iconBgColor: VillageTheme.warning,
-            iconColor: VillageTheme.warning,
+            iconBgColor: context.palette.warning,
+            iconColor: context.palette.warning,
           );
         }
         return RefreshIndicator(
@@ -723,11 +723,11 @@ class _RedemptionsTab extends StatelessWidget {
                         height: 48,
                         decoration: BoxDecoration(
                           color: isPending
-                              ? VillageTheme.warning.withValues(alpha: 0.12)
+                              ? context.palette.warning.withValues(alpha: 0.12)
                               : isApproved
-                                  ? VillageTheme.positive
+                                  ? context.palette.positive
                                       .withValues(alpha: 0.12)
-                                  : VillageTheme.danger
+                                  : context.palette.danger
                                       .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -738,10 +738,10 @@ class _RedemptionsTab extends StatelessWidget {
                                   ? Icons.check_circle_rounded
                                   : Icons.cancel_rounded,
                           color: isPending
-                              ? VillageTheme.warning
+                              ? context.palette.warning
                               : isApproved
-                                  ? VillageTheme.positive
-                                  : VillageTheme.danger,
+                                  ? context.palette.positive
+                                  : context.palette.danger,
                           size: 24,
                         ),
                       ),
@@ -762,7 +762,7 @@ class _RedemptionsTab extends StatelessWidget {
                               '${r.userName} · ${r.status}',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey[600],
+                                color: context.palette.textTertiary,
                               ),
                             ),
                           ],
@@ -772,24 +772,24 @@ class _RedemptionsTab extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: VillageTheme.warning
+                          color: context.palette.warning
                               .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           '${r.pointsCost} ${ref.read(familyProvider).family?.currencyName ?? 'pts'}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: VillageTheme.warning,
+                            color: context.palette.warning,
                           ),
                         ),
                       ),
                       if (isPending) const SizedBox(width: 8),
                       if (isPending)
                         IconButton(
-                          icon: const Icon(Icons.check_circle_rounded,
-                              color: VillageTheme.positive),
+                          icon: Icon(Icons.check_circle_rounded,
+                              color: context.palette.positive),
                           onPressed: () async {
                             try {
                               await ref
@@ -817,8 +817,8 @@ class _RedemptionsTab extends StatelessWidget {
                         ),
                       if (isPending)
                         IconButton(
-                          icon: const Icon(Icons.cancel_rounded,
-                              color: VillageTheme.danger),
+                          icon: Icon(Icons.cancel_rounded,
+                              color: context.palette.danger),
                           onPressed: () async {
                             try {
                               await ref

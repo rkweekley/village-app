@@ -15,7 +15,7 @@ class VillageApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: VillageTheme.light,
       darkTheme: VillageTheme.dark,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }
