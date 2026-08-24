@@ -121,7 +121,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: VillageTheme.surfaceCard,
+        color: context.palette.surfaceCard,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -152,7 +152,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
                   child: LinearProgressIndicator(
                     value: total == 0 ? 0 : done / total,
                     minHeight: 6,
-                    backgroundColor: VillageTheme.borderSubtle,
+                    backgroundColor: context.palette.borderSubtle,
                     color: context.palette.positive,
                   ),
                 ),
@@ -175,7 +175,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
           hintText: 'Add a task…',
           prefixIcon: const Icon(Icons.add_rounded),
           filled: true,
-          fillColor: VillageTheme.surfaceBase,
+          fillColor: context.palette.surfaceBase,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide.none,
@@ -341,7 +341,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
                     labelText: 'Project name',
                     prefixIcon: const Icon(Icons.folder_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -356,7 +356,7 @@ class _ProjectDetailPageState extends ConsumerState<ProjectDetailPage> {
                     labelText: 'Description',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,

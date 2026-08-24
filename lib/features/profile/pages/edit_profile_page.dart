@@ -245,7 +245,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 labelText: 'Family Name',
                 prefixIcon: const Icon(Icons.groups_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -271,7 +271,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               labelText: 'Display Name',
               prefixIcon: const Icon(Icons.person_outline),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -288,7 +288,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               labelText: 'Email',
               prefixIcon: const Icon(Icons.email_outlined),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -307,7 +307,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 labelText: 'Birth Date',
                 prefixIcon: const Icon(Icons.cake_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -333,7 +333,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               labelText: 'Points Balance',
               prefixIcon: const Icon(Icons.stars_rounded),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,

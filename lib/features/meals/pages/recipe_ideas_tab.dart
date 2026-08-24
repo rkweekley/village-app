@@ -52,7 +52,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                           )
                         : null,
                     filled: true,
-                    fillColor: VillageTheme.surfaceCard,
+                    fillColor: context.palette.surfaceCard,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -221,7 +221,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 0,
-        color: VillageTheme.surfaceCard,
+        color: context.palette.surfaceCard,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -302,7 +302,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 0,
-          color: VillageTheme.surfaceCard,
+          color: context.palette.surfaceCard,
           child: const Center(
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
@@ -342,7 +342,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: VillageTheme.surfaceBase,
+      backgroundColor: context.palette.surfaceBase,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -358,7 +358,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
-          backgroundColor: VillageTheme.surfaceBase,
+          backgroundColor: context.palette.surfaceBase,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),

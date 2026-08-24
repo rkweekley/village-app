@@ -106,8 +106,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                         margin: const EdgeInsets.only(bottom: 8),
                         elevation: 0,
                         color: n.isRead
-                            ? VillageTheme.surfaceCard
-                            : VillageTheme.surfaceBase,
+                            ? context.palette.surfaceCard
+                            : context.palette.surfaceBase,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),

@@ -344,7 +344,7 @@ class _ChoreCard extends ConsumerWidget {
                   decoration: InputDecoration(
                     labelText: 'Assign to',
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -387,7 +387,7 @@ class _ChoreCard extends ConsumerWidget {
                     decoration: InputDecoration(
                       labelText: 'Due date',
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -616,7 +616,7 @@ class _ChoreCard extends ConsumerWidget {
                     labelText: 'Chore name',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -631,7 +631,7 @@ class _ChoreCard extends ConsumerWidget {
                     labelText: 'Description',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -646,7 +646,7 @@ class _ChoreCard extends ConsumerWidget {
                     labelText: 'Point value',
                     prefixIcon: const Icon(Icons.stars_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -661,7 +661,7 @@ class _ChoreCard extends ConsumerWidget {
                     labelText: 'Recurrence',
                     prefixIcon: const Icon(Icons.repeat_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -680,7 +680,7 @@ class _ChoreCard extends ConsumerWidget {
                     labelText: 'Difficulty',
                     prefixIcon: const Icon(Icons.speed_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -1139,7 +1139,7 @@ class _AssignmentCard extends ConsumerWidget {
                   labelText: 'Points',
                   prefixIcon: const Icon(Icons.stars_rounded),
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1258,7 +1258,7 @@ class _AssignmentCard extends ConsumerWidget {
                     labelText: 'Title',
                     prefixIcon: const Icon(Icons.edit_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -1286,7 +1286,7 @@ class _AssignmentCard extends ConsumerWidget {
                       decoration: InputDecoration(
                         labelText: 'Subject',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1329,7 +1329,7 @@ class _AssignmentCard extends ConsumerWidget {
                       decoration: InputDecoration(
                         labelText: 'Assign to',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -1367,7 +1367,7 @@ class _AssignmentCard extends ConsumerWidget {
                     labelText: 'Description (optional)',
                     prefixIcon: const Icon(Icons.description_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -1385,7 +1385,7 @@ class _AssignmentCard extends ConsumerWidget {
                           labelText: 'Points',
                           prefixIcon: const Icon(Icons.numbers_outlined),
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -1415,7 +1415,7 @@ class _AssignmentCard extends ConsumerWidget {
                           decoration: InputDecoration(
                             labelText: 'Due date',
                             filled: true,
-                            fillColor: VillageTheme.surfaceBase,
+                            fillColor: context.palette.surfaceBase,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -1607,7 +1607,7 @@ class _CreateAssignmentSheetState
                 labelText: 'Title',
                 prefixIcon: const Icon(Icons.edit_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1622,7 +1622,7 @@ class _CreateAssignmentSheetState
                 decoration: InputDecoration(
                   labelText: 'Assign to',
                   filled: true,
-                  fillColor: VillageTheme.surfaceBase,
+                  fillColor: context.palette.surfaceBase,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -1670,7 +1670,7 @@ class _CreateAssignmentSheetState
                         decoration: InputDecoration(
                           labelText: 'Subject',
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -1705,7 +1705,7 @@ class _CreateAssignmentSheetState
                 labelText: 'Description (optional)',
                 prefixIcon: const Icon(Icons.description_outlined),
                 filled: true,
-                fillColor: VillageTheme.surfaceBase,
+                fillColor: context.palette.surfaceBase,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -1723,7 +1723,7 @@ class _CreateAssignmentSheetState
                       labelText: 'Points',
                       prefixIcon: const Icon(Icons.numbers_outlined),
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -1752,7 +1752,7 @@ class _CreateAssignmentSheetState
                       decoration: InputDecoration(
                         labelText: 'Due date',
                         filled: true,
-                        fillColor: VillageTheme.surfaceBase,
+                        fillColor: context.palette.surfaceBase,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,

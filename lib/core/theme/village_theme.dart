@@ -147,18 +147,7 @@ class VillageTheme {
           surfaceContainerHighest: const Color(0xFFD8D3CE),
           error: danger,
         ),
-        extensions: const [
-          VillagePalette(
-            primary: Color(0xFF0D7C66),
-            positive: Color(0xFF1B7A55),
-            warning: Color(0xFF8A6200),
-            info: Color(0xFF2A5FA8),
-            danger: Color(0xFFB23B2A),
-            textPrimary: Color(0xFF1E1B18),
-            textSecondary: Color(0xFF6B6560),
-            textTertiary: Color(0xFF6F6963),
-          ),
-        ],
+        extensions: const [VillagePalette.light],
         scaffoldBackgroundColor: surfaceBase,
         textTheme: textTheme,
 
@@ -346,18 +335,7 @@ class VillageTheme {
           surfaceContainerHighest: const Color(0xFF343230),
           error: const Color(0xFFFF8A80),
         ),
-        extensions: const [
-          VillagePalette(
-            primary: Color(0xFF4DD0B5),
-            positive: Color(0xFF2EAF7D),
-            warning: Color(0xFFD4950A),
-            info: Color(0xFF4A8FE7),
-            danger: Color(0xFFDC5C4A),
-            textPrimary: Color(0xFFDDD8D3),
-            textSecondary: Color(0xFFC2BDB7),
-            textTertiary: Color(0xFFA8A39D),
-          ),
-        ],
+        extensions: const [VillagePalette.dark],
         scaffoldBackgroundColor: const Color(0xFF141210),
         textTheme: textTheme.apply(
           bodyColor: const Color(0xFFDDD8D3),
@@ -473,6 +451,10 @@ class VillagePalette extends ThemeExtension<VillagePalette> {
     required this.textPrimary,
     required this.textSecondary,
     required this.textTertiary,
+    required this.surfaceBase,
+    required this.surfaceCard,
+    required this.surfaceElevated,
+    required this.borderSubtle,
   });
 
   final Color primary;
@@ -483,6 +465,42 @@ class VillagePalette extends ThemeExtension<VillagePalette> {
   final Color textPrimary;
   final Color textSecondary;
   final Color textTertiary;
+  final Color surfaceBase;
+  final Color surfaceCard;
+  final Color surfaceElevated;
+  final Color borderSubtle;
+
+  /// Light-mode palette. Also used as the defensive fallback when a widget is
+  /// built outside a themed context, so `context.palette` can never null-crash.
+  static const VillagePalette light = VillagePalette(
+    primary: Color(0xFF0D7C66),
+    positive: Color(0xFF1B7A55),
+    warning: Color(0xFF8A6200),
+    info: Color(0xFF2A5FA8),
+    danger: Color(0xFFB23B2A),
+    textPrimary: Color(0xFF1E1B18),
+    textSecondary: Color(0xFF6B6560),
+    textTertiary: Color(0xFF6F6963),
+    surfaceBase: Color(0xFFF5F0EB),
+    surfaceCard: Color(0xFFFBF8F5),
+    surfaceElevated: Color(0xFFFFFFFF),
+    borderSubtle: Color(0xFFE8E3DE),
+  );
+
+  static const VillagePalette dark = VillagePalette(
+    primary: Color(0xFF4DD0B5),
+    positive: Color(0xFF2EAF7D),
+    warning: Color(0xFFD4950A),
+    info: Color(0xFF4A8FE7),
+    danger: Color(0xFFDC5C4A),
+    textPrimary: Color(0xFFDDD8D3),
+    textSecondary: Color(0xFFC2BDB7),
+    textTertiary: Color(0xFFA8A39D),
+    surfaceBase: Color(0xFF141210),
+    surfaceCard: Color(0xFF1C1A17),
+    surfaceElevated: Color(0xFF242220),
+    borderSubtle: Color(0xFF2C2A27),
+  );
 
   @override
   VillagePalette copyWith({
@@ -494,6 +512,10 @@ class VillagePalette extends ThemeExtension<VillagePalette> {
     Color? textPrimary,
     Color? textSecondary,
     Color? textTertiary,
+    Color? surfaceBase,
+    Color? surfaceCard,
+    Color? surfaceElevated,
+    Color? borderSubtle,
   }) {
     return VillagePalette(
       primary: primary ?? this.primary,
@@ -504,6 +526,10 @@ class VillagePalette extends ThemeExtension<VillagePalette> {
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
       textTertiary: textTertiary ?? this.textTertiary,
+      surfaceBase: surfaceBase ?? this.surfaceBase,
+      surfaceCard: surfaceCard ?? this.surfaceCard,
+      surfaceElevated: surfaceElevated ?? this.surfaceElevated,
+      borderSubtle: borderSubtle ?? this.borderSubtle,
     );
   }
 
@@ -519,15 +545,20 @@ class VillagePalette extends ThemeExtension<VillagePalette> {
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
+      surfaceBase: Color.lerp(surfaceBase, other.surfaceBase, t)!,
+      surfaceCard: Color.lerp(surfaceCard, other.surfaceCard, t)!,
+      surfaceElevated: Color.lerp(surfaceElevated, other.surfaceElevated, t)!,
+      borderSubtle: Color.lerp(borderSubtle, other.borderSubtle, t)!,
     );
   }
 
   static VillagePalette of(BuildContext context) =>
-      Theme.of(context).extension<VillagePalette>()!;
+      Theme.of(context).extension<VillagePalette>() ?? light;
 }
 
 /// Shorthand so widgets can write `context.palette.textSecondary` instead of
 /// `Theme.of(context).extension<VillagePalette>()!.textSecondary`.
 extension VillagePaletteX on BuildContext {
-  VillagePalette get palette => Theme.of(this).extension<VillagePalette>()!;
+  VillagePalette get palette =>
+      Theme.of(this).extension<VillagePalette>() ?? VillagePalette.light;
 }

@@ -221,7 +221,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
               ),
               prefixIcon: const Icon(Icons.badge),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
             ),
             textCapitalization: TextCapitalization.words,
           ),
@@ -236,7 +236,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
               ),
               prefixIcon: const Icon(Icons.monetization_on),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
             ),
           ),
           const SizedBox(height: 24),
@@ -297,7 +297,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
               ),
               prefixIcon: const Icon(Icons.vpn_key),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               suffixIcon: _joinCodeCtrl.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear),
@@ -349,7 +349,7 @@ class _FamilySetupPageState extends ConsumerState<FamilySetupPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               elevation: 0,
-              color: VillageTheme.surfaceCard,
+              color: context.palette.surfaceCard,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

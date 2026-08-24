@@ -59,7 +59,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             if (familyState.family != null && authState.isParent) ...[
               Card(
                 elevation: 0,
-                color: VillageTheme.surfaceCard,
+                color: context.palette.surfaceCard,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -158,7 +158,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             if (familyState.family != null)
               Card(
                 elevation: 0,
-                color: VillageTheme.surfaceCard,
+                color: context.palette.surfaceCard,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -330,7 +330,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
             ),
             Card(
               elevation: 0,
-              color: VillageTheme.surfaceCard,
+              color: context.palette.surfaceCard,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -424,7 +424,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
     final submitted = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: VillageTheme.surfaceBase,
+      backgroundColor: context.palette.surfaceBase,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -649,7 +649,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     labelText: 'Family name',
                     prefixIcon: const Icon(Icons.family_restroom_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -665,7 +665,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     labelText: 'Currency name',
                     prefixIcon: const Icon(Icons.monetization_on_outlined),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -691,7 +691,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       labelText: 'Custom currency name',
                       prefixIcon: const Icon(Icons.edit_outlined),
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -706,7 +706,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                     labelText: 'Timezone',
                     prefixIcon: const Icon(Icons.language_rounded),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -732,7 +732,7 @@ class _FamilyPageState extends ConsumerState<FamilyPage> {
                       labelText: 'Custom timezone (e.g. America/Chicago)',
                       prefixIcon: const Icon(Icons.edit_outlined),
                       filled: true,
-                      fillColor: VillageTheme.surfaceBase,
+                      fillColor: context.palette.surfaceBase,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -965,7 +965,7 @@ class _InviteEmailFieldState extends ConsumerState<_InviteEmailField> {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               filled: true,
-              fillColor: VillageTheme.surfaceBase,
+              fillColor: context.palette.surfaceBase,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -1023,7 +1023,7 @@ class _MemberCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
-      color: VillageTheme.surfaceCard,
+      color: context.palette.surfaceCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),

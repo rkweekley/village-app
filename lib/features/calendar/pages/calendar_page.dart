@@ -213,7 +213,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                         decoration: InputDecoration(
                           labelText: 'Title',
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -227,7 +227,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                         decoration: InputDecoration(
                           labelText: 'Description (optional)',
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -245,7 +245,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                             size: 20,
                           ),
                           filled: true,
-                          fillColor: VillageTheme.surfaceBase,
+                          fillColor: context.palette.surfaceBase,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -392,7 +392,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       const SizedBox(height: 8),
                       Container(
                         decoration: BoxDecoration(
-                          color: VillageTheme.surfaceBase,
+                          color: context.palette.surfaceBase,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: SwitchListTile(
@@ -508,7 +508,7 @@ class _EventDateTimeField extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: VillageTheme.surfaceBase,
+        color: context.palette.surfaceBase,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -617,7 +617,7 @@ class _CalendarGrid extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             decoration: BoxDecoration(
-              color: VillageTheme.surfaceBase,
+              color: context.palette.surfaceBase,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -797,7 +797,7 @@ class _DayEventsList extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             elevation: 0,
-            color: VillageTheme.surfaceCard,
+            color: context.palette.surfaceCard,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1086,7 +1086,7 @@ class _DayEventsList extends ConsumerWidget {
                   decoration: InputDecoration(
                     labelText: 'Title',
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -1100,7 +1100,7 @@ class _DayEventsList extends ConsumerWidget {
                   decoration: InputDecoration(
                     labelText: 'Description (optional)',
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -1118,7 +1118,7 @@ class _DayEventsList extends ConsumerWidget {
                       size: 20,
                     ),
                     filled: true,
-                    fillColor: VillageTheme.surfaceBase,
+                    fillColor: context.palette.surfaceBase,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -1257,7 +1257,7 @@ class _DayEventsList extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
-                    color: VillageTheme.surfaceBase,
+                    color: context.palette.surfaceBase,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: SwitchListTile(
@@ -1360,7 +1360,7 @@ class _RsvpButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? selectedColor.withValues(alpha: 0.12)
-              : VillageTheme.surfaceBase,
+              : context.palette.surfaceBase,
           borderRadius: BorderRadius.circular(10),
           border: !isSelected
               ? Border.all(color: Colors.grey.withValues(alpha: 0.15))
