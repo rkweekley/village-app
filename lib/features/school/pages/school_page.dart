@@ -536,6 +536,9 @@ class _SubjectsTab extends ConsumerWidget {
                 child: ListTile(
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  onTap: canManage
+                      ? () => _showEditSubjectSheet(ctx, ref, subject)
+                      : null,
                   leading: Container(
                     width: 44,
                     height: 44,
@@ -597,10 +600,24 @@ class _SubjectsTab extends ConsumerWidget {
                       ],
                     ],
                   ),
-                  trailing: Text(
-                    '${subject.sortOrder}',
-                    style: TextStyle(fontSize: 12, color: context.palette.textTertiary),
-                  ),
+                  trailing: canManage
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.edit_outlined,
+                                size: 18, color: context.palette.textTertiary),
+                            const SizedBox(width: 6),
+                            Text('${subject.sortOrder}',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: context.palette.textTertiary)),
+                          ],
+                        )
+                      : Text(
+                          '${subject.sortOrder}',
+                          style: TextStyle(
+                              fontSize: 12, color: context.palette.textTertiary),
+                        ),
                 ),
               );
             },
@@ -662,6 +679,145 @@ class _SubjectsTab extends ConsumerWidget {
         return context.palette.info;
     }
   }
+}
+
+void _showEditSubjectSheet(
+    BuildContext context, WidgetRef ref, Subject subject) {
+  final nameCtrl = TextEditingController(text: subject.name);
+  final descCtrl = TextEditingController(text: subject.description ?? '');
+  String? selectedColor = subject.color;
+  final sortOrder = subject.sortOrder;
+
+  const standardColors = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336'];
+
+  showAdaptiveModalSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setState) => Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: context.palette.info.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(Icons.edit_rounded,
+                      color: context.palette.info, size: 22),
+                ),
+                const SizedBox(width: 12),
+                const Text('Edit Subject',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: nameCtrl,
+              decoration: InputDecoration(
+                labelText: 'Subject name',
+                hintText: 'e.g. Math, Reading',
+                prefixIcon: const Icon(Icons.abc_outlined),
+                filled: true,
+                fillColor: context.palette.surfaceBase,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: descCtrl,
+              decoration: InputDecoration(
+                labelText: 'Description (optional)',
+                prefixIcon: const Icon(Icons.description_outlined),
+                filled: true,
+                fillColor: context.palette.surfaceBase,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: selectedColor,
+              decoration: InputDecoration(
+                labelText: 'Color',
+                filled: true,
+                fillColor: context.palette.surfaceBase,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('None')),
+                const DropdownMenuItem(value: '#4CAF50', child: Text('Green')),
+                const DropdownMenuItem(value: '#2196F3', child: Text('Blue')),
+                const DropdownMenuItem(value: '#FF9800', child: Text('Orange')),
+                const DropdownMenuItem(value: '#9C27B0', child: Text('Purple')),
+                const DropdownMenuItem(value: '#F44336', child: Text('Red')),
+                if (selectedColor != null &&
+                    !standardColors.contains(selectedColor))
+                  DropdownMenuItem(
+                      value: selectedColor, child: Text(selectedColor!)),
+              ],
+              onChanged: (v) => setState(() => selectedColor = v),
+            ),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: () async {
+                final name = nameCtrl.text.trim();
+                if (name.isEmpty) return;
+                try {
+                  await ref.read(schoolServiceProvider).updateSubject(
+                        subject.id,
+                        name: name,
+                        description: descCtrl.text.trim().isEmpty
+                            ? null
+                            : descCtrl.text.trim(),
+                        color: selectedColor,
+                        sortOrder: sortOrder,
+                      );
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  ref.invalidate(subjectsListProvider);
+                } catch (e) {
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(content: Text('Failed: $e')),
+                    );
+                  }
+                }
+              },
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+                backgroundColor: VillageTheme.info,
+              ),
+              child: const Text('Save Changes', style: TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 // ── Assignments Tab ──
