@@ -78,7 +78,21 @@ class _WeekTab extends ConsumerStatefulWidget {
 class _WeekTabState extends ConsumerState<_WeekTab> {
   late DateTime _weekStart;
   int _weekOffset = 0;
-  int _selectedDayIndex = DateTime.now().weekday % 7;
+  int _selectedDayIndex = DateTime.now().weekday - DateTime.monday;
+
+  /// Stored/queried dayOfWeek convention: 0 = Sunday .. 6 = Saturday.
+  int _dayOfWeekValue(DateTime d) => d.weekday % 7;
+
+  static const _weekdayAbbrev = [
+    '',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
+  ];
 
   @override
   void initState() {
@@ -157,65 +171,70 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
           ),
         ),
 
-        // Day strip (horizontal scrollable)
+        // Day strip — all 7 days, labels from each cell's actual date
         SizedBox(
           height: 72,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: 7,
-            itemBuilder: (ctx, i) {
-              final day = _daysInWeek[i];
-              final isToday = day.day == DateTime.now().day &&
-                  day.month == DateTime.now().month &&
-                  day.year == DateTime.now().year;
-              final isSelected = i == _selectedDayIndex;
+            child: Row(
+              children: List.generate(7, (i) {
+                final day = _daysInWeek[i];
+                final isToday =
+                    day.day == DateTime.now().day &&
+                    day.month == DateTime.now().month &&
+                    day.year == DateTime.now().year;
+                final isSelected = i == _selectedDayIndex;
 
-              return GestureDetector(
-                onTap: () => setState(() => _selectedDayIndex = i),
-                child: Container(
-                  width: 56,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? context.palette.danger
-                        : isToday
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedDayIndex = i),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? context.palette.danger
+                            : isToday
                             ? context.palette.danger.withValues(alpha: 0.1)
                             : context.palette.surfaceBase,
-                    borderRadius: BorderRadius.circular(16),
-                    border: isToday && !isSelected
-                        ? Border.all(
-                            color: context.palette.danger.withValues(alpha: 0.3),
-                            width: 1.5)
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _dayNames[i],
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: isSelected
-                              ? Colors.white
-                              : context.palette.textTertiary,
-                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        border: isToday && !isSelected
+                            ? Border.all(
+                                color: context.palette.danger.withValues(
+                                  alpha: 0.3,
+                                ),
+                                width: 1.5,
+                              )
+                            : null,
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${day.day}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : null,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _weekdayAbbrev[day.weekday],
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white
+                                  : context.palette.textTertiary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${day.day}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected ? Colors.white : null,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              }),
+            ),
           ),
         ),
 
@@ -238,8 +257,9 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
                 );
               }
               final plan = mealPlans.first;
+              final dayOfWeek = _dayOfWeekValue(_daysInWeek[_selectedDayIndex]);
               final dayEntries = plan.entries
-                  .where((e) => e.dayOfWeek == _selectedDayIndex)
+                  .where((e) => e.dayOfWeek == dayOfWeek)
                   .toList();
 
               return RefreshIndicator(
@@ -252,7 +272,7 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
                     Padding(
                       padding: const EdgeInsets.only(left: 4, bottom: 12),
                       child: Text(
-                        '${_dayNames[_selectedDayIndex]} · ${_daysInWeek[_selectedDayIndex].month}/${_daysInWeek[_selectedDayIndex].day}',
+                        '${_weekdayAbbrev[_daysInWeek[_selectedDayIndex].weekday]} · ${_daysInWeek[_selectedDayIndex].month}/${_daysInWeek[_selectedDayIndex].day}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -269,9 +289,9 @@ class _WeekTabState extends ConsumerState<_WeekTab> {
                         mealPlanId: plan.id,
                         dayOfWeek: _selectedDayIndex,
                         ref: ref,
-                        onRefresh: () =>
-                            ref.refresh(
-                                mealPlansListProvider(_weekStartStr).future),
+                        onRefresh: () => ref.refresh(
+                          mealPlansListProvider(_weekStartStr).future,
+                        ),
                       ),
                       const SizedBox(height: 8),
                     ],
@@ -303,23 +323,28 @@ class _EmptyWeekPlaceholder extends StatelessWidget {
               color: context.palette.danger.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(24),
             ),
-            child: Icon(Icons.restaurant_rounded,
-                size: 40, color: context.palette.danger),
+            child: Icon(
+              Icons.restaurant_rounded,
+              size: 40,
+              color: context.palette.danger,
+            ),
           ),
           const SizedBox(height: 16),
-          const Text('No meal plan for this week.',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const Text(
+            'No meal plan for this week.',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 4),
-          Text('Tap below to create one',
-              style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
+          Text(
+            'Tap below to create one',
+            style: TextStyle(color: context.palette.textTertiary, fontSize: 14),
+          ),
           const SizedBox(height: 16),
           FilledButton.icon(
             icon: const Icon(Icons.add_rounded),
             label: const Text('Create Meal Plan'),
             onPressed: onCreateMealPlan,
-            style: FilledButton.styleFrom(
-              backgroundColor: VillageTheme.danger,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: VillageTheme.danger),
           ),
         ],
       ),
@@ -403,7 +428,9 @@ class _MealSlot extends StatelessWidget {
                           ? FontWeight.w600
                           : FontWeight.normal,
                       fontSize: 14,
-                      color: entry != null ? null : context.palette.textTertiary,
+                      color: entry != null
+                          ? null
+                          : context.palette.textTertiary,
                     ),
                   ),
                 ],
@@ -470,30 +497,38 @@ class _MealSlot extends StatelessWidget {
                         color: context.palette.danger.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(_mealIcons[mealType] ?? Icons.restaurant_rounded,
-                          color: context.palette.danger, size: 22),
+                      child: Icon(
+                        _mealIcons[mealType] ?? Icons.restaurant_rounded,
+                        color: context.palette.danger,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    Text('Add $mealType',
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
+                    Text(
+                      'Add $mealType',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Text('Favorite recipes',
-                    style:
-                        TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                const Text(
+                  'Favorite recipes',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                ),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 140,
                   child: Builder(
                     builder: (context) {
-                      final favs =
-                          recipes.where((r) => r.isFamilyFavorite).toList();
+                      final favs = recipes
+                          .where((r) => r.isFamilyFavorite)
+                          .toList();
                       if (favs.isEmpty) {
                         return Padding(
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 24),
+                          padding: const EdgeInsets.symmetric(vertical: 24),
                           child: Center(
                             child: Text(
                               'No favorites yet — star a recipe below',
@@ -512,8 +547,10 @@ class _MealSlot extends StatelessWidget {
                         itemBuilder: (_, i) {
                           final r = favs[i];
                           return RadioListTile<String>(
-                            title: Text(r.title,
-                                style: const TextStyle(fontSize: 14)),
+                            title: Text(
+                              r.title,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                             subtitle: Text(
                               '${r.difficulty} · ${_formatMinutes(r.prepTimeMinutes)}',
                               style: const TextStyle(fontSize: 12),
@@ -522,8 +559,8 @@ class _MealSlot extends StatelessWidget {
                             groupValue: selectedRecipeId,
                             dense: true,
                             activeColor: context.palette.danger,
-                            onChanged: (v) => setDialogState(
-                                () => selectedRecipeId = v),
+                            onChanged: (v) =>
+                                setDialogState(() => selectedRecipeId = v),
                           );
                         },
                       );
@@ -531,9 +568,10 @@ class _MealSlot extends StatelessWidget {
                   ),
                 ),
                 const Divider(),
-                const Text('Or type a custom title:',
-                    style:
-                        TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                const Text(
+                  'Or type a custom title:',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: titleCtrl,
@@ -556,13 +594,18 @@ class _MealSlot extends StatelessWidget {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () async {
-                    if (selectedRecipeId == null && freeTextTitle.isEmpty) return;
-                    await ref.read(mealsServiceProvider).addEntry(
+                    if (selectedRecipeId == null && freeTextTitle.isEmpty)
+                      return;
+                    await ref
+                        .read(mealsServiceProvider)
+                        .addEntry(
                           mealPlanId,
                           dayOfWeek: dayOfWeek,
                           mealType: mealType,
                           recipeId: selectedRecipeId,
-                          title: selectedRecipeId != null ? null : freeTextTitle,
+                          title: selectedRecipeId != null
+                              ? null
+                              : freeTextTitle,
                         );
                     Navigator.pop(ctx);
                     onRefresh();
@@ -571,8 +614,10 @@ class _MealSlot extends StatelessWidget {
                     minimumSize: const Size(double.infinity, 52),
                     backgroundColor: VillageTheme.danger,
                   ),
-                  child: const Text('Add to Plan',
-                      style: TextStyle(fontSize: 16)),
+                  child: const Text(
+                    'Add to Plan',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ],
             ),
@@ -603,9 +648,7 @@ class _RecipeCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,
       color: context.palette.surfaceCard,
       child: InkWell(
@@ -625,8 +668,11 @@ class _RecipeCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
-                  child: Icon(Icons.menu_book_rounded,
-                      color: diffColor, size: 28),
+                  child: Icon(
+                    Icons.menu_book_rounded,
+                    color: diffColor,
+                    size: 28,
+                  ),
                 ),
               ),
               const SizedBox(width: 14),
@@ -679,7 +725,9 @@ class _RecipeCard extends StatelessWidget {
                         // Difficulty badge
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: diffColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
@@ -695,23 +743,33 @@ class _RecipeCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         // Prep time
-                        Icon(Icons.schedule_rounded,
-                            size: 14, color: context.palette.textSecondary),
+                        Icon(
+                          Icons.schedule_rounded,
+                          size: 14,
+                          color: context.palette.textSecondary,
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           _formatMinutes(r.prepTimeMinutes),
                           style: TextStyle(
-                              fontSize: 12, color: context.palette.textTertiary),
+                            fontSize: 12,
+                            color: context.palette.textTertiary,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         // Servings
-                        Icon(Icons.people_rounded,
-                            size: 14, color: context.palette.textSecondary),
+                        Icon(
+                          Icons.people_rounded,
+                          size: 14,
+                          color: context.palette.textSecondary,
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           '${r.servings}',
                           style: TextStyle(
-                              fontSize: 12, color: context.palette.textTertiary),
+                            fontSize: 12,
+                            color: context.palette.textTertiary,
+                          ),
                         ),
                       ],
                     ),
@@ -720,7 +778,9 @@ class _RecipeCard extends StatelessWidget {
                       Text(
                         r.tags!,
                         style: TextStyle(
-                            fontSize: 11, color: context.palette.textTertiary),
+                          fontSize: 11,
+                          color: context.palette.textTertiary,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -794,74 +854,103 @@ class _RecipeCard extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 6,
                     children: [
-                      _metaChip(r.difficulty, Icons.flag_rounded,
-                          difficultyColor(context, r.difficulty)),
-                      _metaChip(_formatMinutes(r.prepTimeMinutes),
-                          Icons.schedule_rounded, Colors.grey),
-                      _metaChip('${r.servings} servings', Icons.people_rounded,
-                          Colors.grey),
+                      _metaChip(
+                        r.difficulty,
+                        Icons.flag_rounded,
+                        difficultyColor(context, r.difficulty),
+                      ),
+                      _metaChip(
+                        _formatMinutes(r.prepTimeMinutes),
+                        Icons.schedule_rounded,
+                        Colors.grey,
+                      ),
+                      _metaChip(
+                        '${r.servings} servings',
+                        Icons.people_rounded,
+                        Colors.grey,
+                      ),
                     ],
                   ),
                   if (r.tags != null && r.tags!.isNotEmpty) ...[
                     const SizedBox(height: 6),
-                    Text(r.tags!,
-                        style: TextStyle(fontSize: 12, color: context.palette.textSecondary)),
+                    Text(
+                      r.tags!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: context.palette.textSecondary,
+                      ),
+                    ),
                   ],
 
                   // Description
                   if (r.description != null && r.description!.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    Text(r.description!,
-                        style: const TextStyle(color: Colors.grey)),
+                    Text(
+                      r.description!,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
                   ],
 
                   const SizedBox(height: 20),
                   // Ingredients
-                  const Text('Ingredients',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 17)),
+                  const Text(
+                    'Ingredients',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+                  ),
                   const SizedBox(height: 8),
                   ...r.ingredients
                       .split(',')
                       .map((line) => line.trim())
                       .where((line) => line.isNotEmpty)
-                      .map((ingredient) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 3),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  margin: const EdgeInsets.only(top: 7, right: 10),
-                                  decoration: BoxDecoration(
-                                    color: context.palette.danger,
-                                    shape: BoxShape.circle,
-                                  ),
+                      .map(
+                        (ingredient) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                margin: const EdgeInsets.only(
+                                  top: 7,
+                                  right: 10,
                                 ),
-                                Expanded(child: Text(ingredient, style: const TextStyle(fontSize: 14))),
-                              ],
-                            ),
-                          )),
+                                decoration: BoxDecoration(
+                                  color: context.palette.danger,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  ingredient,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   const SizedBox(height: 20),
 
                   // Instructions — render as clean paragraphs
-                  const Text('Instructions',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 17)),
+                  const Text(
+                    'Instructions',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+                  ),
                   const SizedBox(height: 8),
                   ...r.instructions
                       .split('\n')
                       .map((p) => p.trim())
                       .where((p) => p.isNotEmpty)
-                      .map((paragraph) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Text(
-                              paragraph,
-                              style: const TextStyle(
-                                  fontSize: 14, height: 1.6),
-                            ),
-                          )),
+                      .map(
+                        (paragraph) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            paragraph,
+                            style: const TextStyle(fontSize: 14, height: 1.6),
+                          ),
+                        ),
+                      ),
 
                   const SizedBox(height: 24),
 
@@ -900,8 +989,14 @@ class _RecipeCard extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 4),
-          Text(label,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: color)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
         ],
       ),
     );
@@ -938,13 +1033,20 @@ class _RecipeCard extends StatelessWidget {
                         color: context.palette.danger.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.calendar_month_rounded,
-                          color: context.palette.danger, size: 22),
+                      child: Icon(
+                        Icons.calendar_month_rounded,
+                        color: context.palette.danger,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    const Text('Add to Meal Plan',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
+                    const Text(
+                      'Add to Meal Plan',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -979,11 +1081,14 @@ class _RecipeCard extends StatelessWidget {
                             ),
                           ),
                           items: plans
-                              .map((p) => DropdownMenuItem(
-                                    value: p.id,
-                                    child: Text(
-                                        'Week of ${_formatIsoDate(p.weekStart)}'),
-                                  ))
+                              .map(
+                                (p) => DropdownMenuItem(
+                                  value: p.id,
+                                  child: Text(
+                                    'Week of ${_formatIsoDate(p.weekStart)}',
+                                  ),
+                                ),
+                              )
                               .toList(),
                           onChanged: (v) =>
                               setDialogState(() => selectedPlanId = v),
@@ -1004,13 +1109,14 @@ class _RecipeCard extends StatelessWidget {
                                   ),
                                 ),
                                 items: List.generate(
-                                    7,
-                                    (i) => DropdownMenuItem(
-                                          value: i,
-                                          child: Text(_dayNames[i]),
-                                        )),
-                                onChanged: (v) => setDialogState(
-                                    () => selectedDay = v!),
+                                  7,
+                                  (i) => DropdownMenuItem(
+                                    value: i,
+                                    child: Text(_dayNames[i]),
+                                  ),
+                                ),
+                                onChanged: (v) =>
+                                    setDialogState(() => selectedDay = v!),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -1027,11 +1133,15 @@ class _RecipeCard extends StatelessWidget {
                                   ),
                                 ),
                                 items: _mealTypes
-                                    .map((m) => DropdownMenuItem(
-                                        value: m, child: Text(m)))
+                                    .map(
+                                      (m) => DropdownMenuItem(
+                                        value: m,
+                                        child: Text(m),
+                                      ),
+                                    )
                                     .toList(),
-                                onChanged: (v) => setDialogState(
-                                    () => selectedMealType = v!),
+                                onChanged: (v) =>
+                                    setDialogState(() => selectedMealType = v!),
                               ),
                             ),
                           ],
@@ -1048,14 +1158,16 @@ class _RecipeCard extends StatelessWidget {
                           if (selectedPlanId == null) {
                             ScaffoldMessenger.of(ctx).showSnackBar(
                               const SnackBar(
-                                  content:
-                                      Text('Please select a meal plan.')),
+                                content: Text('Please select a meal plan.'),
+                              ),
                             );
                             return;
                           }
                           setDialogState(() => _addPlanLoading = true);
                           try {
-                            await ref.read(mealsServiceProvider).addEntry(
+                            await ref
+                                .read(mealsServiceProvider)
+                                .addEntry(
                                   selectedPlanId!,
                                   dayOfWeek: selectedDay,
                                   mealType: selectedMealType,
@@ -1067,7 +1179,8 @@ class _RecipeCard extends StatelessWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                      'Added ${recipe.title} to ${_dayNames[selectedDay]} $selectedMealType'),
+                                    'Added ${recipe.title} to ${_dayNames[selectedDay]} $selectedMealType',
+                                  ),
                                 ),
                               );
                               onRefresh();
@@ -1077,8 +1190,10 @@ class _RecipeCard extends StatelessWidget {
                               setDialogState(() => _addPlanLoading = false);
                               ScaffoldMessenger.of(ctx).showSnackBar(
                                 const SnackBar(
-                                    content: Text(
-                                        'Could not add to meal plan. Check your connection.')),
+                                  content: Text(
+                                    'Could not add to meal plan. Check your connection.',
+                                  ),
+                                ),
                               );
                             }
                           }
@@ -1092,9 +1207,14 @@ class _RecipeCard extends StatelessWidget {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
-                      : const Text('Add to Plan',
-                          style: TextStyle(fontSize: 16)),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Add to Plan',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),
@@ -1146,13 +1266,17 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                       color: context.palette.danger.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.menu_book_rounded,
-                        color: context.palette.danger, size: 22),
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      color: context.palette.danger,
+                      size: 22,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  const Text('New Recipe',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                  const Text(
+                    'New Recipe',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -1285,8 +1409,7 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                 title: const Text('Family favorite'),
                 value: isFamilyFavorite,
                 activeColor: context.palette.danger,
-                onChanged: (v) =>
-                    setDialogState(() => isFamilyFavorite = v),
+                onChanged: (v) => setDialogState(() => isFamilyFavorite = v),
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 12),
@@ -1294,15 +1417,16 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                 onPressed: () async {
                   if (titleCtrl.text.isEmpty) return;
                   try {
-                    await ref.read(mealsServiceProvider).createRecipe(
+                    await ref
+                        .read(mealsServiceProvider)
+                        .createRecipe(
                           title: titleCtrl.text,
                           description: descCtrl.text.isNotEmpty
                               ? descCtrl.text
                               : null,
                           ingredients: ingredientsCtrl.text,
                           instructions: instructionsCtrl.text,
-                          prepTimeMinutes:
-                              int.tryParse(prepCtrl.text) ?? 30,
+                          prepTimeMinutes: int.tryParse(prepCtrl.text) ?? 30,
                           servings: int.tryParse(servingsCtrl.text) ?? 4,
                           difficulty: difficulty,
                           tags: tagsCtrl.text.isNotEmpty ? tagsCtrl.text : null,
@@ -1313,9 +1437,11 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   } catch (e) {
                     if (ctx.mounted) {
                       ScaffoldMessenger.of(ctx).showSnackBar(
-                        SnackBar(content: Text('Failed: $e'),
-                            backgroundColor: Colors.red.shade700,
-                            behavior: SnackBarBehavior.floating),
+                        SnackBar(
+                          content: Text('Failed: $e'),
+                          backgroundColor: Colors.red.shade700,
+                          behavior: SnackBarBehavior.floating,
+                        ),
                       );
                     }
                   }
@@ -1324,8 +1450,10 @@ void _showCreateRecipeSheet(BuildContext context, WidgetRef ref) {
                   minimumSize: const Size(double.infinity, 52),
                   backgroundColor: VillageTheme.danger,
                 ),
-                child: const Text('Create Recipe',
-                    style: TextStyle(fontSize: 16)),
+                child: const Text(
+                  'Create Recipe',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),
@@ -1374,13 +1502,17 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                       color: context.palette.danger.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.menu_book_rounded,
-                        color: context.palette.danger, size: 22),
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      color: context.palette.danger,
+                      size: 22,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  const Text('Edit Recipe',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                  const Text(
+                    'Edit Recipe',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -1513,8 +1645,7 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                 title: const Text('Family favorite'),
                 value: isFamilyFavorite,
                 activeColor: context.palette.danger,
-                onChanged: (v) =>
-                    setDialogState(() => isFamilyFavorite = v),
+                onChanged: (v) => setDialogState(() => isFamilyFavorite = v),
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 12),
@@ -1522,7 +1653,9 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                 onPressed: () async {
                   if (titleCtrl.text.isEmpty) return;
                   try {
-                    await ref.read(mealsServiceProvider).updateRecipe(
+                    await ref
+                        .read(mealsServiceProvider)
+                        .updateRecipe(
                           recipe.id,
                           title: titleCtrl.text,
                           description: descCtrl.text.isNotEmpty
@@ -1530,10 +1663,12 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                               : null,
                           ingredients: ingredientsCtrl.text,
                           instructions: instructionsCtrl.text,
-                          prepTimeMinutes: int.tryParse(prepCtrl.text) ??
+                          prepTimeMinutes:
+                              int.tryParse(prepCtrl.text) ??
                               recipe.prepTimeMinutes,
                           servings:
-                              int.tryParse(servingsCtrl.text) ?? recipe.servings,
+                              int.tryParse(servingsCtrl.text) ??
+                              recipe.servings,
                           difficulty: difficulty,
                           tags: tagsCtrl.text.isNotEmpty ? tagsCtrl.text : null,
                           isFamilyFavorite: isFamilyFavorite,
@@ -1545,9 +1680,10 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                     if (ctx.mounted) {
                       ScaffoldMessenger.of(ctx).showSnackBar(
                         SnackBar(
-                            content: Text('Failed: $e'),
-                            backgroundColor: Colors.red.shade700,
-                            behavior: SnackBarBehavior.floating),
+                          content: Text('Failed: $e'),
+                          backgroundColor: Colors.red.shade700,
+                          behavior: SnackBarBehavior.floating,
+                        ),
                       );
                     }
                   }
@@ -1556,8 +1692,10 @@ void _showEditRecipeSheet(BuildContext context, WidgetRef ref, Recipe recipe) {
                   minimumSize: const Size(double.infinity, 52),
                   backgroundColor: VillageTheme.danger,
                 ),
-                child: const Text('Save Changes',
-                    style: TextStyle(fontSize: 16)),
+                child: const Text(
+                  'Save Changes',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),
@@ -1606,8 +1744,10 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear_rounded),
@@ -1654,10 +1794,12 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
                 var filtered = recipes;
                 if (_searchQuery.isNotEmpty) {
                   filtered = filtered
-                      .where((r) =>
-                          r.title.toLowerCase().contains(_searchQuery) ||
-                          (r.tags?.toLowerCase().contains(_searchQuery) ??
-                              false))
+                      .where(
+                        (r) =>
+                            r.title.toLowerCase().contains(_searchQuery) ||
+                            (r.tags?.toLowerCase().contains(_searchQuery) ??
+                                false),
+                      )
                       .toList();
                 }
                 if (_difficultyFilter != null) {
@@ -1684,8 +1826,7 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
                     itemBuilder: (ctx, i) => _RecipeCard(
                       recipe: filtered[i],
                       ref: ref,
-                      onRefresh: () =>
-                          ref.refresh(recipesListProvider.future),
+                      onRefresh: () => ref.refresh(recipesListProvider.future),
                     ),
                   ),
                 );
@@ -1758,8 +1899,7 @@ class _FavoritesTab extends ConsumerWidget {
             itemBuilder: (ctx, i) => _RecipeCard(
               recipe: recipes[i],
               ref: ref,
-              onRefresh: () =>
-                  ref.refresh(familyFavoritesListProvider.future),
+              onRefresh: () => ref.refresh(familyFavoritesListProvider.future),
             ),
           ),
         );
