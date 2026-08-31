@@ -55,11 +55,16 @@ class TasksPage extends ConsumerWidget {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _ChoresSection(ref: ref, isParent: isParent),
-            _SchoolSection(ref: ref),
-          ],
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 840),
+            child: TabBarView(
+              children: [
+                _ChoresSection(ref: ref, isParent: isParent),
+                _SchoolSection(ref: ref),
+              ],
+            ),
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           heroTag: const ObjectKey('tasksPageFAB'),

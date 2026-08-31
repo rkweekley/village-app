@@ -16,10 +16,7 @@ class ShoppingListsPage extends ConsumerWidget {
     final isParent = ref.watch(authProvider).canManage;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Shopping Lists'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Shopping Lists'), centerTitle: true),
       floatingActionButton: isParent
           ? FloatingActionButton(
               heroTag: const ObjectKey('shoppingListsPageFAB'),
@@ -27,164 +24,182 @@ class ShoppingListsPage extends ConsumerWidget {
               child: const Icon(Icons.add),
             )
           : null,
-      body: listsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (lists) {
-          if (lists.isEmpty) {
-            return EmptyState(
-              icon: Icons.shopping_cart_rounded,
-              title: 'No shopping lists yet',
-              subtitle: isParent ? 'Tap + to create one' : 'Ask a parent to create a list',
-              iconBgColor: context.palette.primary,
-              iconColor: context.palette.primary,
-            );
-          }
-          return RefreshIndicator(
-            onRefresh: () => ref.refresh(shoppingListsProvider.future),
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-              itemCount: lists.length,
-              itemBuilder: (ctx, i) {
-                final list = lists[i];
-                final progress =
-                    list.itemCount > 0 ? list.checkedCount / list.itemCount : 0.0;
-                final isComplete = progress >= 1.0;
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 840),
+          child: listsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('Error: $e')),
+            data: (lists) {
+              if (lists.isEmpty) {
+                return EmptyState(
+                  icon: Icons.shopping_cart_rounded,
+                  title: 'No shopping lists yet',
+                  subtitle: isParent
+                      ? 'Tap + to create one'
+                      : 'Ask a parent to create a list',
+                  iconBgColor: context.palette.primary,
+                  iconColor: context.palette.primary,
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: () => ref.refresh(shoppingListsProvider.future),
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  itemCount: lists.length,
+                  itemBuilder: (ctx, i) {
+                    final list = lists[i];
+                    final progress = list.itemCount > 0
+                        ? list.checkedCount / list.itemCount
+                        : 0.0;
+                    final isComplete = progress >= 1.0;
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 0,
-                  color: context.palette.surfaceCard,
-                  child: InkWell(
-                    onTap: () => context.push('/shopping-detail/${list.id}'),
-                    borderRadius: BorderRadius.circular(20),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          // Circular progress indicator
-                          SizedBox(
-                            width: 56,
-                            height: 56,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 56,
-                                  height: 56,
-                                  child: CircularProgressIndicator(
-                                    value: progress,
-                                    strokeWidth: 4,
-                                    backgroundColor:
-                                        context.palette.primary
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 0,
+                      color: context.palette.surfaceCard,
+                      child: InkWell(
+                        onTap: () =>
+                            context.push('/shopping-detail/${list.id}'),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              // Circular progress indicator
+                              SizedBox(
+                                width: 56,
+                                height: 56,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 56,
+                                      height: 56,
+                                      child: CircularProgressIndicator(
+                                        value: progress,
+                                        strokeWidth: 4,
+                                        backgroundColor: context.palette.primary
                                             .withValues(alpha: 0.1),
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      isComplete
-                                          ? context.palette.positive
-                                          : context.palette.primary,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              isComplete
+                                                  ? context.palette.positive
+                                                  : context.palette.primary,
+                                            ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${list.checkedCount}/${list.itemCount}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: isComplete
+                                            ? context.palette.positive
+                                            : context.palette.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              // List info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      list.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${list.itemCount} items${isComplete ? ' · Done! 🎉' : ''}',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: isComplete
+                                            ? context.palette.positive
+                                            : context.palette.textTertiary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Delete button
+                              PopupMenuButton<String>(
+                                icon: Icon(
+                                  Icons.more_vert_rounded,
+                                  color: context.palette.textTertiary,
+                                  size: 20,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                itemBuilder: (_) => [
+                                  PopupMenuItem(
+                                    value: 'delete',
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete_outline,
+                                          color: context.palette.danger,
+                                          size: 20,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text('Delete'),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  '${list.checkedCount}/${list.itemCount}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: isComplete
-                                        ? context.palette.positive
-                                        : context.palette.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          // List info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  list.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${list.itemCount} items${isComplete ? ' · Done! 🎉' : ''}',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: isComplete
-                                        ? context.palette.positive
-                                        : context.palette.textTertiary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Delete button
-                          PopupMenuButton<String>(
-                            icon: Icon(Icons.more_vert_rounded,
-                                color: context.palette.textTertiary, size: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            itemBuilder: (_) => [
-                              PopupMenuItem(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.delete_outline,
-                                          color: context.palette.danger,
-                                          size: 20),
-                                      SizedBox(width: 8),
-                                      Text('Delete'),
-                                    ],
-                                  )),
+                                ],
+                                onSelected: (action) async {
+                                  if (action == 'delete') {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text('Delete List'),
+                                        content: Text(
+                                          'Delete "${list.name}" and all its items?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(ctx, false),
+                                            child: const Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(ctx, true),
+                                            child: const Text('Delete'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    if (confirm == true) {
+                                      await ref
+                                          .read(shoppingServiceProvider)
+                                          .deleteList(list.id);
+                                      ref.invalidate(shoppingListsProvider);
+                                    }
+                                  }
+                                },
+                              ),
                             ],
-                            onSelected: (action) async {
-                              if (action == 'delete') {
-                                final confirm = await showDialog<bool>(
-                                  context: context,
-                                  builder: (ctx) => AlertDialog(
-                                    title: const Text('Delete List'),
-                                    content: Text(
-                                        'Delete "${list.name}" and all its items?'),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(ctx, false),
-                                          child: const Text('Cancel')),
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(ctx, true),
-                                          child: const Text('Delete')),
-                                    ],
-                                  ),
-                                );
-                                if (confirm == true) {
-                                  await ref
-                                      .read(shoppingServiceProvider)
-                                      .deleteList(list.id);
-                                  ref.invalidate(shoppingListsProvider);
-                                }
-                              }
-                            },
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        },
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -206,88 +221,100 @@ class ShoppingListsPage extends ConsumerWidget {
         ),
         child: SingleChildScrollView(
           child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: context.palette.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: context.palette.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.shopping_cart_rounded,
+                      color: context.palette.primary,
+                      size: 22,
+                    ),
                   ),
-                  child: Icon(Icons.shopping_cart_rounded,
-                      color: context.palette.primary, size: 22),
-                ),
-                const SizedBox(width: 12),
-                const Text('New Shopping List',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-              ],
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: nameCtrl,
-              decoration: InputDecoration(
-                labelText: 'List name',
-                prefixIcon: const Icon(Icons.edit_outlined),
-                filled: true,
-                fillColor: context.palette.surfaceBase,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'New Shopping List',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  ),
+                ],
               ),
-              autofocus: true,
-              onSubmitted: (value) async {
-                if (value.trim().isNotEmpty) {
-                  try {
-                    await ref.read(shoppingServiceProvider).createList(value.trim());
-                    ref.invalidate(shoppingListsProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  } catch (e) {
-                    if (ctx.mounted) {
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        SnackBar(content: Text('Failed: $e'),
+              const SizedBox(height: 20),
+              TextField(
+                controller: nameCtrl,
+                decoration: InputDecoration(
+                  labelText: 'List name',
+                  prefixIcon: const Icon(Icons.edit_outlined),
+                  filled: true,
+                  fillColor: context.palette.surfaceBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                autofocus: true,
+                onSubmitted: (value) async {
+                  if (value.trim().isNotEmpty) {
+                    try {
+                      await ref
+                          .read(shoppingServiceProvider)
+                          .createList(value.trim());
+                      ref.invalidate(shoppingListsProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed: $e'),
                             backgroundColor: Colors.red.shade700,
-                            behavior: SnackBarBehavior.floating),
-                      );
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
                     }
                   }
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () async {
-                if (nameCtrl.text.trim().isNotEmpty) {
-                  try {
-                    await ref
-                        .read(shoppingServiceProvider)
-                        .createList(nameCtrl.text.trim());
-                    ref.invalidate(shoppingListsProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  } catch (e) {
-                    if (ctx.mounted) {
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        SnackBar(content: Text('Failed: $e'),
+                },
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () async {
+                  if (nameCtrl.text.trim().isNotEmpty) {
+                    try {
+                      await ref
+                          .read(shoppingServiceProvider)
+                          .createList(nameCtrl.text.trim());
+                      ref.invalidate(shoppingListsProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed: $e'),
                             backgroundColor: Colors.red.shade700,
-                            behavior: SnackBarBehavior.floating),
-                      );
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
                     }
                   }
-                }
-              },
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
-                backgroundColor: VillageTheme.primary,
+                },
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  backgroundColor: VillageTheme.primary,
+                ),
+                child: const Text(
+                  'Create List',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
-              child: const Text('Create List',
-                  style: TextStyle(fontSize: 16)),
-            ),
-          ],
+            ],
           ),
         ),
       ),
@@ -308,9 +335,7 @@ class _ShoppingListDetailPageState
     extends ConsumerState<ShoppingListDetailPage> {
   @override
   Widget build(BuildContext context) {
-    final detailAsync = ref.watch(
-      shoppingListDetailProvider(widget.listId),
-    );
+    final detailAsync = ref.watch(shoppingListDetailProvider(widget.listId));
 
     return Scaffold(
       appBar: AppBar(
@@ -376,9 +401,8 @@ class _ShoppingListDetailPageState
                                     ? detail.checkedCount / detail.itemCount
                                     : 0.0,
                                 strokeWidth: 4,
-                                backgroundColor:
-                                    context.palette.primary
-                                        .withValues(alpha: 0.1),
+                                backgroundColor: context.palette.primary
+                                    .withValues(alpha: 0.1),
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   context.palette.primary,
                                 ),
@@ -399,14 +423,19 @@ class _ShoppingListDetailPageState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Progress',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600)),
+                              const Text(
+                                'Progress',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                               Text(
                                 '${detail.checkedCount} of ${detail.itemCount} items checked',
                                 style: TextStyle(
-                                    fontSize: 13, color: context.palette.textTertiary),
+                                  fontSize: 13,
+                                  color: context.palette.textTertiary,
+                                ),
                               ),
                             ],
                           ),
@@ -421,17 +450,19 @@ class _ShoppingListDetailPageState
                 if (unchecked.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 4, bottom: 8),
-                    child: Text('To Get (${unchecked.length})',
-                        style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey)),
+                    child: Text(
+                      'To Get (${unchecked.length})',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
-                  ...unchecked.map((item) => _ItemTile(
-                        item: item,
-                        listId: widget.listId,
-                        ref: ref,
-                      )),
+                  ...unchecked.map(
+                    (item) =>
+                        _ItemTile(item: item, listId: widget.listId, ref: ref),
+                  ),
                   if (checked.isNotEmpty) const SizedBox(height: 16),
                 ],
 
@@ -439,17 +470,19 @@ class _ShoppingListDetailPageState
                 if (checked.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 4, bottom: 8),
-                    child: Text('Checked (${checked.length})',
-                        style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey)),
+                    child: Text(
+                      'Checked (${checked.length})',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
-                  ...checked.map((item) => _ItemTile(
-                        item: item,
-                        listId: widget.listId,
-                        ref: ref,
-                      )),
+                  ...checked.map(
+                    (item) =>
+                        _ItemTile(item: item, listId: widget.listId, ref: ref),
+                  ),
                 ],
               ],
             ),
@@ -489,17 +522,23 @@ class _ShoppingListDetailPageState
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color:
-                            context.palette.primary.withValues(alpha: 0.12),
+                        color: context.palette.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.add_shopping_cart_rounded,
-                          color: context.palette.primary, size: 22),
+                      child: Icon(
+                        Icons.add_shopping_cart_rounded,
+                        color: context.palette.primary,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    const Text('Add Item',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
+                    const Text(
+                      'Add Item',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -549,17 +588,22 @@ class _ShoppingListDetailPageState
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        items: [
-                          'Produce',
-                          'Dairy',
-                          'Meat',
-                          'Bakery',
-                          'Pantry',
-                          'Other'
-                        ]
-                            .map((c) => DropdownMenuItem(
-                                value: c, child: Text(c)))
-                            .toList(),
+                        items:
+                            [
+                                  'Produce',
+                                  'Dairy',
+                                  'Meat',
+                                  'Bakery',
+                                  'Pantry',
+                                  'Other',
+                                ]
+                                .map(
+                                  (c) => DropdownMenuItem(
+                                    value: c,
+                                    child: Text(c),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (v) => setState(() => category = v),
                       ),
                     ),
@@ -570,20 +614,26 @@ class _ShoppingListDetailPageState
                   onPressed: () async {
                     if (nameCtrl.text.trim().isNotEmpty) {
                       try {
-                        await ref.read(shoppingServiceProvider).addItem(
+                        await ref
+                            .read(shoppingServiceProvider)
+                            .addItem(
                               widget.listId,
                               name: nameCtrl.text.trim(),
                               quantity: int.tryParse(qtyCtrl.text) ?? 1,
                               category: category,
                             );
-                        ref.invalidate(shoppingListDetailProvider(widget.listId));
+                        ref.invalidate(
+                          shoppingListDetailProvider(widget.listId),
+                        );
                         if (ctx.mounted) Navigator.pop(ctx);
                       } catch (e) {
                         if (ctx.mounted) {
                           ScaffoldMessenger.of(ctx).showSnackBar(
-                            SnackBar(content: Text('Failed: $e'),
-                                backgroundColor: Colors.red.shade700,
-                                behavior: SnackBarBehavior.floating),
+                            SnackBar(
+                              content: Text('Failed: $e'),
+                              backgroundColor: Colors.red.shade700,
+                              behavior: SnackBarBehavior.floating,
+                            ),
                           );
                         }
                       }
@@ -593,8 +643,10 @@ class _ShoppingListDetailPageState
                     minimumSize: const Size(double.infinity, 52),
                     backgroundColor: VillageTheme.primary,
                   ),
-                  child: const Text('Add to List',
-                      style: TextStyle(fontSize: 16)),
+                  child: const Text(
+                    'Add to List',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ],
             ),
@@ -620,21 +672,19 @@ class _ItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,
       color: context.palette.surfaceCard,
       child: ListTile(
         leading: Checkbox(
           value: item.isChecked,
           activeColor: context.palette.positive,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           onChanged: (_) async {
             try {
-              await ref.read(shoppingServiceProvider).toggleItem(listId, item.id);
+              await ref
+                  .read(shoppingServiceProvider)
+                  .toggleItem(listId, item.id);
               if (!context.mounted) return;
               // Refresh the detail page (and list counts) so the checkbox
               // reflects the new state immediately.
@@ -669,8 +719,10 @@ class _ItemTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: _categoryColor(context, item.category!)
-                      .withValues(alpha: 0.12),
+                  color: _categoryColor(
+                    context,
+                    item.category!,
+                  ).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -736,10 +788,21 @@ class _ItemTile extends StatelessWidget {
           // Include the item's existing category if it's not one of the
           // standard options, so the dropdown never crashes on unknown values.
           final categories = <String>[
-            'Produce', 'Dairy', 'Meat', 'Bakery', 'Pantry', 'Other',
+            'Produce',
+            'Dairy',
+            'Meat',
+            'Bakery',
+            'Pantry',
+            'Other',
             if (category != null &&
-                !['Produce', 'Dairy', 'Meat', 'Bakery', 'Pantry', 'Other']
-                    .contains(category))
+                ![
+                  'Produce',
+                  'Dairy',
+                  'Meat',
+                  'Bakery',
+                  'Pantry',
+                  'Other',
+                ].contains(category))
               category!,
           ];
           return Padding(
@@ -760,16 +823,25 @@ class _ItemTile extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: context.palette.primary.withValues(alpha: 0.12),
+                          color: context.palette.primary.withValues(
+                            alpha: 0.12,
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(Icons.edit_note_rounded,
-                            color: context.palette.primary, size:22),
+                        child: Icon(
+                          Icons.edit_note_rounded,
+                          color: context.palette.primary,
+                          size: 22,
+                        ),
                       ),
                       const SizedBox(width: 12),
-                      const Text('Edit Item',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w700)),
+                      const Text(
+                        'Edit Item',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -820,8 +892,10 @@ class _ItemTile extends StatelessWidget {
                             ),
                           ),
                           items: categories
-                              .map((c) => DropdownMenuItem(
-                                  value: c, child: Text(c)))
+                              .map(
+                                (c) =>
+                                    DropdownMenuItem(value: c, child: Text(c)),
+                              )
                               .toList(),
                           onChanged: (v) => setState(() => category = v),
                         ),
@@ -833,7 +907,9 @@ class _ItemTile extends StatelessWidget {
                     onPressed: () async {
                       if (nameCtrl.text.trim().isNotEmpty) {
                         try {
-                          await ref.read(shoppingServiceProvider).updateItem(
+                          await ref
+                              .read(shoppingServiceProvider)
+                              .updateItem(
                                 listId,
                                 item.id,
                                 name: nameCtrl.text.trim(),
@@ -848,9 +924,10 @@ class _ItemTile extends StatelessWidget {
                           if (ctx.mounted) {
                             ScaffoldMessenger.of(ctx).showSnackBar(
                               SnackBar(
-                                  content: Text('Failed: $e'),
-                                  backgroundColor: Colors.red.shade700,
-                                  behavior: SnackBarBehavior.floating),
+                                content: Text('Failed: $e'),
+                                backgroundColor: Colors.red.shade700,
+                                behavior: SnackBarBehavior.floating,
+                              ),
                             );
                           }
                         }
@@ -860,8 +937,10 @@ class _ItemTile extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 52),
                       backgroundColor: VillageTheme.primary,
                     ),
-                    child: const Text('Save Changes',
-                        style: TextStyle(fontSize: 16)),
+                    child: const Text(
+                      'Save Changes',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ],
               ),

@@ -88,11 +88,11 @@ class _HubPageState extends ConsumerState<HubPage> {
               final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
               return IconButton(
                 icon: Icon(
-                  isDark
-                      ? Icons.light_mode_outlined
-                      : Icons.dark_mode_outlined,
+                  isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
                 ),
-                tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+                tooltip: isDark
+                    ? 'Switch to light mode'
+                    : 'Switch to dark mode',
                 onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
               );
             },
@@ -128,178 +128,195 @@ class _HubPageState extends ConsumerState<HubPage> {
       ),
       body: Stack(
         children: [
-          RefreshIndicator(
-            onRefresh: () => ref.read(familyProvider.notifier).loadFamily(),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
-              children: [
-                // ── Welcome banner ──
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    context.palette.primary,
-                    context.palette.primary.withValues(alpha: 0.85),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Welcome back, $myName 👋',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    familyState.isLoading
-                        ? 'Loading your family...'
-                        : '$familyName is waiting for you',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ── Subscription / Trial banner ──
-            if (familyState.family != null)
-              _buildSubscriptionBanner(context, familyState.family!),
-            if (familyState.family != null) const SizedBox(height: 16),
-
-            // ── Points card ──
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              elevation: 0,
-              color: context.palette.surfaceCard,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 840),
+              child: RefreshIndicator(
+                onRefresh: () => ref.read(familyProvider.notifier).loadFamily(),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                   children: [
+                    // ── Welcome banner ──
                     Container(
-                      width: 56,
-                      height: 56,
                       decoration: BoxDecoration(
-                        color: context.palette.warning.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          colors: [
+                            context.palette.primary,
+                            context.palette.primary.withValues(alpha: 0.85),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Icon(
-                        Icons.stars_rounded,
-                        size: 32,
-                        color: context.palette.warning,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
+                      padding: const EdgeInsets.all(24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'My ${familyState.family?.currencyName ?? 'Points'}',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
+                            'Welcome back, $myName 👋',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
                           Text(
-                            familyState.isLoading ? '...' : myPoints.toString(),
-                            style: theme.textTheme.displaySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: context.palette.primary,
+                            familyState.isLoading
+                                ? 'Loading your family...'
+                                : '$familyName is waiting for you',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.85),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    if (familyState.isLoading)
-                      const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                    const SizedBox(height: 16),
+
+                    // ── Subscription / Trial banner ──
+                    if (familyState.family != null)
+                      _buildSubscriptionBanner(context, familyState.family!),
+                    if (familyState.family != null) const SizedBox(height: 16),
+
+                    // ── Points card ──
+                    Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 0,
+                      color: context.palette.surfaceCard,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: context.palette.warning.withValues(
+                                  alpha: 0.15,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                Icons.stars_rounded,
+                                size: 32,
+                                color: context.palette.warning,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'My ${familyState.family?.currencyName ?? 'Points'}',
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    familyState.isLoading
+                                        ? '...'
+                                        : myPoints.toString(),
+                                    style: theme.textTheme.displaySmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: context.palette.primary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (familyState.isLoading)
+                              const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // ── Quick Actions (Bento Grid) ──
+                    Text(
+                      'Quick Actions',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildBentoGrid(context),
+
+                    // ── Leaderboard ──
+                    if (familyState.family != null &&
+                        familyState.family!.members.length > 1) ...[
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.leaderboard_rounded,
+                            size: 22,
+                            color: context.palette.warning,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Family Leaderboard',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildLeaderboardCard(
+                        context,
+                        familyState.family!.members,
+                        currentUserId,
+                      ),
+                    ],
+
+                    // ── Error banner ──
+                    if (familyState.error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Card(
+                          color: theme.colorScheme.errorContainer,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  color: theme.colorScheme.onErrorContainer,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    familyState.error!,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onErrorContainer,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-
-            // ── Quick Actions (Bento Grid) ──
-            Text(
-              'Quick Actions',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildBentoGrid(context),
-
-            // ── Leaderboard ──
-            if (familyState.family != null &&
-                familyState.family!.members.length > 1) ...[
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Icon(Icons.leaderboard_rounded,
-                      size: 22, color: context.palette.warning),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Family Leaderboard',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _buildLeaderboardCard(
-                context,
-                familyState.family!.members,
-                currentUserId,
-              ),
-            ],
-
-            // ── Error banner ──
-            if (familyState.error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Card(
-                  color: theme.colorScheme.errorContainer,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Icon(Icons.error_outline,
-                            color: theme.colorScheme.onErrorContainer),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            familyState.error!,
-                            style: TextStyle(
-                                color: theme.colorScheme.onErrorContainer),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
+          ),
           // ── FAB overlay ──
           Positioned(
             bottom: 16,
@@ -332,12 +349,42 @@ class _HubPageState extends ConsumerState<HubPage> {
 
   Widget _buildMobileGrid(BuildContext context) {
     final items = [
-      (Icons.checklist_rounded, 'Chores', context.palette.positive, () => context.push('/chores')),
-      (Icons.stars_rounded, 'Rewards', context.palette.warning, () => context.push('/rewards')),
-      (Icons.calendar_month_rounded, 'Calendar', VillageTheme.primaryLight, () => context.go('/calendar')),
-      (Icons.shopping_cart_rounded, 'Shopping', context.palette.primary, () => context.go('/shopping')),
-      (Icons.school_rounded, 'School', context.palette.info, () => context.push('/school')),
-      (Icons.restaurant_rounded, 'Meals', context.palette.danger, () => context.push('/meals')),
+      (
+        Icons.checklist_rounded,
+        'Chores',
+        context.palette.positive,
+        () => context.push('/chores'),
+      ),
+      (
+        Icons.stars_rounded,
+        'Rewards',
+        context.palette.warning,
+        () => context.push('/rewards'),
+      ),
+      (
+        Icons.calendar_month_rounded,
+        'Calendar',
+        VillageTheme.primaryLight,
+        () => context.go('/calendar'),
+      ),
+      (
+        Icons.shopping_cart_rounded,
+        'Shopping',
+        context.palette.primary,
+        () => context.go('/shopping'),
+      ),
+      (
+        Icons.school_rounded,
+        'School',
+        context.palette.info,
+        () => context.push('/school'),
+      ),
+      (
+        Icons.restaurant_rounded,
+        'Meals',
+        context.palette.danger,
+        () => context.push('/meals'),
+      ),
     ];
 
     return Column(
@@ -527,8 +574,10 @@ class _HubPageState extends ConsumerState<HubPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Create…',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            const Text(
+              'Create…',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: () {
@@ -595,13 +644,20 @@ class _HubPageState extends ConsumerState<HubPage> {
                         color: context.palette.positive.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.cleaning_services_rounded,
-                          color: context.palette.positive, size: 22),
+                      child: Icon(
+                        Icons.cleaning_services_rounded,
+                        color: context.palette.positive,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    const Text('New Chore',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
+                    const Text(
+                      'New Chore',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -704,7 +760,9 @@ class _HubPageState extends ConsumerState<HubPage> {
                 FilledButton(
                   onPressed: () async {
                     if (nameCtrl.text.trim().isEmpty) return;
-                    await ref.read(choresServiceProvider).createChore(
+                    await ref
+                        .read(choresServiceProvider)
+                        .createChore(
                           name: nameCtrl.text.trim(),
                           description: descCtrl.text.trim(),
                           pointValue: int.tryParse(pointCtrl.text) ?? 10,
@@ -720,8 +778,10 @@ class _HubPageState extends ConsumerState<HubPage> {
                     minimumSize: const Size(double.infinity, 52),
                     backgroundColor: VillageTheme.positive,
                   ),
-                  child: const Text('Create Chore',
-                      style: TextStyle(fontSize: 16)),
+                  child: const Text(
+                    'Create Chore',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ],
             ),
@@ -736,7 +796,9 @@ class _HubPageState extends ConsumerState<HubPage> {
     final members = familyState.family?.members ?? [];
     if (members.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No family members loaded. Visit Hub first.')),
+        const SnackBar(
+          content: Text('No family members loaded. Visit Hub first.'),
+        ),
       );
       return;
     }
@@ -777,13 +839,20 @@ class _HubPageState extends ConsumerState<HubPage> {
                         color: context.palette.info.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.assignment_rounded,
-                          color: context.palette.info, size: 22),
+                      child: Icon(
+                        Icons.assignment_rounded,
+                        color: context.palette.info,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    const Text('New Assignment',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
+                    const Text(
+                      'New Assignment',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -815,30 +884,34 @@ class _HubPageState extends ConsumerState<HubPage> {
                       ),
                     ),
                     items: members
-                        .map((m) => DropdownMenuItem(
-                              value: m,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    m.role == 'Parent'
-                                        ? Icons.star
-                                        : Icons.person,
-                                    size: 18,
-                                    color: m.role == 'Parent'
-                                        ? Colors.amber
-                                        : Colors.grey,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(m.displayName),
-                                ],
-                              ),
-                            ))
+                        .map(
+                          (m) => DropdownMenuItem(
+                            value: m,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  m.role == 'Parent'
+                                      ? Icons.star
+                                      : Icons.person,
+                                  size: 18,
+                                  color: m.role == 'Parent'
+                                      ? Colors.amber
+                                      : Colors.grey,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(m.displayName),
+                              ],
+                            ),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() => selectedMember = v),
                   )
                 else
-                  const Text('No family members loaded.',
-                      style: TextStyle(color: Colors.grey)),
+                  const Text(
+                    'No family members loaded.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 const SizedBox(height: 12),
                 if (subjects.isNotEmpty)
                   DropdownButtonFormField<String>(
@@ -853,23 +926,28 @@ class _HubPageState extends ConsumerState<HubPage> {
                       ),
                     ),
                     items: subjects
-                        .map((s) => DropdownMenuItem(
-                              value: s.id,
-                              child: Text(s.name),
-                            ))
+                        .map(
+                          (s) => DropdownMenuItem(
+                            value: s.id,
+                            child: Text(s.name),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() => selectedSubjectId = v),
                   )
-                  else
+                else
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
                       'No subjects yet — create one in School first.',
-                      style: TextStyle(color: context.palette.warning, fontSize: 13),
+                      style: TextStyle(
+                        color: context.palette.warning,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
+                const SizedBox(height: 12),
+                TextField(
                   controller: descCtrl,
                   decoration: InputDecoration(
                     labelText: 'Description (optional)',
@@ -910,8 +988,9 @@ class _HubPageState extends ConsumerState<HubPage> {
                             context: ctx,
                             initialDate: selectedDate,
                             firstDate: DateTime.now(),
-                            lastDate:
-                                DateTime.now().add(const Duration(days: 365)),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
                             helpText: 'Select due date',
                           );
                           if (date != null) {
@@ -927,8 +1006,10 @@ class _HubPageState extends ConsumerState<HubPage> {
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
                             ),
-                            suffixIcon:
-                                const Icon(Icons.calendar_today, size: 18),
+                            suffixIcon: const Icon(
+                              Icons.calendar_today,
+                              size: 18,
+                            ),
                           ),
                           child: Text(
                             '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
@@ -946,12 +1027,13 @@ class _HubPageState extends ConsumerState<HubPage> {
                     if (selectedMember == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content:
-                                Text('Please assign to a family member.')),
+                          content: Text('Please assign to a family member.'),
+                        ),
                       );
                       return;
                     }
-                    if (selectedSubjectId == null || selectedSubjectId!.isEmpty) {
+                    if (selectedSubjectId == null ||
+                        selectedSubjectId!.isEmpty) {
                       ScaffoldMessenger.of(ctx).showSnackBar(
                         SnackBar(
                           content: const Text('Please select a subject.'),
@@ -963,7 +1045,9 @@ class _HubPageState extends ConsumerState<HubPage> {
                     final dueDate =
                         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
                     try {
-                      await ref.read(schoolServiceProvider).createSchoolWork(
+                      await ref
+                          .read(schoolServiceProvider)
+                          .createSchoolWork(
                             subjectId: selectedSubjectId!,
                             assignedToId: selectedMember!.id,
                             title: titleCtrl.text.trim(),
@@ -971,8 +1055,7 @@ class _HubPageState extends ConsumerState<HubPage> {
                                 ? descCtrl.text.trim()
                                 : null,
                             dueDate: dueDate,
-                            pointsPossible:
-                                int.tryParse(pointsCtrl.text) ?? 10,
+                            pointsPossible: int.tryParse(pointsCtrl.text) ?? 10,
                           );
                       ref.invalidate(schoolWorkListProvider);
                       if (ctx.mounted) Navigator.pop(ctx);
@@ -981,7 +1064,8 @@ class _HubPageState extends ConsumerState<HubPage> {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           SnackBar(
                             content: const Text(
-                                'Failed to create assignment. Check your connection.'),
+                              'Failed to create assignment. Check your connection.',
+                            ),
                             backgroundColor: Colors.red.shade700,
                           ),
                         );
@@ -1001,8 +1085,10 @@ class _HubPageState extends ConsumerState<HubPage> {
                     minimumSize: const Size(double.infinity, 52),
                     backgroundColor: VillageTheme.info,
                   ),
-                  child: const Text('Create Assignment',
-                      style: TextStyle(fontSize: 16)),
+                  child: const Text(
+                    'Create Assignment',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ],
             ),
@@ -1019,35 +1105,96 @@ class _HubPageState extends ConsumerState<HubPage> {
     if (status == 'active') return const SizedBox.shrink();
     if (status == 'canceled') return const SizedBox.shrink();
     if (status == 'past_due') {
-      return _banner(context.palette.warning, Icons.error_outline_rounded,
-          'Payment Past Due', 'Update payment method to keep access', 'Update');
+      return _banner(
+        context.palette.warning,
+        Icons.error_outline_rounded,
+        'Payment Past Due',
+        'Update payment method to keep access',
+        'Update',
+      );
     }
     final isNew = status == 'trial' && family.subscriptionExpiresAt == null;
-    return _banner(context.palette.primary, Icons.rocket_launch_rounded,
-        'First month free', isNew ? 'Add a card — cancel anytime' : 'Subscribe to restore access', 'Subscribe');
+    return _banner(
+      context.palette.primary,
+      Icons.rocket_launch_rounded,
+      'First month free',
+      isNew ? 'Add a card — cancel anytime' : 'Subscribe to restore access',
+      'Subscribe',
+    );
   }
 
-  Widget _banner(Color color, IconData icon, String title, String subtitle, String action) {
+  Widget _banner(
+    Color color,
+    IconData icon,
+    String title,
+    String subtitle,
+    String action,
+  ) {
     return Card(
-      elevation: 0, color: color.withValues(alpha: 0.08),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: color.withValues(alpha: 0.25))),
+      elevation: 0,
+      color: color.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: color.withValues(alpha: 0.25)),
+      ),
       child: InkWell(
-        onTap: () => context.go('/subscription'), borderRadius: BorderRadius.circular(16),
-        child: Padding(padding: const EdgeInsets.all(16), child: Row(children: [
-          Container(width: 40, height: 40,
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
-              child: Icon(icon, color: color, size: 22)),
-          const SizedBox(width: 14),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: color)),
-            const SizedBox(height: 2),
-            Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          ])),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
-              child: Text(action, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600))),
-        ])),
+        onTap: () => context.go('/subscription'),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  action,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1127,7 +1274,11 @@ class _BentoActionCardState extends State<_BentoActionCard> {
                 AnimatedOpacity(
                   duration: const Duration(milliseconds: 200),
                   opacity: _hovered ? 1.0 : 0.4,
-                  child: Icon(Icons.chevron_right_rounded, size: 20, color: color),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    size: 20,
+                    color: color,
+                  ),
                 ),
               ],
             ),
@@ -1144,16 +1295,34 @@ class _BentoActionCardState extends State<_BentoActionCard> {
     if (status == 'canceled') return const SizedBox.shrink();
 
     if (status == 'past_due') {
-      return _banner(context.palette.warning, Icons.error_outline_rounded,
-          'Payment Past Due', 'Update payment method to keep access', 'Update');
+      return _banner(
+        context.palette.warning,
+        Icons.error_outline_rounded,
+        'Payment Past Due',
+        'Update payment method to keep access',
+        'Update',
+      );
     }
 
     final isNew = status == 'trial' && family.subscriptionExpiresAt == null;
-    return _banner(context.palette.primary, Icons.rocket_launch_rounded,
-        'First month free', isNew ? 'Add a card to get started — cancel anytime' : 'Subscribe to restore access', 'Subscribe');
+    return _banner(
+      context.palette.primary,
+      Icons.rocket_launch_rounded,
+      'First month free',
+      isNew
+          ? 'Add a card to get started — cancel anytime'
+          : 'Subscribe to restore access',
+      'Subscribe',
+    );
   }
 
-  Widget _banner(Color color, IconData icon, String title, String subtitle, String action) {
+  Widget _banner(
+    Color color,
+    IconData icon,
+    String title,
+    String subtitle,
+    String action,
+  ) {
     return Card(
       elevation: 0,
       color: color.withValues(alpha: 0.08),
@@ -1168,19 +1337,53 @@ class _BentoActionCardState extends State<_BentoActionCard> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Container(width: 40, height: 40,
-                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
-                child: Icon(icon, color: color, size: 22)),
-              const SizedBox(width: 14),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: color)),
-                const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-              ])),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
-                child: Text(action, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  action,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),

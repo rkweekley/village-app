@@ -88,56 +88,61 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         onPressed: () => _showCreateEventSheet(context),
         child: const Icon(Icons.add),
       ),
-      body: eventsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (events) => Column(
-          children: [
-            _CalendarGrid(
-              focusedMonth: _focusedMonth,
-              selectedDay: _selectedDay,
-              events: events,
-              onDaySelected: (day) => setState(() => _selectedDay = day),
-            ),
-            if (_selectedDay != null) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 840),
+          child: eventsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('Error: $e')),
+            data: (events) => Column(
+              children: [
+                _CalendarGrid(
+                  focusedMonth: _focusedMonth,
+                  selectedDay: _selectedDay,
+                  events: events,
+                  onDaySelected: (day) => setState(() => _selectedDay = day),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: VillageTheme.primaryLight.withValues(
-                          alpha: 0.12,
+                if (_selectedDay != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: VillageTheme.primaryLight.withValues(
+                              alpha: 0.12,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.event_rounded,
+                            size: 18,
+                            color: VillageTheme.primaryLight,
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.event_rounded,
-                        size: 18,
-                        color: VillageTheme.primaryLight,
-                      ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Events for ${_selectedDay!.month}/${_selectedDay!.day}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 17,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Events for ${_selectedDay!.month}/${_selectedDay!.day}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 17,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: _DayEventsList(day: _selectedDay!, events: events),
-              ),
-            ],
-          ],
+                  ),
+                  Expanded(
+                    child: _DayEventsList(day: _selectedDay!, events: events),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -170,288 +175,294 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
       isScrollControlled: true,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => Padding(
-                padding: EdgeInsets.only(
-                  left: 24,
-                  right: 24,
-                  top: 24,
-                  bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: VillageTheme.primaryLight.withValues(
+                          alpha: 0.12,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.calendar_month_rounded,
+                        color: VillageTheme.primaryLight,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'New Event',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: VillageTheme.primaryLight.withValues(
-                                alpha: 0.12,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.calendar_month_rounded,
-                              color: VillageTheme.primaryLight,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'New Event',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: titleCtrl,
-                        decoration: InputDecoration(
-                          labelText: 'Title',
-                          filled: true,
-                          fillColor: context.palette.surfaceBase,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        autofocus: true,
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: descCtrl,
-                        decoration: InputDecoration(
-                          labelText: 'Description (optional)',
-                          filled: true,
-                          fillColor: context.palette.surfaceBase,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        maxLines: 2,
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: locCtrl,
-                        decoration: InputDecoration(
-                          labelText: 'Location (optional)',
-                          prefixIcon: const Icon(
-                            Icons.location_on_outlined,
-                            size: 20,
-                          ),
-                          filled: true,
-                          fillColor: context.palette.surfaceBase,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: _EventDateTimeField(
-                              label: 'Starts',
-                              value: start,
-                              timeEnabled: !allDay,
-                              onDateTap: () async {
-                                final picked = await showDatePicker(
-                                  context: ctx,
-                                  initialDate: start,
-                                  firstDate: DateTime.now().subtract(
-                                    const Duration(days: 30),
-                                  ),
-                                  lastDate: DateTime.now().add(
-                                    const Duration(days: 365),
-                                  ),
-                                  builder: (ctx, child) => Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: Theme.of(context).colorScheme
-                                          .copyWith(
-                                            primary: VillageTheme.primaryLight,
-                                          ),
-                                    ),
-                                    child: child!,
-                                  ),
-                                );
-                                if (picked != null) {
-                                  setDialogState(
-                                    () => start = DateTime(
-                                      picked.year,
-                                      picked.month,
-                                      picked.day,
-                                      start.hour,
-                                      start.minute,
-                                    ),
-                                  );
-                                }
-                              },
-                              onTimeTap: () async {
-                                final picked = await showTimePicker(
-                                  context: ctx,
-                                  initialTime: TimeOfDay.fromDateTime(start),
-                                  builder: (ctx, child) => Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: Theme.of(context).colorScheme
-                                          .copyWith(
-                                            primary: VillageTheme.primaryLight,
-                                          ),
-                                    ),
-                                    child: child!,
-                                  ),
-                                );
-                                if (picked != null) {
-                                  setDialogState(
-                                    () => start = DateTime(
-                                      start.year,
-                                      start.month,
-                                      start.day,
-                                      picked.hour,
-                                      picked.minute,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _EventDateTimeField(
-                              label: 'Ends',
-                              value: end,
-                              timeEnabled: !allDay,
-                              onDateTap: () async {
-                                final picked = await showDatePicker(
-                                  context: ctx,
-                                  initialDate: end,
-                                  firstDate: DateTime.now().subtract(
-                                    const Duration(days: 30),
-                                  ),
-                                  lastDate: DateTime.now().add(
-                                    const Duration(days: 365),
-                                  ),
-                                  builder: (ctx, child) => Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: Theme.of(context).colorScheme
-                                          .copyWith(
-                                            primary: VillageTheme.primaryLight,
-                                          ),
-                                    ),
-                                    child: child!,
-                                  ),
-                                );
-                                if (picked != null) {
-                                  setDialogState(
-                                    () => end = DateTime(
-                                      picked.year,
-                                      picked.month,
-                                      picked.day,
-                                      end.hour,
-                                      end.minute,
-                                    ),
-                                  );
-                                }
-                              },
-                              onTimeTap: () async {
-                                final picked = await showTimePicker(
-                                  context: ctx,
-                                  initialTime: TimeOfDay.fromDateTime(end),
-                                  builder: (ctx, child) => Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: Theme.of(context).colorScheme
-                                          .copyWith(
-                                            primary: VillageTheme.primaryLight,
-                                          ),
-                                    ),
-                                    child: child!,
-                                  ),
-                                );
-                                if (picked != null) {
-                                  setDialogState(
-                                    () => end = DateTime(
-                                      end.year,
-                                      end.month,
-                                      end.day,
-                                      picked.hour,
-                                      picked.minute,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: context.palette.surfaceBase,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: SwitchListTile(
-                          title: const Text('All day event'),
-                          value: allDay,
-                          activeColor: VillageTheme.primaryLight,
-                          onChanged: (v) => setDialogState(() => allDay = v),
-                          dense: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      FilledButton(
-                        onPressed: () async {
-                          if (titleCtrl.text.isEmpty) return;
-                          await ref
-                              .read(calendarServiceProvider)
-                              .createEvent(
-                                title: titleCtrl.text,
-                                description: descCtrl.text.isNotEmpty
-                                    ? descCtrl.text
-                                    : null,
-                                location: locCtrl.text.isNotEmpty
-                                    ? locCtrl.text
-                                    : null,
-                                startTime: start,
-                                endTime: end,
-                                isAllDay: allDay,
-                              );
-                          final monthStart = DateTime(
-                            _focusedMonth.year, _focusedMonth.month, 1);
-                          final monthEnd = DateTime(
-                            _focusedMonth.year, _focusedMonth.month + 1,
-                            0, 23, 59);
-                          // ignore: unused_result
-                          ref.refresh(
-                            calendarEventsProvider(
-                              CalendarDateRange(
-                                start: monthStart, end: monthEnd)));
-                          if (ctx.mounted) Navigator.pop(ctx);
-                        },
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 52),
-                          backgroundColor: VillageTheme.primaryLight,
-                        ),
-                        child: const Text(
-                          'Create Event',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 20),
+                TextField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    filled: true,
+                    fillColor: context.palette.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  autofocus: true,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Description (optional)',
+                    filled: true,
+                    fillColor: context.palette.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: locCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Location (optional)',
+                    prefixIcon: const Icon(
+                      Icons.location_on_outlined,
+                      size: 20,
+                    ),
+                    filled: true,
+                    fillColor: context.palette.surfaceBase,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _EventDateTimeField(
+                        label: 'Starts',
+                        value: start,
+                        timeEnabled: !allDay,
+                        onDateTap: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: start,
+                            firstDate: DateTime.now().subtract(
+                              const Duration(days: 30),
+                            ),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => start = DateTime(
+                                picked.year,
+                                picked.month,
+                                picked.day,
+                                start.hour,
+                                start.minute,
+                              ),
+                            );
+                          }
+                        },
+                        onTimeTap: () async {
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: TimeOfDay.fromDateTime(start),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => start = DateTime(
+                                start.year,
+                                start.month,
+                                start.day,
+                                picked.hour,
+                                picked.minute,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _EventDateTimeField(
+                        label: 'Ends',
+                        value: end,
+                        timeEnabled: !allDay,
+                        onDateTap: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: end,
+                            firstDate: DateTime.now().subtract(
+                              const Duration(days: 30),
+                            ),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => end = DateTime(
+                                picked.year,
+                                picked.month,
+                                picked.day,
+                                end.hour,
+                                end.minute,
+                              ),
+                            );
+                          }
+                        },
+                        onTimeTap: () async {
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: TimeOfDay.fromDateTime(end),
+                            builder: (ctx, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: VillageTheme.primaryLight,
+                                    ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => end = DateTime(
+                                end.year,
+                                end.month,
+                                end.day,
+                                picked.hour,
+                                picked.minute,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: context.palette.surfaceBase,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: SwitchListTile(
+                    title: const Text('All day event'),
+                    value: allDay,
+                    activeColor: VillageTheme.primaryLight,
+                    onChanged: (v) => setDialogState(() => allDay = v),
+                    dense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: () async {
+                    if (titleCtrl.text.isEmpty) return;
+                    await ref
+                        .read(calendarServiceProvider)
+                        .createEvent(
+                          title: titleCtrl.text,
+                          description: descCtrl.text.isNotEmpty
+                              ? descCtrl.text
+                              : null,
+                          location: locCtrl.text.isNotEmpty
+                              ? locCtrl.text
+                              : null,
+                          startTime: start,
+                          endTime: end,
+                          isAllDay: allDay,
+                        );
+                    final monthStart = DateTime(
+                      _focusedMonth.year,
+                      _focusedMonth.month,
+                      1,
+                    );
+                    final monthEnd = DateTime(
+                      _focusedMonth.year,
+                      _focusedMonth.month + 1,
+                      0,
+                      23,
+                      59,
+                    );
+                    // ignore: unused_result
+                    ref.refresh(
+                      calendarEventsProvider(
+                        CalendarDateRange(start: monthStart, end: monthEnd),
+                      ),
+                    );
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    backgroundColor: VillageTheme.primaryLight,
+                  ),
+                  child: const Text(
+                    'Create Event',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
             ),
-          );
+          ),
+        ),
+      ),
+    );
   }
 
   String _monthName(int m) {
@@ -833,25 +844,43 @@ class _DayEventsList extends ConsumerWidget {
                         _showEditEventSheet(context, ref, e);
                       } else if (value == 'delete') {
                         try {
-                          await ref.read(calendarServiceProvider).deleteEvent(e.id);
+                          await ref
+                              .read(calendarServiceProvider)
+                              .deleteEvent(e.id);
                           final monthStart = DateTime(day.year, day.month, 1);
-                          final monthEnd = DateTime(day.year, day.month + 1, 0, 23, 59);
-                          ref.invalidate(calendarEventsProvider(
-                              CalendarDateRange(start: monthStart, end: monthEnd)));
+                          final monthEnd = DateTime(
+                            day.year,
+                            day.month + 1,
+                            0,
+                            23,
+                            59,
+                          );
+                          ref.invalidate(
+                            calendarEventsProvider(
+                              CalendarDateRange(
+                                start: monthStart,
+                                end: monthEnd,
+                              ),
+                            ),
+                          );
                         } on DioException catch (err) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text(
-                                      'Failed to delete event: ${err.message}')),
+                                content: Text(
+                                  'Failed to delete event: ${err.message}',
+                                ),
+                              ),
                             );
                           }
                         } catch (err) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text(
-                                      'Failed to delete event: ${err.toString()}')),
+                                content: Text(
+                                  'Failed to delete event: ${err.toString()}',
+                                ),
+                              ),
                             );
                           }
                         }
@@ -880,7 +909,10 @@ class _DayEventsList extends ConsumerWidget {
                                 color: Colors.red,
                               ),
                               SizedBox(width: 8),
-                              Text('Delete', style: TextStyle(color: Colors.red)),
+                              Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
+                              ),
                             ],
                           ),
                         ),
@@ -906,26 +938,44 @@ class _DayEventsList extends ConsumerWidget {
                               await ref
                                   .read(calendarServiceProvider)
                                   .rsvp(e.id, 'Accepted');
-                              final monthStart = DateTime(day.year, day.month, 1);
-                              final monthEnd =
-                                  DateTime(day.year, day.month + 1, 0, 23, 59);
-                              ref.invalidate(calendarEventsProvider(
+                              final monthStart = DateTime(
+                                day.year,
+                                day.month,
+                                1,
+                              );
+                              final monthEnd = DateTime(
+                                day.year,
+                                day.month + 1,
+                                0,
+                                23,
+                                59,
+                              );
+                              ref.invalidate(
+                                calendarEventsProvider(
                                   CalendarDateRange(
-                                      start: monthStart, end: monthEnd)));
+                                    start: monthStart,
+                                    end: monthEnd,
+                                  ),
+                                ),
+                              );
                             } on DioException catch (err) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Failed to RSVP: ${err.message}')),
+                                    content: Text(
+                                      'Failed to RSVP: ${err.message}',
+                                    ),
+                                  ),
                                 );
                               }
                             } catch (err) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Failed to RSVP: ${err.toString()}')),
+                                    content: Text(
+                                      'Failed to RSVP: ${err.toString()}',
+                                    ),
+                                  ),
                                 );
                               }
                             }
@@ -945,26 +995,44 @@ class _DayEventsList extends ConsumerWidget {
                               await ref
                                   .read(calendarServiceProvider)
                                   .rsvp(e.id, 'Tentative');
-                              final monthStart = DateTime(day.year, day.month, 1);
-                              final monthEnd =
-                                  DateTime(day.year, day.month + 1, 0, 23, 59);
-                              ref.invalidate(calendarEventsProvider(
+                              final monthStart = DateTime(
+                                day.year,
+                                day.month,
+                                1,
+                              );
+                              final monthEnd = DateTime(
+                                day.year,
+                                day.month + 1,
+                                0,
+                                23,
+                                59,
+                              );
+                              ref.invalidate(
+                                calendarEventsProvider(
                                   CalendarDateRange(
-                                      start: monthStart, end: monthEnd)));
+                                    start: monthStart,
+                                    end: monthEnd,
+                                  ),
+                                ),
+                              );
                             } on DioException catch (err) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Failed to RSVP: ${err.message}')),
+                                    content: Text(
+                                      'Failed to RSVP: ${err.message}',
+                                    ),
+                                  ),
                                 );
                               }
                             } catch (err) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Failed to RSVP: ${err.toString()}')),
+                                    content: Text(
+                                      'Failed to RSVP: ${err.toString()}',
+                                    ),
+                                  ),
                                 );
                               }
                             }
@@ -983,26 +1051,44 @@ class _DayEventsList extends ConsumerWidget {
                               await ref
                                   .read(calendarServiceProvider)
                                   .rsvp(e.id, 'Declined');
-                              final monthStart = DateTime(day.year, day.month, 1);
-                              final monthEnd =
-                                  DateTime(day.year, day.month + 1, 0, 23, 59);
-                              ref.invalidate(calendarEventsProvider(
+                              final monthStart = DateTime(
+                                day.year,
+                                day.month,
+                                1,
+                              );
+                              final monthEnd = DateTime(
+                                day.year,
+                                day.month + 1,
+                                0,
+                                23,
+                                59,
+                              );
+                              ref.invalidate(
+                                calendarEventsProvider(
                                   CalendarDateRange(
-                                      start: monthStart, end: monthEnd)));
+                                    start: monthStart,
+                                    end: monthEnd,
+                                  ),
+                                ),
+                              );
                             } on DioException catch (err) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Failed to RSVP: ${err.message}')),
+                                    content: Text(
+                                      'Failed to RSVP: ${err.message}',
+                                    ),
+                                  ),
                                 );
                               }
                             } catch (err) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Failed to RSVP: ${err.toString()}')),
+                                    content: Text(
+                                      'Failed to RSVP: ${err.toString()}',
+                                    ),
+                                  ),
                                 );
                               }
                             }
@@ -1267,9 +1353,7 @@ class _DayEventsList extends ConsumerWidget {
                     activeColor: VillageTheme.primaryLight,
                     onChanged: (v) => setDialogState(() => allDay = v),
                     dense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -1277,19 +1361,21 @@ class _DayEventsList extends ConsumerWidget {
                   onPressed: () async {
                     if (titleCtrl.text.isEmpty) return;
                     try {
-                      await ref.read(calendarServiceProvider).updateEvent(
-                        event.id,
-                        title: titleCtrl.text,
-                        description: descCtrl.text.isNotEmpty
-                            ? descCtrl.text
-                            : null,
-                        location: locCtrl.text.isNotEmpty
-                            ? locCtrl.text
-                            : null,
-                        startTime: start,
-                        endTime: end,
-                        isAllDay: allDay,
-                      );
+                      await ref
+                          .read(calendarServiceProvider)
+                          .updateEvent(
+                            event.id,
+                            title: titleCtrl.text,
+                            description: descCtrl.text.isNotEmpty
+                                ? descCtrl.text
+                                : null,
+                            location: locCtrl.text.isNotEmpty
+                                ? locCtrl.text
+                                : null,
+                            startTime: start,
+                            endTime: end,
+                            isAllDay: allDay,
+                          );
                       final monthStart = DateTime(day.year, day.month, 1);
                       final monthEnd = DateTime(
                         day.year,
@@ -1300,10 +1386,7 @@ class _DayEventsList extends ConsumerWidget {
                       );
                       ref.invalidate(
                         calendarEventsProvider(
-                          CalendarDateRange(
-                            start: monthStart,
-                            end: monthEnd,
-                          ),
+                          CalendarDateRange(start: monthStart, end: monthEnd),
                         ),
                       );
                       if (ctx.mounted) Navigator.pop(ctx);
@@ -1381,7 +1464,9 @@ class _RsvpButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? selectedColor : context.palette.textTertiary,
+                color: isSelected
+                    ? selectedColor
+                    : context.palette.textTertiary,
               ),
             ),
           ],
