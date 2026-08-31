@@ -84,6 +84,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: const ObjectKey('calendarPageFAB'),
         onPressed: () => _showCreateEventSheet(context),
         child: const Icon(Icons.add),
       ),

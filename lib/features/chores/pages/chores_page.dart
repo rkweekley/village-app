@@ -69,6 +69,7 @@ class _ChoresPageState extends ConsumerState<ChoresPage>
       floatingActionButton: _currentTab == 2
           ? null // No FAB on Approvals tab
           : FloatingActionButton(
+              heroTag: const ObjectKey('choresPageFAB'),
               onPressed: () {
                 if (_currentTab == 0) {
                   _showCreateMenu(context);

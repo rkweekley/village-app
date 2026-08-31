@@ -62,6 +62,7 @@ class TasksPage extends ConsumerWidget {
           ],
         ),
         floatingActionButton: FloatingActionButton(
+          heroTag: const ObjectKey('tasksPageFAB'),
           onPressed: () => _showCreateChoice(context, ref),
           child: const Icon(Icons.add),
         ),

@@ -35,6 +35,7 @@ class RewardsPage extends ConsumerWidget {
         ),
         floatingActionButton: isParent
             ? FloatingActionButton(
+                heroTag: const ObjectKey('rewardsPageFAB'),
                 onPressed: () => _showCreateRewardDialog(context, ref),
                 child: const Icon(Icons.add),
               )

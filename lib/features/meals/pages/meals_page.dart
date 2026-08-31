@@ -1695,6 +1695,7 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: const ObjectKey('mealsPageFAB'),
         onPressed: () => _showCreateRecipeSheet(context, ref),
         backgroundColor: VillageTheme.danger,
         child: const Icon(Icons.add_rounded, color: Colors.white),

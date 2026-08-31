@@ -305,6 +305,7 @@ class _HubPageState extends ConsumerState<HubPage> {
             bottom: 16,
             right: 16,
             child: FloatingActionButton(
+              heroTag: const ObjectKey('hubPageFAB'),
               onPressed: () => _showCreateChoice(context),
               child: const Icon(Icons.add),
             ),

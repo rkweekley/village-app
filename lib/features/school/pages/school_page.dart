@@ -39,6 +39,7 @@ class SchoolPage extends ConsumerWidget {
         ),
         floatingActionButton: canManage
             ? FloatingActionButton(
+              heroTag: const ObjectKey('schoolPageFAB'),
           onPressed: () {
             final tabIndex = DefaultTabController.of(innerContext).index;
             if (tabIndex == 1) {

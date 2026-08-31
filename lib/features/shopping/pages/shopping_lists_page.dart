@@ -22,6 +22,7 @@ class ShoppingListsPage extends ConsumerWidget {
       ),
       floatingActionButton: isParent
           ? FloatingActionButton(
+              heroTag: const ObjectKey('shoppingListsPageFAB'),
               onPressed: () => _showCreateListSheet(context, ref),
               child: const Icon(Icons.add),
             )
@@ -325,6 +326,7 @@ class _ShoppingListDetailPageState
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: const ObjectKey('shoppingListDetailFAB'),
         onPressed: () => _showAddItemSheet(context),
         child: const Icon(Icons.add),
       ),
