@@ -99,8 +99,15 @@ class RewardsService {
     int? maxRedemptions,
     bool requiresApproval = true,
   }) async {
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty) {
+      throw ArgumentError('Reward name is required');
+    }
+    if (pointCost < 1) {
+      throw ArgumentError('Point cost must be at least 1');
+    }
     final res = await _dio.post('/api/rewards', data: {
-      'name': name,
+      'name': trimmedName,
       'description': description,
       'pointCost': pointCost,
       'category': category,
@@ -120,6 +127,12 @@ class RewardsService {
     bool? requiresApproval,
     bool? isActive,
   }) async {
+    if (name != null && name.trim().isEmpty) {
+      throw ArgumentError('Reward name is required');
+    }
+    if (pointCost != null && pointCost < 1) {
+      throw ArgumentError('Point cost must be at least 1');
+    }
     final res = await _dio.put('/api/rewards/$id', data: {
       'name': name,
       'description': description,
