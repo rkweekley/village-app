@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>method</key>
+	<string>app-store</string>
+	<key>teamID</key>
+	<string>R9U8JNTV28</string>
+	<key>uploadSymbols</key>
+	<false/>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>app.villagefamily.app</key>
+		<string>b40b64ca-3769-4110-9ee6-3d0b73046aa0</string>
+	</dict>
+</dict>
+</plist>
