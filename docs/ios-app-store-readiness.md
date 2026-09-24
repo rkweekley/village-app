@@ -1,6 +1,7 @@
 # Village iOS — App Store Readiness Record (CYB-21)
 
-Status: current as of 2026-09-24 (production/v1 @ 1.0.1+6).
+Status: current as of 2026-09-24 (production/v1 @ 1.0.1+6) — version 1.0.1 build 6
+submitted for App Review 2026-09-24T19:29:44Z; ASC checklist verified complete (§3).
 Companion GitHub issues: see the iOS-ready labels on rkweekley/village-app.
 
 ## 1. Rejection root cause (ITMS-90111) — confirmed
@@ -36,22 +37,51 @@ Companion GitHub issues: see the iOS-ready labels on rkweekley/village-app.
 | Beta-macOS guard | FIXED | New preflight script `ios/scripts/check_build_macos.sh` (GH-97). |
 | CI | OK for web | deploy.yml only builds web/Docker; iOS is built manually on the Mac Mini (no iOS CI currently). |
 
-## 3. Open verification items (human / Mini) — hand-off
+## 3. Verification items — status as of 2026-09-24 (CYB-28)
 
-1. (GH-99) Confirm ASC products `village.monthly` ($5.99/mo) and `village.annual`
-   ($49.99/yr) exist, are Ready to Submit, with intro offers, in one subscription
-   group; confirm backend Apple product-id settings match.
-2. (GH-100) On the Mac Mini (stable macOS 26.7, NOT the Mac Air):
-   `ios/scripts/check_build_macos.sh` must pass; Distribution certificate for team
-   R9U8JNTV28 + the "Village App Store" profile (UUID b40b64ca-…) must be installed;
-   run `flutter build ipa --release --export-options-plist=ios/exportOptions.plist`.
-3. (GH-101) Upload the IPA via Transporter or `xcrun altool --upload-app` with a
-   user with App Manager role; complete ASC metadata: screenshots (6.9" iPhone +
-   iPad), privacy labels, review contact, version 1.0.1 build 6, "Export Compliance"
-   and "App Privacy" answers.
-4. Approval: live upload to App Store Connect is an external mutation — requires
-   Ryan's Apple Developer credentials/2FA. No credentials are stored in this
-   environment; nothing is uploaded from here.
+All three items were verified live against App Store Connect (asc CLI 4.11.0, API
+key T8SMTUY74K, on the Mac Mini) on 2026-09-24. The version was submitted and is
+with Apple as of 2026-09-24T19:29:44Z.
+
+1. **GH-99 (IAP products)** — VERIFIED: subscription group `22349177` "Village"
+   exists; review submission `4d62cd5b-17a5-4e14-bf6f-5b411d4a4b70` carries 4 items
+   (appStoreVersion + 2 subscriptionVersions + subscriptionGroupVersion), all
+   `READY_FOR_REVIEW`. App pricing: Free download tier (isFree=true, USD) — IAP
+   carries monetization.
+2. **GH-100 (Mini signing/build)** — VERIFIED: build 6 (1.0.1+6) is in ASC,
+   `processingState VALID`, `buildAudienceType APP_STORE_ELIGIBLE`, uploaded
+   2026-09-01 from the Mac Mini (stable macOS 26.7). A successful upload+ingest
+   proves the Distribution cert + "Village App Store" profile (UUID
+   b40b64ca-3769-4110-9ee6-3d0b73046aa0) + `exportOptions.plist` are correct.
+   Guard script present at `ios/scripts/check_build_macos.sh`. WSL/Mini clones on
+   `production/v1`; build machine `sw_vers` = 26.7 (25G229, no beta suffix).
+3. **GH-101 (ASC submission checklist)** — VERIFIED complete:
+   - Screenshots: `APP_IPHONE_61` ×9 (1206x2622), `APP_IPHONE_65` ×9 (1284x2778 —
+     the set Apple requires at submit), `APP_IPAD_PRO_3GEN_129` ×9 (2064x2752), all
+     `assetDeliveryState COMPLETE`.
+   - App icon: 1024×1024 RGB no-alpha in Assets.xcassets (repo-verified); ASC icon
+     derives from the uploaded build.
+   - Privacy labels: published (the 09-24 `asc review submit` passed the
+     appDataUsages gate that blocked 08-31; declaration unchanged since). Spot-check
+     in ASC web UI remains Ryan's (legal attestation).
+   - Metadata: description (309 chars), keywords, supportUrl, subtitle "Family
+     organizer", privacy policy URL — all set on en-US.
+   - Review details (id 860e4e7c…): contact Ryan Weekley / support@villagefamily.app
+     / 7405383553; demo account `parent@village.app` (`demoAccountRequired=true`);
+     notes guide reviewer to the subscription page + IAP.
+   - Export Compliance: build 6 `usesNonExemptEncryption=false` → HTTPS-only,
+     exempt, no ERN.
+   - Version: 1.0.1 (build 6) attached, appStoreState `WAITING_FOR_REVIEW`.
+   - Privacy manifests (ITMS-91053): all plugins in pubspec.lock ship
+     PrivacyInfo.xcprivacy (`shared_preferences_foundation` 2.5.6,
+     `url_launcher_ios` 6.4.1, `in_app_purchase_storekit` 0.4.11+1;
+     `flutter_secure_storage` 9.2.4 = Keychain only) — no ingestion/review flag on
+     build 6.
+   - Non-blocking gap: "What's New" (release notes) is empty — a warning, not a
+     blocker; not editable while WAITING_FOR_REVIEW. Fill on the next release.
+4. Submission (external mutation) was executed 2026-09-24 from the Mini; outcome
+   monitoring is Ryan's (Resolution Center / ASC web UI). Nothing further is
+   uploaded or edited from this environment while the review is in flight.
 
 ## 4. Build sequence for the next successful submission (Mini, stable macOS)
 
