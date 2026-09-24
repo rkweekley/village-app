@@ -436,6 +436,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           ],
         ],
 
+        // Terms of Use + Privacy Policy (Apple Guideline 3.1.2 / 5.1.1:
+        // auto-renewable subscriptions must link the EULA and privacy policy
+        // from inside the app).
+        const SizedBox(height: 28),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => launchUrl(Uri.parse('https://villagefamily.app/terms')),
+              child: const Text('Terms of Use',
+                  style: TextStyle(fontSize: 12, decoration: TextDecoration.underline)),
+            ),
+            Text('·', style: TextStyle(color: context.palette.textTertiary)),
+            TextButton(
+              onPressed: () => launchUrl(Uri.parse('https://villagefamily.app/privacy')),
+              child: const Text('Privacy Policy',
+                  style: TextStyle(fontSize: 12, decoration: TextDecoration.underline)),
+            ),
+          ],
+        ),
+
         if (status == 'active' || status == 'past_due') ...[
           if (status == 'past_due')
             Container(

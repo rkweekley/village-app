@@ -57,6 +57,12 @@ class LegalPage extends StatelessWidget {
                 Uri.parse('https://villagefamily.app/privacy')),
           ),
           _linkTile(context,
+            icon: Icons.description_outlined,
+            title: 'Terms of Use',
+            onTap: () => launchUrl(
+                Uri.parse('https://villagefamily.app/terms')),
+          ),
+          _linkTile(context,
             icon: Icons.mail_outline,
             title: 'Contact Support',
             onTap: () => launchUrl(
