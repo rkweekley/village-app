@@ -195,8 +195,9 @@ version reviewed `1.0.1 (6)`.
 
 ### 8.3 Remediation state (verified 2026-09-25)
 - **2.3.2:** `asc subscriptions promoted-purchases list --app 6803645374` returns
-  **0** promoted purchases, so no promotional image remains. Appears resolved;
-  confirm in the ASC UI.
+  **0** promoted purchases, so no promotional image remains. VERIFIED resolved at the
+  ASC API level 2026-09-25 (the same backend the ASC UI reads); no promotional image on
+  any IAP/subscription.
 - **2.1(a):** the login failure lines up with the demo account not existing when the
   reviewer tested. `parent@village.app` was created **2026-09-16T14:39:07Z** —
   roughly 4.5 hours *after* the rejection message. The account now sits in family
@@ -215,3 +216,36 @@ build when no code changed), but it also means **no code fix exists for the logi
 failure**. If the 2.1(a) error was a genuine bug — rather than missing demo
 credentials — the current review will fail the same way. This is the single largest
 open risk on the app and is tracked in Paperclip (see §7.2 note and CYB-32/CYB-33).
+
+### 8.5 VERIFIED 2026-09-25 — clean first-run login reproduces on iOS 27.0 (CYB-33)
+
+Ran the committed screenshot/login harness (`integration_test/screenshots_test.dart`,
+`test_driver/screenshots.dart`) against the LIVE API (`api.villagefamily.app`, health
+200) on the Mac Air, on the production/v1 code that shipped as build 6 (Air clone synced
+to `79d4cab`). Each run: fresh-installed the app, reset the simulator keychain
+(`xcrun simctl keychain reset` — no pre-existing state/cached session), then logged in
+with the ASC review-details demo account and asserted the Hub's `NavigationBar` appears.
+Both runs finished **"All tests passed"** and captured 9 byte-distinct screenshots
+(md5-verified) walking Login → Hub → Chores → Rewards → Tasks → Meals → Family →
+Calendar → Shopping.
+
+- **iPhone 17 Pro Max, iOS 27.0** (sim `AD694C9A-…`) — first-run login reaches Home,
+  Hub shows Smith Family / "Welcome back, Mom", 500 pts, all quick actions + bottom nav.
+  **No login error, no blocked state.**
+- **iPad Air 11-inch (M4), iOS 27.0** (sim `DC210B98-…`) — same clean result,
+  reaches Home, no error/blocked UI. Known iPad layout polish issues remain (uneven
+  Quick Actions grid, wide margins, FAB overlap — the GH-83/GH-95 line) but these are
+  cosmetic and were not the basis of the 2.1(a) rejection.
+- **Runtime note:** builds used the Air's iOS 27.0 simulator runtime, which matches the
+  reviewer's OS exactly. The Mac Mini (stable 26.7, the shipping host) only has the
+  iOS 26.5 runtime installable, so iOS 27.0 coverage came from the Air sim, not the Mini.
+
+Conclusion: the 2.1(a) login error the reviewer hit is consistent with the demo account
+not existing at review time (created 2026-09-16T14:39:07Z ≈ 4.5h AFTER the rejection).
+With the demo account now present + active, first-run login reproduces cleanly on the
+reviewer's device family and OS. No code change was needed. The current in-flight
+WAITING_FOR_REVIEW submission is cleared against this specific risk.
+
+Escalation remains: if Apple still rejects with 2.1(a), capture the message verbatim and
+require a new build number + documented fix before resubmitting — do not resubmit
+unchanged a second time.
