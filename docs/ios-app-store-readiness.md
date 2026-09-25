@@ -7,7 +7,11 @@ checked against live App Store Connect and closed (§7.1).
 One known open defect: no iOS introductory offers (§7.2).
 Companion GitHub issues: see the iOS-ready labels on rkweekley/village-app.
 
-## 1. Rejection root cause (ITMS-90111) — confirmed
+## 1. Ingestion rejection root cause (ITMS-90111) — confirmed
+
+> Scope note: this section covers the **ingestion** rejection of build 5, which never
+> reached review. The app was later **rejected in review** for Guideline 2.1(a) and
+> 2.3.2 — see §8. Do not read this section as the whole rejection story.
 
 - Build 5 (`1.0.1+3-candidate`) was rejected by Apple App Store ingestion with
   **ITMS-90111** ("Invalid Build … your build is not an acceptable build" family).
@@ -169,3 +173,45 @@ Apple moved the App Store Connect web-session config endpoint and 4.x hard-coded
 (checksum-verified; old binary backed up at `~/.local/bin/asc-4.11.0.bak`).
 This is why the ASC verification items looked "blocked on Ryan's credentials"
 through 2026-09-24 — no credential would have made the old tool work.
+
+## 8. Apple rejection history — Resolution Center (read 2026-09-25)
+
+Two distinct rejections. Only the first was known when this record was written.
+
+### 8.1 Build 5 — ingestion (ITMS-90111), never reached review
+Covered in §1. Beta-macOS stamp. Fixed by rebuilding on the Mac Mini.
+
+### 8.2 Build 6 — rejected IN REVIEW, 2026-09-16
+Review thread `8c531ec1-dffc-3d80-af54-edb05ef0306f` (`REJECTION_REVIEW_SUBMISSION`,
+created 2026-09-16T10:03:41Z), rejection `31ba5108`, on submission `4d62cd5b`.
+Reviewed on **iPhone 17 Pro Max and iPad Air 11-inch (M3), iOS/iPadOS 27.0**,
+version reviewed `1.0.1 (6)`.
+
+- **Guideline 2.1(a) — Performance / App Completeness.** *"We were unable to access
+  the app because the app displayed an error message during login."*
+- **Guideline 2.3.2 — Performance / Accurate Metadata.** The promotional image for the
+  promoted In-App Purchase was the same as the app icon. Apple's remedy: revise it or
+  delete the associated promotional image.
+
+### 8.3 Remediation state (verified 2026-09-25)
+- **2.3.2:** `asc subscriptions promoted-purchases list --app 6803645374` returns
+  **0** promoted purchases, so no promotional image remains. Appears resolved;
+  confirm in the ASC UI.
+- **2.1(a):** the login failure lines up with the demo account not existing when the
+  reviewer tested. `parent@village.app` was created **2026-09-16T14:39:07Z** —
+  roughly 4.5 hours *after* the rejection message. The account now sits in family
+  "Smith Family" (`cd708117-4917-4b2d-95a0-0dee69fdfdff`) with
+  `SubscriptionStatus: active` and `SubscriptionExpiresAt: 2030-01-01`, so
+  entitlement can no longer be the failure mode (the guard admits `active`).
+- Review details `860e4e7c` are configured with `demoAccountRequired: true` and name
+  `parent@village.app` plus usage notes. **Credentials live in the ASC review details
+  only — never copy them into this repo or into an issue tracker.**
+
+### 8.4 Resubmission
+Resubmitted **2026-09-24T19:29:44Z** as the *same* submission `4d62cd5b` carrying the
+*same* build 6 — no new build number. That is consistent with both rejection causes
+being demo-account/metadata rather than code (Apple permits resubmitting the same
+build when no code changed), but it also means **no code fix exists for the login
+failure**. If the 2.1(a) error was a genuine bug — rather than missing demo
+credentials — the current review will fail the same way. This is the single largest
+open risk on the app and is tracked in Paperclip (see §7.2 note and CYB-32/CYB-33).
