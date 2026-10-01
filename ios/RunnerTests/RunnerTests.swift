@@ -32,10 +32,17 @@
 //  StoreKit testing is a launch-time facility of the Xcode launcher, so a
 //  headless `xcodebuild test` may not turn it on. When no environment is active
 //  StoreKit returns an empty product list, which says nothing about the app —
-//  so these tests SKIP with that exact reason instead of failing. The measured
-//  behaviour on the build host (Mac Mini, iOS 26.5 simulator, Xcode 27.0), the
-//  four configuration variants tried, and the unblock action are recorded in
-//  docs/ios-app-store-readiness.md §11.8 (CYB-48).
+//  so these tests SKIP with that exact reason instead of failing.
+//
+//  MEASURED VERDICT (2026-10-01, build host Mac Mini, iOS 26.5 simulator,
+//  Xcode 27.0 27A266a): the local StoreKit environment cannot be activated on an
+//  iOS SIMULATOR on this Xcode. `test00` below records the machine-readable
+//  evidence on every run (SKTestSession init outcome, storefront round-trip,
+//  resolved product count) so the verdict is never inferred. This matches a
+//  published upstream regression — RevenueCat purchases-ios PR #6897:
+//  "StoreKit unit tests can't fetch products on iOS simulators with Xcode 26.4+
+//  due to a StoreKit bug", worked around there by running the same suite on Mac
+//  Catalyst. See docs/ios-app-store-readiness.md §13.3 and §14 (CYB-48).
 //
 //  RUN IT (from the repo root on the build Mac):
 //    xcodebuild test -workspace ios/Runner.xcworkspace -scheme Runner \
@@ -52,6 +59,7 @@
 //
 
 import StoreKit
+import StoreKitTest
 import XCTest
 
 @available(iOS 15.0, *)
@@ -68,10 +76,13 @@ final class VillageStoreKitTests: XCTestCase {
   static let environmentBlocker =
     "No local StoreKit environment is active in this process, so StoreKit "
     + "returned an empty product list. That is the build host's state, not the "
-    + "app's — see docs/ios-app-store-readiness.md §11.8 (CYB-48). Run this "
-    + "suite from Xcode with the Runner scheme's StoreKit configuration "
-    + "(ios/Runner/Village.storekit) selected, or from a host with a working "
-    + "StoreKit test environment."
+    + "app's — see docs/ios-app-store-readiness.md §13.3/§14 (CYB-48). On Xcode "
+    + "26.4+ an iOS simulator cannot activate a StoreKit test environment "
+    + "(upstream StoreKit regression; RevenueCat purchases-ios PR #6897 works "
+    + "around it by running the same suite on Mac Catalyst). Run this suite on "
+    + "Mac Catalyst or a physical device, or from Xcode with a working StoreKit "
+    + "test environment. The machine-readable verdict is printed by test00 on "
+    + "every run."
 
   private func currentStorefront() async -> String {
     if let storefront = await Storefront.current { return storefront.countryCode }
@@ -89,6 +100,73 @@ final class VillageStoreKitTests: XCTestCase {
           + "storefront=\(await currentStorefront()) resolved=\(summary)")
     try XCTSkipIf(products.isEmpty, Self.environmentBlocker)
     return products
+  }
+
+  // MARK: - 00 — record WHY the local StoreKit environment is or is not live
+
+  /// Never fails on an environment problem: this test exists to emit the
+  /// machine-readable verdict that separates "the app is broken" from "this
+  /// build host cannot host a StoreKit test environment". Every line is
+  /// prefixed `[CYB48-DIAG]` so it can be grepped out of the xcodebuild log.
+  func test00_storeKitTestEnvironmentDiagnostic() async throws {
+    let configURL = URL(fileURLWithPath: #filePath)      // …/ios/RunnerTests/RunnerTests.swift
+      .deletingLastPathComponent()                       // …/ios/RunnerTests
+      .deletingLastPathComponent()                       // …/ios
+      .appendingPathComponent("Runner/Village.storekit") // …/ios/Runner/Village.storekit
+
+    // XCTest swallows the test process's stdout into the .xcresult bundle, which
+    // `xcresulttool` will not hand back as text. The verdict is therefore ALSO
+    // written to a file inside the app's container so the host can read it with
+    // a plain `find` + `cat` — that is the artifact quoted in the issue thread.
+    var lines: [String] = []
+    func diag(_ line: String) {
+      print(line)
+      lines.append(line)
+    }
+
+    diag("[CYB48-DIAG] bundle=\(Bundle.main.bundleIdentifier ?? "nil")")
+    diag("[CYB48-DIAG] config_path=\(configURL.path)")
+    diag("[CYB48-DIAG] config_exists=\(FileManager.default.fileExists(atPath: configURL.path))")
+    diag("[CYB48-DIAG] storefront_before=\(await currentStorefront())")
+
+    // 1. Can a StoreKit test session even be constructed against our config?
+    do {
+      let session = try SKTestSession(contentsOf: configURL)
+      session.disableDialogs = true
+      session.clearTransactions()
+      diag("[CYB48-DIAG] sktestsession=OK storefront_echo=\(session.storefront ?? "nil") "
+           + "transactions=\(session.allTransactions().count)")
+      // A live session must round-trip its configured storefront. The config
+      // declares USA; anything else means the session is inert.
+      diag("[CYB48-DIAG] storefront_roundtrip=\(session.storefront == "USA" ? "PASS" : "FAIL")")
+    } catch {
+      let ns = error as NSError
+      diag("[CYB48-DIAG] sktestsession=FAILED domain=\(ns.domain) code=\(ns.code) "
+           + "desc=\(ns.localizedDescription)")
+    }
+
+    // 2. What does StoreKit 2 actually hand the app for the production IDs?
+    let products = try await Product.products(for: Self.expectedProductIDs)
+    diag("[CYB48-DIAG] products_resolved=\(products.count) of \(Self.expectedProductIDs.count) "
+         + "ids=\(products.map(\.id).sorted().joined(separator: ","))")
+    diag("[CYB48-DIAG] storefront_after=\(await currentStorefront())")
+    diag("[CYB48-DIAG] verdict=\(products.isEmpty ? "NO_STOREKIT_ENVIRONMENT" : "ENVIRONMENT_LIVE")")
+
+    let outURL = URL(fileURLWithPath: NSHomeDirectory())
+      .appendingPathComponent("Documents/cyb48-storekit-diagnostic.txt")
+    do {
+      try lines.joined(separator: "\n").appending("\n")
+        .write(to: outURL, atomically: true, encoding: .utf8)
+      print("[CYB48-DIAG] wrote=\(outURL.path)")
+    } catch {
+      print("[CYB48-DIAG] write_failed=\(error)")
+    }
+
+    // The one thing that IS a defect at any host: the configuration must exist.
+    XCTAssertTrue(
+      FileManager.default.fileExists(atPath: configURL.path),
+      "ios/Runner/Village.storekit is missing — the runtime proof has no "
+        + "configuration to load. Path tried: \(configURL.path)")
   }
 
   // MARK: - 01 — both production identifiers resolve

@@ -793,3 +793,131 @@ next report of it would carry the storefront code that proves it.
 | `ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme` | StoreKit config on Test + Launch actions |
 | `ios/RunnerTests/RunnerTests.swift` | `VillageStoreKitTests` (self-skipping when no environment) |
 
+## 14. 2026-10-01 (round 2) — the client-side proof is blocked by an Apple platform bug, not by the app or the config
+
+The `ios265` interaction answer (interaction `da7069b4`) asked for a client-side
+proof on the iOS 26.5 simulator using a StoreKit configuration file. This round
+built that proof, ran it on the reviewer's device family, and **characterised**
+why it cannot report a live environment on this host. The verdict is now
+machine-recorded on every run instead of inferred.
+
+### 14.1 What was measured (Mac Mini, Xcode 27.0 27A266a, iOS 26.5)
+
+`RunnerTests/VillageStoreKitTests.test00` writes its verdict into the app
+container so the host can read it as plain text:
+
+```
+[CYB48-DIAG] bundle=app.villagefamily.app
+[CYB48-DIAG] config_path=/Users/cyberal/projects/village-app-ios/ios/Runner/Village.storekit
+[CYB48-DIAG] config_exists=true
+[CYB48-DIAG] storefront_before=USA
+[CYB48-DIAG] sktestsession=OK storefront_echo= transactions=0
+[CYB48-DIAG] storefront_roundtrip=FAIL
+[CYB48-DIAG] products_resolved=0 of 2 ids=
+[CYB48-DIAG] storefront_after=USA
+[CYB48-DIAG] verdict=NO_STOREKIT_ENVIRONMENT
+```
+
+Reading it:
+
+- The app under test is the **real** app (`app.villagefamily.app`) on the
+  reviewer's device family (iPhone 17 Pro Max, iOS 26.5) — the suite is hosted,
+  not simulated at the Dart layer.
+- `ios/Runner/Village.storekit` exists and **loads**: `SKTestSession(contentsOf:)`
+  constructs with **no error**.
+- But the session is **inert**: its declared storefront (`"USA"` in the config)
+  does **not** round-trip (echo is empty, `allTransactions()` = 0).
+- `Product.products(for:)` returns **0 of 2** identifiers while
+  `Storefront.current` reports the device's *real* store. No StoreKit test
+  environment was installed for the process — which is exactly the empty product
+  list shape that produced build 6's rejection, and it is reproducible with the
+  fixed code, proving it is environmental.
+
+Run result: **1 passed, 4 skipped, 0 failed** — the four product/purchase tests
+skip (never fail) when no environment is live, so a red-looking run cannot be
+mistaken for an app regression.
+
+### 14.2 Root cause of the blocker — an upstream StoreKit regression on iOS simulators
+
+- **Published regression:** RevenueCat `purchases-ios` PR #6897 —
+  *"StoreKit unit tests can't fetch products on iOS simulators with Xcode 26.4+
+  due to a StoreKit bug"*. Their workaround is to run the same suite on **Mac
+  Catalyst** on Xcode 26.5, *"where the bug doesn't reproduce"*.
+- **Corroborated at file level on this host:** the installed Xcode ships a
+  *runnable* `StoreKitTest.framework` binary for iPhoneOS, AppleTVOS, WatchOS,
+  XROS and MacOSX, but **only an SDK `.tbd` link stub for the four simulator
+  platforms**:
+
+  ```
+  $ ls …/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/
+  AppIntentsTesting.framework  Evaluations.framework  Testing.framework
+  XCTest.framework  XCUIAutomation.framework  _Testing_CoreGraphics.framework
+  _Testing_CoreImage.framework  _Testing_CoreTransferable.framework
+  _Testing_Foundation.framework  _Testing_UIKit.framework
+  # no StoreKitTest.framework
+  $ file …/Platforms/MacOSX.platform/Developer/Library/Frameworks/StoreKitTest.framework/StoreKitTest
+  Mach-O universal binary with 3 architectures: [x86_64] [arm64] [arm64e]
+  ```
+
+- **The previous round's attribution was wrong.** §13.3 blamed "stale
+  CoreSimulator / missing Xcode first-launch components". Measured this round:
+  the Xcode licence is **accepted** (`xcodebuild -checkFirstLaunchStatus` → 0),
+  `CoreSimulatorService` is running from `/Library/Developer/PrivateFrameworks`,
+  11 iOS 26.5 simulators exist, and the Runner target builds and hosts the suite
+  cleanly. There is nothing left to repair on the host for this path.
+
+### 14.3 Harness changes this round
+
+- `test00_storeKitTestEnvironmentDiagnostic` — records the environment verdict
+  (bundle id, config path/existence, session outcome, storefront round-trip,
+  resolved product count) and writes it to
+  `Documents/cyb48-storekit-diagnostic.txt` inside the app container. XCTest
+  swallows `print` into the `.xcresult` and `xcresulttool` will not hand it back,
+  so the file is the quotable artifact.
+- Corrected the cross-reference in the test header and skip reason
+  (`§11.8` → `§13.3`/`§14`).
+- The suite must be run with **`-parallel-testing-enabled NO`**: xcodebuild
+  otherwise tests on a *cloned* simulator (`Clone 1 of iPhone 17 Pro Max`) and
+  deletes it afterwards, taking the diagnostic artifact with it.
+
+### 14.4 Consequence for the acceptance criterion
+
+*"New build uploaded; 2.1(b) not reproducible in sandbox on iOS 27.0"* cannot be
+satisfied on this build host. Remaining options, best first:
+
+1. **Sandbox tester + physical device** — the gold standard, but
+   `asc sandbox list` is still `total 0` and only the Account Holder can create a
+   tester (an App Store Connect write). Owner: **Ryan**.
+2. **Mac Catalyst / macOS run of the same assertions** — where the regression
+   does not reproduce. Requires a native harness; the Village app has no
+   macOS/Catalyst target, so this proves the configuration and the StoreKit 2
+   path, not the Flutter paywall.
+3. **An Xcode/iOS runtime train where the regression is fixed** — re-run the
+   committed suite unchanged; it becomes the proof automatically because it is
+   already wired to the scheme's StoreKit configuration.
+
+### 14.5 New store-side fact (extends §12.4)
+
+Live read-only check this round, `asc` 5.5.0:
+
+```
+$ asc subscriptions list --app 6803645374
+  village.annual   6807153583  state READY_TO_SUBMIT
+  village.monthly  6807153048  state READY_TO_SUBMIT
+$ asc web review subscriptions list --app 6803645374
+  attachedCount 0
+  village.annual   6807153583  state MISSING_METADATA  submitWithNextAppStoreVersion false
+  village.monthly  6807153048  state MISSING_METADATA  submitWithNextAppStoreVersion false
+```
+
+The public API and Apple's own web view **disagree**. On cause: RevenueCat's
+App Store troubleshooting codelab states that products with *Missing Metadata*
+*"are still available for testing in the sandbox environment and with StoreKit
+Configuration files"*, so this is **not** a proven cause of build 6's empty
+product list and must not be reported as one. What it *is* is a hard,
+command-verified blocker for the next submission: `attachedCount 0` /
+`submitWithNextAppStoreVersion false` means neither subscription is attached to
+the next app version, which is CYB-49's unwind (release the inflight versions
+from submission `4d62cd5b`).
+
+
