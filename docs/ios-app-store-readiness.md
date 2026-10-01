@@ -526,3 +526,126 @@ version (1051.55.0) is older than build version (1171.7.0)`, Xcode reports
 "Authorization is required to install the packages"). Device archives are unaffected,
 but simulator work needs the Xcode first-launch components installed. This is why the
 iOS 27.0 sandbox proof in §11.6 is still outstanding.
+
+## 12. CYB-49 — the 2.3.2 promotional image has a LIVE cause (2026-10-01)
+
+§10.2 concluded "promoted purchases -> total 0, so no API-visible object carries a
+promotional image". **That conclusion was wrong.** `promoted-purchases list` only
+covers the *Promoted Purchase* object. The promotional image itself hangs off the
+**subscription version**: `subscriptionImages`, read with
+`asc subscriptions versions images list --version-id <VER>`. Apple:
+*"Subscription images — Create, modify, and delete promotion images for auto-renewable
+subscriptions"*, and the image is **1024x1024**.
+
+### 12.1 Proven cause — both images ARE the app icon
+
+```
+$ asc subscriptions versions images list --version-id cabac1de-7482-4fde-9f83-5bd696f3e034  # village.monthly v1
+  id cbac7921-d737-4f49-a302-dffdaf3e4265  fileName sub_icon.png  fileSize 134624
+                                           1024x1024  assetDeliveryState COMPLETE
+$ asc subscriptions versions images list --version-id 38f315ce-5125-4726-8fbd-1d3172aa4532  # village.annual v1
+  id 107a87a6-89a6-4af9-9c9b-44d9cfb04fd9  fileName sub_icon.png  fileSize 134624
+                                           1024x1024  assetDeliveryState COMPLETE
+```
+
+The app's own icon `ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png`
+is **134624 bytes**. Downloading both ASC images from Apple's CDN and hashing raw pixels:
+
+| image | pixel sha256 |
+|---|---|
+| app icon (repo) | `307a99d73193ca0c8b0244016ff04aa8ab82e1d930e3980fa7ef6902c864b8ce` |
+| village.monthly promotional image | `307a99d73193ca0c8b0244016ff04aa8ab82e1d930e3980fa7ef6902c864b8ce` |
+| village.annual promotional image | `307a99d73193ca0c8b0244016ff04aa8ab82e1d930e3980fa7ef6902c864b8ce` |
+
+All three are **pixel-identical**. That reproduces Apple's 2.3.2 bullet for bullet —
+*"Your promotional image is the same as the app's icon"* **and** *"duplicate or identical
+promotional images for different ... products"*. Left unchanged this is a third rejection.
+
+### 12.2 Why it cannot be fixed while the rejected submission stands
+
+```
+$ asc subscriptions versions images upload --version-id cabac1de-... --file promo-monthly.png
+Error: failed to reserve: Version is not in modifiable state.
+
+$ asc subscriptions versions create --subscription-id 6807153048
+Error: There is already an inflight version with id 'cabac1de-...' for subscription 6807153048
+
+$ asc subscriptions versions list --subscription-id 6807153048 --state PREPARE_FOR_SUBMISSION
+  total 0
+```
+
+Both subscription versions are still **inflight on the rejected submission**
+`4d62cd5b`. `asc review items list --submission 4d62cd5b-...` returns four
+`reviewSubmissionItems`: the `appStoreVersion` item `REJECTED`, and the two
+`subscriptionVersion`s (`38f315ce`, `cabac1de`) plus the `subscriptionGroupVersion`
+(`af642536`) still `READY_FOR_REVIEW`. Apple will not modify or supersede an inflight
+version, so there is no modifiable version to carry the next submission's metadata.
+
+Release path (**needs a decision — Ryan owns it**, see §12.6):
+
+```
+asc review items-remove --id <subscriptionVersionItemId> --confirm     # x2
+   (or) asc review submissions-update --id 4d62cd5b-... --canceled=true --confirm
+```
+
+### 12.3 The replacement images are BUILT and Apple-compliant
+
+`docs/appstore/promotional-images/promo-monthly.png` and `promo-annual.png` —
+1024x1024, RGB, flattened, no rounded corners, 72 dpi, distinct from the app icon
+**and from each other** (mirrored band layout plus a different label), teal `#0D7C66`
+taken from the real icon. Generated reproducibly by
+`docs/appstore/promotional-images/gen_promo.py`.
+
+| | pixel sha256 |
+|---|---|
+| `promo-monthly.png` | `cd12ae3dac66d45bac233b39ddd9fb6142fc0064458cd7f71009d1098da6a370` |
+| `promo-annual.png`  | `75ede247d65024bcd9aefd028a63f5c0b84560c5883bdd555b80932830a7e39b` |
+
+Upload once §12.2 is unwound:
+`asc subscriptions versions images upload --version-id <VER> --file <png>`
+
+### 12.4 Attach is refused too — `MISSING_METADATA`
+
+```
+$ asc web review subscriptions list --app 6803645374
+  village.annual  6807153583  MISSING_METADATA  submitWithNextAppStoreVersion=false
+  village.monthly 6807153048  MISSING_METADATA  submitWithNextAppStoreVersion=false
+$ asc web review subscriptions attach --app 6803645374 --subscription-id 6807153048 --confirm
+Attach preflight: subscription "Village Monthly" (6807153048) is MISSING_METADATA, so
+Apple will not attach it to the next app version review yet.
+```
+
+Apple's **web** view says `MISSING_METADATA` while the public API says
+`READY_TO_SUBMIT` and `asc validate subscriptions --app 6803645374` returns
+**0 errors / 0 blocking**. The web value is the one Apple's attach endpoint enforces.
+Root cause is the same inflight-version lock as §12.2.
+
+### 12.5 `whatsNew` CANNOT be populated — Apple's first-release rule
+
+```
+$ asc localizations update --id 9887a44e-43a8-483e-8385-ebfeb78cbba9 --whats-new "$(cat whatsnew.txt)"
+Error: ... Attribute 'whatsNew' cannot be edited at this time
+```
+
+Control experiment: the **same** localization accepted a `--description` PATCH carrying
+its existing value (HTTP 200), so the version localization is editable and the lock is
+`whatsNew`-specific. `whatsNew` is the "What's New in This Version" field shown on
+*updates*; for an app's **first** version there is nothing to describe, so Apple makes it
+read-only until the next version (HTTP 409 `STATE_ERROR`). This matches the fastlane
+maintainer note ("only for updates — not first versions") and is a known operator pattern
+(OP-16). **The `metadata.required.whats_new` warning from `asc review doctor` is a false
+positive for a first release** — no work item can satisfy it.
+
+Prepared text is kept at
+`docs/appstore/promotional-images/whatsnew-1.0.1.txt` (828 chars) for the first update.
+
+### 12.6 Consequence for the next submission
+
+In order:
+
+1. **release both subscription versions from submission `4d62cd5b`** (§12.2) — decision;
+2. upload the two distinct promotional images (§12.3);
+3. attach both subscriptions (via the app version page — §12.4);
+4. attach **build 7** to version 1.0.1 (currently build **6** is attached) and submit.
+
+Skipping 1–2 will very likely repeat 2.3.2 a third time.
