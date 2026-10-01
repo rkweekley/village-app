@@ -1,9 +1,9 @@
 # Village iOS — App Store Readiness Record (CYB-21)
 
-Status: current as of 2026-09-25 (production/v1 @ 22c161e, 1.0.1+6) — version 1.0.1
-build 6 submitted for App Review 2026-09-24T19:29:44Z and still WAITING_FOR_REVIEW;
-ASC checklist verified complete (§3); all open verification items have now been
-checked against live App Store Connect and closed (§7.1).
+Status: current as of 2026-10-01 — version 1.0.1 build 6, submitted for App Review
+2026-09-24T19:29:44Z, is now **IN_REVIEW** (advanced from WAITING_FOR_REVIEW; Apple
+is actively reviewing). ASC checklist verified complete (§3); all open verification
+items checked against live App Store Connect (§7.1). Latest live verification: §9.
 One known open defect: no iOS introductory offers (§7.2).
 Companion GitHub issues: see the iOS-ready labels on rkweekley/village-app.
 
@@ -249,3 +249,55 @@ WAITING_FOR_REVIEW submission is cleared against this specific risk.
 Escalation remains: if Apple still rejects with 2.1(a), capture the message verbatim and
 require a new build number + documented fix before resubmitting — do not resubmit
 unchanged a second time.
+
+## 9. Verification record — 2026-10-01 (live App Store Connect)
+
+Read-only check via `asc` 5.5.0 on the Mac Mini (API-key path), 2026-10-01T14:00Z.
+No mutations were made. This supersedes §7 as the latest live state.
+
+- **Version advanced into active review.** `asc status` now reports app version
+  `1.0.1` `appstore.state = **IN_REVIEW**` — it moved forward from
+  `WAITING_FOR_REVIEW` (the state recorded through 2026-09-30). Apple has picked the
+  submission up and is reviewing it now.
+- Submission `4d62cd5b-17a5-4e14-bf6f-5b411d4a4b70`: `inFlight=true`,
+  `blockingIssues=[]`, submitted 2026-09-24T19:29:44Z (~7 days in flight).
+- Build 6 `ff8f51f2`: `processingState VALID`, `expired=false` (uploaded 2026-09-01).
+  Phased release configured.
+- Subscriptions `village.monthly` (`6807153048`) and `village.annual` (`6807153583`):
+  both `WAITING_FOR_REVIEW` (expected while attached to the in-flight submission).
+- `asc review history`: latest submission still in flight; **all prior submissions
+  `COMPLETE`/`REMOVED`**; no new rejection. The only review thread remains the
+  historical 2026-09-16 2.1(a)+2.3.2 rejection (§8.2) — already remediated (§8.3–§8.5).
+- `asc review doctor`: the single "blocking" check is `version.state.editable`
+  ("version is in non-editable state IN_REVIEW") — expected and benign while under
+  review, not a defect. Warnings unchanged: keywords overlap app-name/subtitle,
+  `whatsNew` empty (carried from CYB-28; fill on the next release).
+
+### 9.1 Blocking gap — `asc web` session expired (needs Ryan)
+
+`asc web auth status` → `authenticated:false, passwordStored:false`. The web session
+cached on 2026-09-25 has expired, so two web-only reads could **not** be performed:
+
+1. **Resolution Center message text** — the only place a fresh reviewer message appears.
+   Rejection *detection* itself needs no web session (API state is sufficient), but the
+   reviewer's verbatim text does.
+2. **Apple Developer agreements** — `asc web agreements status`. The Program License
+   Agreement carried `dateAgreeBy: 2026-10-01` (i.e. **today**); an unaccepted agreement
+   silently holds reviews. This is worth re-checking now.
+
+Unblock action (one click, on the Mac Mini): the staging tooling is already installed —
+run **`~/Desktop/Apple-Sign-In.command`** (a `screen`-backed login that pops a 2FA
+dialog and waits). No password is ever typed by an agent.
+
+### 9.2 Monitoring gap — Paperclip CYB-32 (recorded, not yet fixed)
+
+The CYB-32 review monitor did not fire for this cycle and its writes are contained:
+the issue carries an **active board-owned recovery action**
+(`configuration_validation` / `configuration_incomplete`) created after run
+`c50f3545` failed on 2026-09-30T17:02Z with
+`OpenCode Go … HTTP 403: Model access is disabled` (provider rejected the model, exit 1).
+The monitor's `nextCheckAt` is therefore `null` and the issue was sitting `blocked`
+(a monitor on a blocked issue never fires). Provider access has since recovered
+(2026-10-01 runs execute on the same model), but the recovery action is owned by the
+board and must be resolved before the monitor can be re-armed. The manual check in §9
+above closes the observation gap for today regardless.
