@@ -1062,3 +1062,140 @@ touched, and nothing was submitted to Apple.
 - The 2.3.2 promotional-image work stays with CYB-49.
 
 
+
+## 16. 2026-10-01 (round 3) — the proof RUNS: both reviewer device families, iOS 27.0
+
+Closes the §14 blocker. §14 concluded that "2.1(b) not reproducible in sandbox on
+iOS 27.0" could not be satisfied on this build host because the iOS 26.5
+simulator could not host a StoreKit test environment. The approved next step was
+to install the **iOS 27.0** simulator runtime and re-run the committed suite
+unchanged. Done — and the verdict flips.
+
+### 16.1 Host and devices (Mac Mini, Xcode 27.0 `27A266a`, macOS 26.7 `25G229`)
+
+| | |
+|---|---|
+| Runtime installed | `iOS 27.0 (27.0 - 24A434)`, state `Ready` (8.07 GB, `xcrun simctl runtime list -j`) |
+| Reviewer device 1 | `CYB48-iPhone17ProMax` `1DC06248-4D3A-4BD5-8ADE-A2F5367AEE09` — iPhone 17 Pro Max |
+| Reviewer device 2 | `CYB48-iPadAir11M3` `DDF84A50-3FA4-4C2E-A37A-8EC2CFFA88B1` — iPad Air 11-inch (M3) |
+
+Both are the two device families Apple's rejection names, on the reviewer's OS
+version (27.0), running the **real** app (`app.villagefamily.app` bundle, hosted
+XCTest target `RunnerTests`), not a Dart-layer simulation.
+
+### 16.2 The §14 blocker was RUNTIME-specific — §14.1/§14.2 over-generalised
+
+| Runtime | `SKTestSession(contentsOf:)` | storefront round-trip | `Product.products(for:)` |
+|---|---|---|---|
+| iOS 26.5 (`23F77`) | constructs, **inert** | `FAIL` (echo empty) | 0 of 2 |
+| **iOS 27.0 (`24A434`)** | constructs, **live** | **`PASS` (`USA`)** | **2 of 2** |
+
+So the upstream StoreKit regression (RevenueCat `purchases-ios` PR #6897) is
+real but is a property of the **iOS 26.5 simulator runtime on Xcode 27.0**, not
+of simulators in general — the same Xcode hosts a working StoreKit test
+environment on iOS 27.0. §14.1/§14.2 stand as measurements of the 26.5 runtime;
+the sentence "an iOS simulator cannot activate a StoreKit test environment on
+Xcode 26.4+" is corrected to name that runtime.
+
+### 16.3 Harness defects found and fixed in this round (the reason round 2 measured 0 of 2)
+
+1. **The test session did not outlive the test that created it.** A `SKTestSession`'s
+   environment lives only as long as the session object, and XCTest builds a fresh
+   `XCTestCase` per test method — so a session held in a local scope (round 2's
+   shape) was torn down before the next query reached StoreKit. The session is now
+   `static` and created once per process.
+2. **Cold start is real, and was being read as a defect.** The first-ever StoreKit
+   test session on a device can answer the first product query with an empty list.
+   The harness now retries (3 attempts, matching the shipped
+   `fetchProductsWithRetry()` in the app) **and** refuses to decide on a device that
+   has never completed a run: it reports
+   `verdict=FIRST_RUN_ON_DEVICE_INCONCLUSIVE` and skips instead of failing. An empty
+   list on a device that *has* run before is the build-6 shape and still **fails**.
+3. `tearDown` disables dialogs and clears transactions, so test04's purchase sheet
+   cannot leave the test host resident after the suite reports.
+
+### 16.4 Measured results on the reviewer's device families (iOS 27.0)
+
+```
+xcodebuild test -workspace ios/Runner.xcworkspace -scheme Runner -configuration Debug \
+  -destination 'platform=iOS Simulator,id=<UDID>' -derivedDataPath ~/DerivedData-cyb48 \
+  -resultBundlePath ~/cyb48-<tag>.xcresult -parallel-testing-enabled NO \
+  -only-testing:RunnerTests/VillageStoreKitTests
+```
+
+**iPhone 17 Pro Max — 5/5 passed, `** TEST SUCCEEDED **`**
+
+```
+[CYB48-DIAG] sktestsession=OK created=true storefront_echo=USA transactions=0
+[CYB48-DIAG] storefront_roundtrip=PASS
+[CYB48-DIAG] products_while_session_alive=2 of 2 ids=village.annual,village.monthly
+[CYB48-DIAG] products_resolved=2 of 2 ids=village.annual,village.monthly
+[CYB48-DIAG] verdict=ENVIRONMENT_LIVE
+[CYB48] bundle=app.villagefamily.app storefront=USA resolved=village.monthly [$5.99], village.annual [$49.99]
+[CYB48] paywall would render monthly=$5.99 annual=$49.99
+[CYB48] purchase OK id=village.monthly date=2026-10-01 20:28:37 +0000 jws=eyJhbG...IkFw…
+[CYB48] STOREKIT_SHEET_OPENING id=village.monthly price=$5.99
+[CYB48] STOREKIT_SHEET_WAS_ON_SCREEN_FOR_40s
+```
+
+**iPad Air 11-inch (M3) — first run `FIRST_RUN_ON_DEVICE_INCONCLUSIVE` (by
+design), immediate second run 5/5 passed, `** TEST SUCCEEDED **`**
+
+```
+[CYB48-DIAG] device_first_run=false
+[CYB48-DIAG] storefront_roundtrip=PASS
+[CYB48-DIAG] products_while_session_alive=2 of 2 ids=village.annual,village.monthly
+[CYB48-DIAG] verdict=ENVIRONMENT_LIVE
+[CYB48] attempt 1/3 resolved=2 ids=village.annual,village.monthly
+[CYB48] purchase OK id=village.monthly date=2026-10-01 20:49:48 +0000
+[CYB48] STOREKIT_SHEET_WAS_ON_SCREEN_FOR_40s
+```
+
+The sheet itself is captured as a PNG on each device and OCR'd so it is quotable
+as text rather than "trust the screenshot" (`docs/appstore/cyb48-evidence/`):
+
+```
+[ocr] Xcode | Village Monthly | Village | Subscription
+[ocr] $5.99 per month | Starting today
+[ocr] For testing purposes only. You will not be charged for confirming this purchase.
+[ocr] Subscribe
+```
+
+That is Apple's **StoreKit purchase sheet** (the `Xcode`-labelled test-environment
+sheet), presented for `village.monthly` at the store's own `$5.99` — which is
+precisely the interaction the build-6 reviewer could not reach: 2.1(b) is not
+reproducible on iOS 27.0 in the sandbox path with build 7's code.
+
+### 16.5 What this proves — and what it still does not
+
+**Proves.** With build 7's `BillingService`, on both reviewer device families on
+the reviewer's OS 27.0: both production product IDs resolve to `ProductDetails`,
+they carry the store's own prices, a purchase completes, and the StoreKit
+purchase sheet is presented. The empty-product-list shape of build 6 does not
+occur. The paywall's unloadable-product path is now dead code in practice: an
+unresolved product renders a disabled button plus a diagnostic line, never the
+build-6 toast over a live button.
+
+**Does not prove (unchanged, and still the one open candidate).** This is the
+**StoreKit test environment**, not a live App Store sandbox with a tester
+account — `asc sandbox list` is still `total 0` and only the Account Holder can
+create one. So the reviewer's real storefront remains unmeasured, and the
+USA-only territory availability of both subscriptions (§11.3, Ryan's `keep_usa`)
+remains the single store-side asymmetry that could produce an empty list for a
+reviewer outside the USA.
+
+### 16.6 Evidence files
+
+- `docs/appstore/cyb48-evidence/iphone17promax-ios27-storekit-sheet.png`
+- `docs/appstore/cyb48-evidence/ipadair11m3-ios27-storekit-sheet.png`
+- `docs/appstore/cyb48-evidence/iphone17promax-ios27-diagnostic.txt`
+- `docs/appstore/cyb48-evidence/ipadair11m3-ios27-diagnostic.txt`
+- Run logs and `.xcresult` bundles remain on the Mac Mini as
+  `~/cyb48-ios27-test.log` / `~/cyb48-ios27.xcresult` (iPhone) and
+  `~/cyb48-ipad27b-run.log` / `~/cyb48-ipad27b.xcresult` (iPad).
+
+### 16.7 Submission posture (unchanged)
+
+Nothing was submitted to Apple by this round. Build 7 stays the current
+candidate; the resubmission still waits on CYB-49 (`attachedCount 0` —
+neither subscription is attached to the next app version).

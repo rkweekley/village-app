@@ -1,0 +1,11 @@
+[CYB48-DIAG] bundle=app.villagefamily.app
+[CYB48-DIAG] device_first_run=false (true means this device had never completed a run of this suite, so an empty product list is inconclusive — see firstRunBlocker)
+[CYB48-DIAG] config_path=/Users/cyberal/projects/village-app-ios/ios/Runner/Village.storekit
+[CYB48-DIAG] config_exists=true
+[CYB48-DIAG] storefront_before=USA
+[CYB48-DIAG] sktestsession=OK created=true storefront_echo=USA transactions=0
+[CYB48-DIAG] storefront_roundtrip=PASS
+[CYB48-DIAG] products_while_session_alive=2 of 2 ids=village.annual,village.monthly
+[CYB48-DIAG] products_resolved=2 of 2 ids=village.annual,village.monthly
+[CYB48-DIAG] storefront_after=USA
+[CYB48-DIAG] verdict=ENVIRONMENT_LIVE

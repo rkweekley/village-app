@@ -23,31 +23,49 @@
 //    * the monthly subscription can be purchased end to end, and
 //    * the StoreKit purchase SHEET is presented for that product.
 //
-//  ENVIRONMENT REQUIREMENT — read before filing a red run
+//  THE STOREKIT TEST ENVIRONMENT — WHAT MUST BE TRUE FIRST
 //  ------------------------------------------------------
-//  A local StoreKit environment must be live in the app process.
-//  `Runner.xcscheme` carries
-//  `<StoreKitConfigurationFileReference identifier = "../../../Runner/Village.storekit">`
-//  (path relative to the scheme file) in BOTH the Test and Launch actions.
-//  StoreKit testing is a launch-time facility of the Xcode launcher, so a
-//  headless `xcodebuild test` may not turn it on. When no environment is active
-//  StoreKit returns an empty product list, which says nothing about the app —
-//  so these tests SKIP with that exact reason instead of failing.
+//  StoreKit testing is a launch-time facility, so a headless `xcodebuild test`
+//  does NOT get it from `Runner.xcscheme` alone. This suite installs it itself
+//  with `SKTestSession(contentsOf:)` and — critically — RETAINS the session for
+//  the whole run:
 //
-//  MEASURED VERDICT (2026-10-01, build host Mac Mini, iOS 26.5 simulator,
-//  Xcode 27.0 27A266a): the local StoreKit environment cannot be activated on an
-//  iOS SIMULATOR on this Xcode. `test00` below records the machine-readable
-//  evidence on every run (SKTestSession init outcome, storefront round-trip,
-//  resolved product count) so the verdict is never inferred. This matches a
-//  published upstream regression — RevenueCat purchases-ios PR #6897:
-//  "StoreKit unit tests can't fetch products on iOS simulators with Xcode 26.4+
-//  due to a StoreKit bug", worked around there by running the same suite on Mac
-//  Catalyst. See docs/ios-app-store-readiness.md §13.3 and §14 (CYB-48).
+//    A SKTestSession's test environment lives only as long as the session
+//    object. XCTest instantiates a fresh XCTestCase for every test method, so a
+//    session held in an instance property — or in a local `do { }` scope, which
+//    is what an earlier revision of this file did — is torn down before the
+//    next query reaches StoreKit. Measured on this host: `storefront_echo=USA`
+//    (session alive, environment installed) immediately followed by
+//    `products_resolved=0 of 2` once the session had left scope.
+//    `Self.testSession` is static precisely so the environment outlives the
+//    per-test case instance.
 //
-//  RUN IT (from the repo root on the build Mac):
+//  MEASURED (2026-10-01, build host Mac Mini, Xcode 27.0 27A266a)
+//  --------------------------------------------------------------
+//    iOS 26.5 simulator — `SKTestSession(contentsOf:)` constructed but was
+//      INERT (its declared USA storefront did not round-trip). That matches the
+//      published upstream regression: RevenueCat purchases-ios PR #6897,
+//      "StoreKit unit tests can't fetch products on iOS simulators with Xcode
+//      26.4+ due to a StoreKit bug".
+//    iOS 27.0 simulator (24A434) — the session is LIVE
+//      (`storefront_roundtrip=PASS`); the earlier iOS 26.5 verdict was an
+//      artefact of that runtime, not of the app.
+//    Cold start — the very FIRST StoreKit test session on a simulator device
+//      that has never hosted one can answer the first product query with an
+//      empty list, and the same device answers 2 of 2 immediately afterwards.
+//      `fetchProductsWithRetry()` absorbs that, matching the shipped paywall.
+//    Details: docs/ios-app-store-readiness.md §13.3 and §14 (CYB-48).
+//
+//  RUN IT (from the repo root on the build Mac; PATH needs Flutter plus the
+//  Homebrew ruby that owns the CocoaPods 1.17 gem — the system ruby 2.6 shim at
+//  ~/.gem/ruby/4.0.0/bin/pod fails with Gem::GemNotFoundException):
 //    xcodebuild test -workspace ios/Runner.xcworkspace -scheme Runner \
 //      -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' \
-//      -only-testing:RunnerTests/VillageStoreKitTests
+//      -parallel-testing-enabled NO -only-testing:RunnerTests/VillageStoreKitTests
+//
+//  `-parallel-testing-enabled NO` is required: xcodebuild otherwise runs the
+//  suite on a CLONED simulator that it deletes afterwards, taking the
+//  diagnostic artifact written into the app container with it.
 //
 //  BUILD THE WORKSPACE, NOT THE PROJECT. `in_app_purchase_storekit`,
 //  `url_launcher_ios` and `shared_preferences_foundation` are linked through
@@ -74,32 +92,146 @@ final class VillageStoreKitTests: XCTestCase {
 
   /// Recorded on every skip: a build-host limitation, not an app defect.
   static let environmentBlocker =
-    "No local StoreKit environment is active in this process, so StoreKit "
-    + "returned an empty product list. That is the build host's state, not the "
-    + "app's — see docs/ios-app-store-readiness.md §13.3/§14 (CYB-48). On Xcode "
-    + "26.4+ an iOS simulator cannot activate a StoreKit test environment "
-    + "(upstream StoreKit regression; RevenueCat purchases-ios PR #6897 works "
-    + "around it by running the same suite on Mac Catalyst). Run this suite on "
-    + "Mac Catalyst or a physical device, or from Xcode with a working StoreKit "
-    + "test environment. The machine-readable verdict is printed by test00 on "
-    + "every run."
+    "No StoreKit test environment could be installed in this process, so "
+    + "StoreKit returned an empty product list. That is the build host's state, "
+    + "not the app's — see docs/ios-app-store-readiness.md §13.3/§14 (CYB-48). "
+    + "On the iOS 26.5 simulator of Xcode 27.0 an SKTestSession constructs but is "
+    + "inert (upstream StoreKit regression; RevenueCat purchases-ios PR #6897 "
+    + "works around it by running the same suite on Mac Catalyst). Run this suite "
+    + "on an iOS 27.0 simulator, Mac Catalyst, or a physical device. The "
+    + "machine-readable verdict is printed by test00 on every run."
+
+  /// Recorded on the first run of this suite on a brand-new simulator device.
+  static let firstRunBlocker =
+    "This simulator device has never completed a run of this suite, and StoreKit "
+    + "answered the product query with an empty list for the whole run — the "
+    + "first-ever StoreKit test session on a device does not come up (measured on "
+    + "a freshly created iPad Air 11-inch (M3) with the session provably live: "
+    + "storefront_roundtrip=PASS, products 0 of 2 across three attempts; the "
+    + "immediate re-run on the same device returned 2 of 2). This verdict is "
+    + "INCONCLUSIVE, not a defect. Re-run the suite on the same device and it "
+    + "will decide for real."
+
+  /// `…/ios/Runner/Village.storekit`, resolved from this file's own path.
+  static let storeKitConfigURL = URL(fileURLWithPath: #filePath)  // …/ios/RunnerTests/RunnerTests.swift
+    .deletingLastPathComponent()                                  // …/ios/RunnerTests
+    .deletingLastPathComponent()                                  // …/ios
+    .appendingPathComponent("Runner/Village.storekit")            // …/ios/Runner/Village.storekit
+
+  /// Where test00 records the machine-readable verdict, inside the app container.
+  static let diagnosticFileURL = URL(fileURLWithPath: NSHomeDirectory())
+    .appendingPathComponent("Documents/cyb48-storekit-diagnostic.txt")
+
+  /// True when a previous run of this suite has already completed on this
+  /// simulator device. Evaluated once, before test00 writes its own verdict —
+  /// `setUp` freezes it. See `firstRunBlocker` for why it matters.
+  static let deviceHasRunThisSuiteBefore: Bool =
+    FileManager.default.fileExists(atPath: diagnosticFileURL.path)
+
+  /// THE session. Static on purpose — see the header. A StoreKit test
+  /// environment is torn down when its session deallocates, and XCTest makes a
+  /// new case instance per test method, so an instance property would drop the
+  /// environment between tests.
+  static var testSession: SKTestSession?
+
+  /// Install the StoreKit test environment once per process and keep it alive.
+  /// Returns the session, plus whether this call created it.
+  @discardableResult
+  static func ensureStoreKitTestSession() throws -> (session: SKTestSession, created: Bool) {
+    if let existing = testSession { return (existing, false) }
+    let session = try SKTestSession(contentsOf: storeKitConfigURL)
+    session.clearTransactions()
+    testSession = session
+    return (session, true)
+  }
+
+  /// `storefront` is nil until the session's environment is actually installed,
+  /// so this is the cheapest liveness probe for the test environment.
+  static var storeKitTestEnvironmentIsLive: Bool {
+    guard let session = testSession else { return false }
+    return session.storefront != nil
+  }
 
   private func currentStorefront() async -> String {
     if let storefront = await Storefront.current { return storefront.countryCode }
     return "none"
   }
 
-  /// Resolve the two production products exactly as the paywall does, skipping
-  /// when this host has no StoreKit environment to talk to.
+  /// Freeze the "has this device run the suite before" verdict before test00
+  /// writes its own verdict file.
+  override func setUp() {
+    super.setUp()
+    _ = Self.deviceHasRunThisSuiteBefore
+  }
+
+  /// Resolve the production products with a bounded retry.
+  ///
+  /// A StoreKit test environment created on a simulator that has NEVER run one
+  /// can answer the first product query with an EMPTY list. Measured on a
+  /// freshly created iPad Air 11-inch (M3) / iOS 27.0 device: the first run of
+  /// this suite recorded `products_while_session_alive=0 of 2` with a session
+  /// that was provably live (`storefront_roundtrip=PASS`), and an immediate
+  /// re-run on the same device recorded `2 of 2`. That is the same cold-start
+  /// behaviour the app's `BillingService.fetchProductsWithRetry()` exists for —
+  /// which is why the paywall no longer treats one empty response as final — so
+  /// the harness retries too instead of reporting a false defect.
+  private func fetchProductsWithRetry(attempts: Int = 3) async throws -> [Product] {
+    var last: [Product] = []
+    for attempt in 1...attempts {
+      last = try await Product.products(for: Self.expectedProductIDs)
+      print("[CYB48] attempt \(attempt)/\(attempts) resolved=\(last.count) "
+            + "ids=\(last.map(\.id).sorted().joined(separator: ","))")
+      if !last.isEmpty { return last }
+      if attempt < attempts {
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+      }
+    }
+    return last
+  }
+
+  /// Resolve the two production products exactly as the paywall does.
+  ///
+  /// Skips ONLY when this host cannot host a StoreKit test environment at all.
+  /// When the environment is live the assertions run for real: an empty product
+  /// list after the retries is then exactly the build-6 2.1(b) defect, and must
+  /// FAIL rather than be excused.
   private func resolvedProductionProducts() async throws -> [Product] {
-    let products = try await Product.products(for: Self.expectedProductIDs)
+    do {
+      try Self.ensureStoreKitTestSession()
+    } catch {
+      XCTFail("SKTestSession(contentsOf:) threw: \(error)")
+      // `throw XCTSkip`, not `try XCTSkip`: XCTSkip's String initializer
+      // BUILDS the error and would silently do nothing here (compiler warning
+      // "result of 'XCTSkip' initializer is unused").
+      throw XCTSkip(Self.environmentBlocker)
+    }
+    // XCTSkipIf, not `guard … else { XCTSkip }`: XCTSkip is not a
+    // Never-returning call, so a guard body around it does not compile.
+    try XCTSkipIf(!Self.storeKitTestEnvironmentIsLive, Self.environmentBlocker)
+
+    let products = try await fetchProductsWithRetry()
+    // A device that has never completed a run cannot produce a verdict: the
+    // first-ever StoreKit test session on a simulator does not come up. Report
+    // that as inconclusive instead of as the build-6 defect.
+    if products.isEmpty && !Self.deviceHasRunThisSuiteBefore {
+      throw XCTSkip(Self.firstRunBlocker)
+    }
     let summary = products.isEmpty
       ? "none"
       : products.map { "\($0.id) [\($0.displayPrice)]" }.joined(separator: ", ")
     print("[CYB48] bundle=\(Bundle.main.bundleIdentifier ?? "unknown") "
           + "storefront=\(await currentStorefront()) resolved=\(summary)")
-    try XCTSkipIf(products.isEmpty, Self.environmentBlocker)
     return products
+  }
+
+  /// Leave no purchase sheet on the simulator and no StoreKit test environment
+  /// behind. A sheet left up by test04 keeps the test host alive, which hangs
+  /// `xcodebuild test` after the suite has already reported (observed: three
+  /// xcodebuild processes still resident minutes after "Test Suite passed").
+  override func tearDown() async throws {
+    Self.testSession?.disableDialogs = true
+    Self.testSession?.clearTransactions()
+    try await super.tearDown()
   }
 
   // MARK: - 00 — record WHY the local StoreKit environment is or is not live
@@ -109,10 +241,7 @@ final class VillageStoreKitTests: XCTestCase {
   /// build host cannot host a StoreKit test environment". Every line is
   /// prefixed `[CYB48-DIAG]` so it can be grepped out of the xcodebuild log.
   func test00_storeKitTestEnvironmentDiagnostic() async throws {
-    let configURL = URL(fileURLWithPath: #filePath)      // …/ios/RunnerTests/RunnerTests.swift
-      .deletingLastPathComponent()                       // …/ios/RunnerTests
-      .deletingLastPathComponent()                       // …/ios
-      .appendingPathComponent("Runner/Village.storekit") // …/ios/Runner/Village.storekit
+    let configURL = Self.storeKitConfigURL
 
     // XCTest swallows the test process's stdout into the .xcresult bundle, which
     // `xcresulttool` will not hand back as text. The verdict is therefore ALSO
@@ -125,35 +254,62 @@ final class VillageStoreKitTests: XCTestCase {
     }
 
     diag("[CYB48-DIAG] bundle=\(Bundle.main.bundleIdentifier ?? "nil")")
+    diag("[CYB48-DIAG] device_first_run=\(!Self.deviceHasRunThisSuiteBefore) "
+         + "(true means this device had never completed a run of this suite, so "
+         + "an empty product list is inconclusive — see firstRunBlocker)")
     diag("[CYB48-DIAG] config_path=\(configURL.path)")
     diag("[CYB48-DIAG] config_exists=\(FileManager.default.fileExists(atPath: configURL.path))")
     diag("[CYB48-DIAG] storefront_before=\(await currentStorefront())")
 
-    // 1. Can a StoreKit test session even be constructed against our config?
+    // 1. Install the StoreKit test environment and hold it in `Self.testSession`
+    //    so it survives into tests 01–04.
     do {
-      let session = try SKTestSession(contentsOf: configURL)
-      session.disableDialogs = true
-      session.clearTransactions()
-      diag("[CYB48-DIAG] sktestsession=OK storefront_echo=\(session.storefront ?? "nil") "
+      let (session, created) = try Self.ensureStoreKitTestSession()
+      diag("[CYB48-DIAG] sktestsession=OK created=\(created) "
+           + "storefront_echo=\(session.storefront ?? "nil") "
            + "transactions=\(session.allTransactions().count)")
       // A live session must round-trip its configured storefront. The config
       // declares USA; anything else means the session is inert.
       diag("[CYB48-DIAG] storefront_roundtrip=\(session.storefront == "USA" ? "PASS" : "FAIL")")
+
+      // 2. Ask StoreKit for the production IDs WHILE the session is provably
+      //    alive. This is the line that separates "the environment was never
+      //    installed" from "the environment is installed and StoreKit still
+      //    returns nothing for these identifiers". Deliberately the RAW first
+      //    attempt — a 0 here on a simulator that has never hosted a StoreKit
+      //    environment is the documented cold-start behaviour, not a defect,
+      //    and step 3 shows whether the retry recovers it.
+      let liveProducts = try await Product.products(for: Self.expectedProductIDs)
+      diag("[CYB48-DIAG] products_while_session_alive=\(liveProducts.count) of "
+           + "\(Self.expectedProductIDs.count) "
+           + "ids=\(liveProducts.map(\.id).sorted().joined(separator: ","))")
     } catch {
       let ns = error as NSError
       diag("[CYB48-DIAG] sktestsession=FAILED domain=\(ns.domain) code=\(ns.code) "
            + "desc=\(ns.localizedDescription)")
     }
 
-    // 2. What does StoreKit 2 actually hand the app for the production IDs?
-    let products = try await Product.products(for: Self.expectedProductIDs)
+    // 3. What StoreKit 2 hands the app for the production IDs once the session
+    //    is retained across test methods and a cold first response is retried —
+    //    which is exactly what the shipped paywall does.
+    let products = try await fetchProductsWithRetry()
     diag("[CYB48-DIAG] products_resolved=\(products.count) of \(Self.expectedProductIDs.count) "
          + "ids=\(products.map(\.id).sorted().joined(separator: ","))")
     diag("[CYB48-DIAG] storefront_after=\(await currentStorefront())")
-    diag("[CYB48-DIAG] verdict=\(products.isEmpty ? "NO_STOREKIT_ENVIRONMENT" : "ENVIRONMENT_LIVE")")
+    let verdict: String
+    if !products.isEmpty {
+      verdict = "ENVIRONMENT_LIVE"
+    } else if !Self.deviceHasRunThisSuiteBefore {
+      // Never ran here before, so this run cannot decide anything.
+      verdict = "FIRST_RUN_ON_DEVICE_INCONCLUSIVE"
+    } else {
+      // The environment is live and has worked on this device before, and
+      // StoreKit still returns nothing: that IS the build-6 shape.
+      verdict = "STOREKIT_RETURNED_NO_PRODUCTS"
+    }
+    diag("[CYB48-DIAG] verdict=\(verdict)")
 
-    let outURL = URL(fileURLWithPath: NSHomeDirectory())
-      .appendingPathComponent("Documents/cyb48-storekit-diagnostic.txt")
+    let outURL = Self.diagnosticFileURL
     do {
       try lines.joined(separator: "\n").appending("\n")
         .write(to: outURL, atomically: true, encoding: .utf8)
@@ -212,9 +368,16 @@ final class VillageStoreKitTests: XCTestCase {
   /// Tapping "Choose Monthly" runs `InAppPurchase.buyNonConsumable` ->
   /// StoreKit 2 `Product.purchase()`. A completed transaction proves the path
   /// the paywall drives is live and is not blocked by an unresolved product.
+  ///
+  /// Dialogs are disabled for THIS test only: the test environment must
+  /// auto-confirm, otherwise `purchase()` would wait for a tap that no one is
+  /// there to make. test04 re-enables them and is the one that shows the sheet.
   func test03_purchaseOfMonthlySubscriptionCompletes() async throws {
     let products = try await resolvedProductionProducts()
     let monthly = try XCTUnwrap(products.first { $0.id == Self.monthlyProductID })
+
+    Self.testSession?.disableDialogs = true
+    Self.testSession?.clearTransactions()
 
     let result = try await monthly.purchase()
     switch result {
@@ -250,13 +413,17 @@ final class VillageStoreKitTests: XCTestCase {
     let products = try await resolvedProductionProducts()
     let monthly = try XCTUnwrap(products.first { $0.id == Self.monthlyProductID })
 
+    // Dialogs ON: the sheet must actually be drawn and wait for a tap.
+    Self.testSession?.disableDialogs = false
+    Self.testSession?.clearTransactions()
+
     print("[CYB48] STOREKIT_SHEET_OPENING id=\(monthly.id) price=\(monthly.displayPrice)")
 
     let purchaseReturnedEarly = expectation(
       description: "purchase() returned before the sheet was dismissed")
     purchaseReturnedEarly.isInverted = true
 
-    Task {
+    let purchaseTask = Task {
       do {
         let result = try await monthly.purchase()
         print("[CYB48] purchase() returned unexpectedly: \(result)")
@@ -271,5 +438,12 @@ final class VillageStoreKitTests: XCTestCase {
     // inside this window and fails the test.
     wait(for: [purchaseReturnedEarly], timeout: 40)
     print("[CYB48] STOREKIT_SHEET_WAS_ON_SCREEN_FOR_40s")
+
+    // Take the sheet down before the suite ends. Left waiting for a tap it keeps
+    // the test host alive, and `xcodebuild test` then stays resident long after
+    // the suite has reported its results.
+    Self.testSession?.disableDialogs = true
+    Self.testSession?.clearTransactions()
+    purchaseTask.cancel()
   }
 }
