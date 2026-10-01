@@ -649,3 +649,147 @@ In order:
 4. attach **build 7** to version 1.0.1 (currently build **6** is attached) and submit.
 
 Skipping 1–2 will very likely repeat 2.3.2 a third time.
+
+## 13. 2026-10-01 — CYB-48 verification round (build 7, live ASC re-check, proof status)
+
+Ryan's decisions on the CYB-48 interaction `da7069b4` (idempotency key
+`cyb48-unblock-2026-10-01`, answered 2026-10-01T19:0xZ):
+
+- **territories → `keep_usa`.** Both subscriptions stay USA-only. The reviewer's
+  storefront is treated as US, so the availability asymmetry in §11.3 is accepted
+  rather than changed. No App Store Connect write was made.
+- **sandbox_proof → `ios265`.** Accept a *client-side* proof on the iOS 26.5
+  simulator (StoreKit configuration file) instead of a live sandbox-tester proof
+  on iOS 27.0. `asc sandbox list` still returns **total 0** (only the account
+  holder can create a sandbox tester) and the Mini cannot install the iOS 27
+  runtime (§11.7 note).
+
+### 13.1 Live App Store Connect re-verification (read-only, 2026-10-01T19:20Z)
+
+```
+$ asc status --app 6803645374
+appstore.version 1.0.1  state REJECTED
+submission 4d62cd5b-...  inFlight true  blockingIssues ["unresolved issues"]
+review.state UNRESOLVED_ISSUES   builds.latest 1.0.1 buildNumber 7  VALID  expired false
+
+$ asc subscriptions versions list --subscription-id <each>
+village.monthly 6807153048  version cabac1de-7482-4fde-9f83-5bd696f3e034  READY_FOR_REVIEW
+village.annual  6807153583  version 38f315ce-5125-4726-8fbd-1d3172aa4532  READY_FOR_REVIEW
+
+$ asc subscriptions review app-store-screenshot view --subscription-id <each>
+village.monthly  fileName SOURCE  assetDeliveryState COMPLETE  1206x2622
+village.annual   fileName SOURCE  assetDeliveryState COMPLETE  1206x2622
+$ asc subscriptions pricing availability available-territories --availability-id <each>
+["USA"]   (total 1)          availableInNewTerritories false     (both products)
+$ asc subscriptions offers introductory list --subscription-id <each>
+total 0                                                            (both products)
+```
+
+So every TN3186 "empty product list" cause is verified good on the store side —
+two products, exact identifiers, prices, localizations, **review screenshots
+present for both** (the annual one was not previously checked), IAP capability,
+active Paid Apps Agreement — with territory availability (§11.3) as the single
+asymmetry, and that one Ryan has now accepted.
+
+### 13.2 Build 7 is uploaded and VALID (draft, unattached)
+
+`asc builds list --app 6803645374` → `1.0.1 build 7 VALID 2026-10-01T11:10:25-07:00
+expired:false`; `asc builds uploads list` → `cfBundleVersion "7"`,
+`state COMPLETE`. The IPA sha256 is recorded in §11.7. Build 7 is **not** attached to
+a submission and nothing was submitted — attaching it plus the §12.6 sequence is CYB-49.
+Build 6 is never resubmitted.
+
+### 13.3 The client-side runtime proof is BUILT but BLOCKED by the host
+
+Deliverables that landed (committed, see §13.4):
+
+- `ios/Runner/Village.storekit` — local StoreKit configuration carrying the two
+  production identifiers/prices (5.99 P1M / 49.99 P1Y) in one subscription group.
+- `Runner.xcscheme` — `<StoreKitConfigurationFileReference
+  identifier="../../../Runner/Village.storekit">` in **both** the Test and Launch
+  actions (the identifier is a path relative to the scheme file, per Apple's own
+  scheme model — the file needs no target membership).
+- `ios/RunnerTests/RunnerTests.swift` — `VillageStoreKitTests`: both production
+  identifiers resolve, the store's own prices arrive, a monthly purchase completes,
+  and test04 holds the out-of-process StoreKit purchase sheet on screen for 40 s so
+  the host can `xcrun simctl io booted screenshot` it.
+
+Two build-host problems were found and one was fixed:
+
+1. **`-project` cannot build this app; `-workspace` can.** `in_app_purchase_storekit`,
+   `url_launcher_ios` and `shared_preferences_foundation` are linked through **Swift
+   Package Manager** (`ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage`),
+   while `flutter_secure_storage` is still a CocoaPod. `xcodebuild test -project
+   ios/Runner.xcodeproj` never builds that pod, so `GeneratedPluginRegistrant.m` fails
+   with `Module 'flutter_secure_storage' not found`. `-workspace ios/Runner.xcworkspace`
+   builds clean. (Repairing the pod state also needs the Ruby 4.0.0 gem binstub,
+   `$HOME/.gem/ruby/4.0.0/bin`, on `PATH` — plain `/opt/homebrew/bin` gives
+   `pod: command not found`.)
+2. **No StoreKit environment can be made active on the Mini's iOS 26.5 simulator.**
+   With the suite running (build green, app hosting the tests — `Bundle.main` =
+   `app.villagefamily.app`), every path returns an empty product list:
+
+   ```
+   xcodebuild test -workspace ios/Runner.xcworkspace -scheme Runner
+     -destination 'platform=iOS Simulator,id=DA36D93F-…'   (iPhone 17 Pro Max, 26.5)
+
+   scheme TestAction StoreKitConfigurationFileReference present   -> products []
+   SKTestSession(contentsOf:)  variant A full doc, version 4/0     -> products []  tx 0  storefrontEcho ""
+   SKTestSession(contentsOf:)  variant B Xcode-shaped, version 2/0 -> products []  tx 0  storefrontEcho ""
+   SKTestSession(contentsOf:)  variant C Xcode-shaped, version 4/0 -> products []  tx 0  storefrontEcho ""
+   SKTestSession(contentsOf:)  variant D full doc, version 2/0     -> products []  tx 0  storefrontEcho ""
+   bogus id "village.nonexistent"                                  -> 0
+   ```
+
+   The file *parses* (no `SKTestSession` init error, 2302 bytes read back) but the
+   session is inert: `session.storefront` does not even round-trip ("GBR" reads back
+   as ""), and `Storefront.current` reports the real store rather than the
+   configuration's storefront. Variant B is byte-shaped like Xcode's own generated
+   files (verified against checked-in `*.storekit` files), so this is not a schema
+   defect — no StoreKit test environment is being installed for the process on this
+   host, which is consistent with the stale `CoreSimulator` / missing Xcode
+   first-launch components recorded in §11.7.
+
+   Consequence: `VillageStoreKitTests` **skips** (it does not fail) when the product
+   list is empty, with the reason above, so a red-looking run cannot be mistaken for
+   an app regression.
+
+Unblock action (owner: **Ryan**, one of):
+- install the iOS 27.0 simulator runtime and the Xcode first-launch components on the
+  Mac Mini (the `CoreSimulator is out of date` state in §11.7) and run the suite from
+  the Xcode GUI with the scheme's StoreKit configuration selected; **or**
+- create a sandbox tester in App Store Connect (the `create_tester` option that was
+  declined for this round) and run the paywall against the live sandbox products.
+
+### 13.4 What makes the 2.1(b) symptom impossible in build 7 regardless
+
+`fbd2ff9` removed the two code defects that turned an empty StoreKit response into
+Apple's rejection:
+
+1. `BillingService.fetchProducts()` returns a `ProductFetchResult` carrying
+   `products`, `notFoundIDs`, the `IAPError` code/message and the device storefront,
+   logs every query under `[StoreKit]`, and never throws;
+   `fetchProductsWithRetry()` absorbs a legitimately empty cold-launch response.
+2. `productForTier()` is the single purchasable gate. When the store returns nothing
+   the plan card's button is **disabled** and reads "Currently unavailable" /
+   "Checking…", `planPriceLabel()` renders the store's own price (never the hardcoded
+   `$5.99`/`$49.99`), and the paywall prints the StoreKit diagnostic line plus Retry.
+
+Verified locally in the WSL workspace: `flutter test test/billing_service_test.dart`
+→ **13/13 pass** (product IDs, the purchasable gate, the no-hardcoded-price rule, the
+diagnostic payload). `flutter analyze` → 0 errors (90 issues, unchanged baseline).
+
+So with `keep_usa` accepted, the residual risk is bounded and *legible*: if the
+reviewing storefront were non-US the products would still come back empty, but the
+app would then show a disabled button, the storefront/notFoundIDs diagnostic and a
+Retry — no dead purchase button, no "subscription product unavailable" toast, and the
+next report of it would carry the storefront code that proves it.
+
+### 13.5 File set for this round
+
+| Path | Purpose |
+|---|---|
+| `ios/Runner/Village.storekit` | Local StoreKit configuration (production IDs/prices) |
+| `ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme` | StoreKit config on Test + Launch actions |
+| `ios/RunnerTests/RunnerTests.swift` | `VillageStoreKitTests` (self-skipping when no environment) |
+

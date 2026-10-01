@@ -1,0 +1,101 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "C48A11CE",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6803645374",
+    "_developerTeamID" : "R9U8JNTV28",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "6D2E0A41",
+      "localizations" : [
+
+      ],
+      "name" : "Village",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "5.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6807153048",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Full access to Village for one month.",
+              "displayName" : "Village Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "village.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Village Monthly",
+          "subscriptionGroupID" : "6D2E0A41",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "49.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6807153583",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Full access to Village for one year.",
+              "displayName" : "Village Annual",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "village.annual",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Village Annual",
+          "subscriptionGroupID" : "6D2E0A41",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
