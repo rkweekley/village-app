@@ -474,3 +474,55 @@ called. Source-verified, not assumed.
   advertises "First month free" with 0 intro offers configured.
 - Sandbox proof on an iOS 27.0 simulator/device requires a sandbox tester
   account; `asc sandbox list` currently returns **total 0** (none configured).
+
+### 11.7 Build 7 archived, uploaded and VERIFIED (2026-10-01)
+
+```
+$ asc builds list --app 6803645374
+1.0.1  build 7   VALID   2026-10-01T11:10:25-07:00   expired:false
+1.0.1  build 6   VALID   2026-09-01T08:44:20-07:00
+
+$ asc builds uploads list --app 6803645374
+{id: 335733d2-ced2-4f68-9513-1899557e7e3e, cfBundleShortVersionString:"1.0.1",
+ cfBundleVersion:"7", platform:"IOS", createdDate:"2026-10-01T11:09:36-07:00",
+ state:{state:"COMPLETE"}}
+```
+
+Local artifact: `~/projects/village-app-ios/build/ios/ipa/Village.ipa`, 22,873,316 bytes,
+sha256 `2a5504122cedc5960f84e51a65978d3529528b75f39aa8c08f4e176050729033`;
+`CFBundleIdentifier app.villagefamily.app`, `CFBundleShortVersionString 1.0.1`,
+`CFBundleVersion 7`, `MinimumOSVersion 15.0`. Source commit `fbd2ff9` on `production/v1`.
+Uploaded with `asc builds upload --app 6803645374 --ipa build/ios/ipa/Village.ipa`.
+
+**Build 7 is a draft build — it is NOT attached to a submission and nothing was
+submitted for review.** Attaching it and resubmitting is CYB-49 (+ the territory
+and intro-offer decisions in §11.6) once the interaction on CYB-48 is answered.
+
+#### Mac Mini build-environment repairs required before this build
+The build machine had degraded since build 6 (2026-09-24) and two repairs were needed:
+1. **Xcode 27.0 licence was unaccepted** — `xcrun simctl` refused every call.
+   Fixed: `sudo xcodebuild -license accept`.
+2. **Ruby + CocoaPods were gone.** Homebrew's Cellar had been cleaned down to four
+   formulae, so `~/.local/bin/pod` failed with `can't find gem cocoapods`.
+   The gems survived in `~/.gem/ruby/4.0.0` (cocoapods 1.17.0) so restoring the matching
+   Ruby ABI 4.0.0 was enough: `brew update && brew install ruby` (4.0.7), then
+   `gem install --user-install bigdecimal drb mutex_m base64 logger ostruct benchmark ffi nkf`
+   for the default gems Ruby 4 no longer bundles. Build with
+   `GEM_HOME=GEM_PATH=$HOME/.gem/ruby/4.0.0` and that binstub on `PATH`.
+3. **Codesign failed with `errSecInternalComponent`** from the SSH session. The login
+   keychain must be unlocked *in the same session that runs the build*, plus the key
+   partition list extended to `codesign`:
+   ```bash
+   security default-keychain -s "$HOME/Library/Keychains/login.keychain-db"
+   security unlock-keychain -p "<login password>" "$HOME/Library/Keychains/login.keychain-db"
+   security set-key-partition-list -S apple-tool:,apple:,codesign -s -k "<login password>" \
+     "$HOME/Library/Keychains/login.keychain-db"
+   ```
+   Unlocking in a *previous* SSH session is not enough — the build script must do it itself.
+
+Note: the Mini's `CoreSimulator` is still stale (`CoreSimulator is out of date. Current
+version (1051.55.0) is older than build version (1171.7.0)`, Xcode reports
+`DVTCoreDeviceCore` plug-in load failures and the iOS 27 runtime install fails with
+"Authorization is required to install the packages"). Device archives are unaffected,
+but simulator work needs the Xcode first-launch components installed. This is why the
+iOS 27.0 sandbox proof in §11.6 is still outstanding.
