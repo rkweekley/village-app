@@ -301,3 +301,90 @@ The monitor's `nextCheckAt` is therefore `null` and the issue was sitting `block
 (2026-10-01 runs execute on the same model), but the recovery action is owned by the
 board and must be resolved before the monitor can be re-armed. The manual check in §9
 above closes the observation gap for today regardless.
+
+## 10. Apple rejection #2 — build 6 rejected in review, 2026-10-01 (CYB-32 / CYB-48 / CYB-49)
+
+Read live 2026-10-01T17:18–17:25Z via `asc` 5.5.0 on the Mac Mini — API-key path **and** a
+live `asc web` session (Ryan re-authenticated 2026-10-01T16:21Z). This supersedes §9 as the
+latest live state. No mutations were made.
+
+Resolution Center thread `8c531ec1-dffc-3d80-af54-edb05ef0306f`, **new** rejection
+`d07de555-c5eb-464b-bcc3-a8764c039521`, message posted **2026-10-01T17:18:30.992Z** on the
+same submission `4d62cd5b` — reviewed as `1.0.1 (6)` on iPhone 17 Pro Max and iPad Air
+11-inch (M3), iOS/iPadOS 27.0.
+
+Apple opens with: *"The issues we previously identified still need your attention."*
+
+### 10.1 Guideline 2.1(b) — Performance / App Completeness (NEW — this is the blocker)
+> The In-App Purchase products in the app exhibited one or more bugs which create a poor
+> user experience. Specifically, an error message appeared stating "subscription product
+> unavailable" after tapping the purchase button.
+
+**2.1(a) did NOT repeat.** The login error is absent from this rejection, and the reviewer
+reached the paywall — which requires a successful login. §8.5's analysis is supported.
+
+Reviewer attachment `Screenshot-1001-101752.png` (retrieved, OCR'd): the paywall in its
+"First month free" state, both plan cards **enabled** ("Choose Monthly" $5.99/month,
+"Choose Annual" $49.99/year), toast **"Subscription product unavailable. Please try again
+shortly."**
+
+Cause, traced in the shipped code: that string is `subscription_page.dart:109`, raised by
+`_buyViaStore()` **only** when `_findProduct(tier)` returns null — i.e. when
+`BillingService.fetchProducts()` -> `InAppPurchase.queryProductDetails()` returned **no**
+product for `village.monthly` / `village.annual`. Two shipped defects compound it:
+`fetchProducts()` discards `ProductDetailsResponse.error` / `.notFoundIDs` and
+`_loadProducts()` swallows every exception (so the StoreKit failure is undiagnosable from
+the field); and the `_PlanCard`s render hardcoded prices with a live `onTap` regardless of
+whether `_products` loaded, so an unloadable product still presents as purchasable.
+
+### 10.2 Guideline 2.3.2 — Performance / Accurate Metadata (repeat of §8.2)
+> Your promotional image is the same as the app's icon. You submitted duplicate or
+> identical promotional images for different promoted In-App Purchase products and/or win
+> back offers.
+
+Re-read live: `asc subscriptions promoted-purchases list --app 6803645374` -> **total 0**.
+No promoted purchase carries a promotional image today, so there is no API-visible object
+to fix; this needs a web-UI confirmation (tracked in CYB-49).
+
+### 10.3 State after the rejection
+- `appstore.state` = **REJECTED**; `review.state` = **UNRESOLVED_ISSUES**; version `1.0.1`
+  (`f6ba0c4c-bc37-4ae7-842f-f2273d0cb7d7`), `submission.blockingIssues` = "submission
+  `4d62cd5b…` has unresolved issues".
+- `asc review history`: this submission `outcome: rejected`; the `appStoreVersion` item is
+  `REJECTED`, both `subscriptionVersion`s and the `subscriptionGroupVersion` sit
+  `READY_FOR_REVIEW`.
+- Both subscriptions are back to **`READY_TO_SUBMIT`** — no longer attached to any
+  submission. Prices read back monthly `5.99 USD`, annual `49.99 USD`.
+- `asc review doctor`: error `review.submission.unresolved_issues`; new remediation
+  warning *"first-time subscriptions must be submitted via the app version page in App
+  Store Connect (not the API)"* — re-attaching the subscriptions is a **web-UI** step.
+- Introductory offers **0** on both products; promoted purchases **0**.
+- **Agreement watchdog CLEAR:** Apple Developer Program License Agreement `XG8DNV4HYY`
+  v5031 `active`, `pending:false`, accepted 2026-08-20T20:10:14Z (its `dateAgreeBy`
+  2026-10-01 has now passed with the agreement already accepted). Apple Developer
+  Agreement v4 `active`. `contractMessages: []`. No silent review hold.
+- Declarations: one `MEDICAL_DEVICE` requirement `PENDING_COLLECTION`, `required:false` —
+  non-blocking.
+
+### 10.4 Consequence — same-build resubmission is CLOSED
+Build 6 was resubmitted **unchanged** after the 2026-09-16 rejection and has now been
+rejected again, on a **runtime** defect (the IAP does not load). §8.4's warning was
+correct. The next submission requires a **new build number** and a documented fix. Do not
+resubmit unchanged a third time.
+
+### 10.5 Monitor correction
+§9.2 recorded the CYB-32 monitor as unfixed. That is now stale: the board armed
+`executionPolicy.monitor` on 2026-10-01 (`nextCheckAt` 2026-10-02T02:10:04Z, `timeoutAt`
+2026-10-08T14:10:04Z, `maxAttempts` 12, `recoveryPolicy` `escalate_to_board`), it fired
+(attempt 8), and the 2026-10-01T17:18Z re-check **caught this rejection** — the monitor did
+its job. CYB-32 is closed with the outcome recorded; CYB-50 carries the watch for the next
+submission.
+
+### 10.6 Follow-up issues
+- **CYB-48** (critical) — fix 2.1(b): new build + sandbox proof + the two code defects.
+- **CYB-49** (high) — clear 2.3.2, re-attach both subscriptions to the next submission,
+  fill `whatsNew`.
+- **CYB-50** (high, blocked by 48/49) — monitor the next submission's review.
+- **CYB-31** — promoted to `todo`: the intro-offer work's "do not disturb the in-flight
+  review" constraint is void and its gate condition #2 (next release cycle) is met. Create
+  the intro offers **before** the next submission.
