@@ -153,16 +153,24 @@ Checked directly against App Store Connect with `asc` 5.5.0 on the Mac Mini
   PURCHASE_HISTORY — all APP_FUNCTIONALITY / DATA_LINKED_TO_YOU;
   `unrepresentableCount: 0`.
 
-### 7.2 Open defect — no introductory offers on iOS
+### 7.2 CLOSED 2026-10-01 — the introductory offers now exist on iOS
 
-`asc subscriptions offers introductory list` returns **0** for both products.
-The paywall advertises a free trial and Android/Play has active 30-day
-`monthly-freetrial` / `annual-freetrial` offers, but the iOS trial is granted
-server-side only (`Family.TrialEndsAt`). Guideline 3.1.2 risk.
+Originally an open defect: `asc subscriptions offers introductory list` returned
+**0** for both products while the paywall advertised a free trial and
+Android/Play carried active 30-day `monthly-freetrial` / `annual-freetrial`
+offers (the iOS trial was granted server-side only via `Family.TrialEndsAt`) —
+a Guideline 3.1.2 risk.
 
-Tracked as GH-102 and Paperclip CYB-31. Deliberately deferred until the current
-submission resolves or the next release cycle, so the in-flight review is not
-disturbed.
+**Both offers were created on 2026-10-01 under CYB-31** (board approval
+`69676df3-b33c-4842-a155-f1a9a585d3fc`, accepted). `list` now returns
+`total: 1` for each product. Full evidence, the exact commands, the territory
+finding, and the rollback path are in **§15** below. Nothing else was mutated.
+
+Tracked as GH-102 and Paperclip CYB-31. The original deferral (don't disturb the
+in-flight submission `4d62cd5b`) ended when Apple rejected build 6 on
+2026-10-01: the submission became `UNRESOLVED_ISSUES`/`REJECTED`, no review was
+in flight, and gate condition 2 (next release cycle — build 7, a new build
+number) was met.
 
 ### 7.3 Tooling note — why these items sat open
 
@@ -470,8 +478,10 @@ called. Source-verified, not assumed.
   must be submitted via the app version page, not the API).
 - **Territory availability (§11.3):** widen both subscriptions beyond USA, or
   confirm the reviewing storefront is US. Decision owner: Ryan.
-- **CYB-31:** create the iOS 30-day introductory offer — the paywall still
-  advertises "First month free" with 0 intro offers configured.
+- **CYB-31 — DONE 2026-10-01:** both iOS 30-day introductory offers were
+  created (USA, `ONE_MONTH`, `FREE_TRIAL`, 1 period) on subscriptions
+  `6807153048` + `6807153583`. `list` returns `total: 1` for each — see §15.
+  Removed from the open list.
 - Sandbox proof on an iOS 27.0 simulator/device requires a sandbox tester
   account; `asc sandbox list` currently returns **total 0** (none configured).
 
@@ -919,5 +929,136 @@ command-verified blocker for the next submission: `attachedCount 0` /
 `submitWithNextAppStoreVersion false` means neither subscription is attached to
 the next app version, which is CYB-49's unwind (release the inflight versions
 from submission `4d62cd5b`).
+
+## 15. CYB-31 — iOS 30-day free-trial introductory offers CREATED (2026-10-01)
+
+Closes §7.2. Executed only after the board approval card
+(`request_confirmation` `69676df3-b33c-4842-a155-f1a9a585d3fc`) returned
+**accepted**. Read-only re-verification immediately before the mutation, two
+additive creates, read-back after.
+
+### 15.1 State immediately before the mutation (Mac Mini, asc 5.5.0, read-only)
+
+```
+$ asc status --app 6803645374
+  appstore  version 1.0.1  state REJECTED
+  review    state UNRESOLVED_ISSUES  submission 4d62cd5b…
+  builds.latest 1.0.1 (7)  processingState VALID  uploaded 2026-10-01T11:10:25-07:00
+$ asc subscriptions list --app 6803645374
+  village.monthly  6807153048  READY_TO_SUBMIT  (ONE_MONTH, groupLevel 1)
+  village.annual   6807153583  READY_TO_SUBMIT  (ONE_YEAR,  groupLevel 2)
+$ asc subscriptions offers introductory list --subscription-id 6807153048  -> meta.paging.total 0
+$ asc subscriptions offers introductory list --subscription-id 6807153583  -> meta.paging.total 0
+$ asc auth status       -> VillageKey / T8SMTUY74K (default)
+$ asc web auth status   -> authenticated  rweekley@gmail.com  team R9U8JNTV28
+```
+
+No review in flight (the submission is `UNRESOLVED_ISSUES`), both subscriptions
+back to `READY_TO_SUBMIT`, so the §7.2 hard constraint is void and gate
+condition 2 (next release cycle — build 7, a new build number) is met.
+
+### 15.2 The mutation — exactly the two approved commands
+
+```bash
+asc subscriptions offers introductory create \
+  --subscription-id 6807153048 --territory USA \
+  --offer-duration ONE_MONTH --offer-mode FREE_TRIAL --number-of-periods 1
+
+asc subscriptions offers introductory create \
+  --subscription-id 6807153583 --territory USA \
+  --offer-duration ONE_MONTH --offer-mode FREE_TRIAL --number-of-periods 1
+```
+
+Both returned exit 0 with a `subscriptionIntroductoryOffers` resource:
+
+```json
+{"data":{"type":"subscriptionIntroductoryOffers","id":"<offer-id>",
+ "attributes":{"startDate":"2026-10-01","duration":"ONE_MONTH",
+ "offerMode":"FREE_TRIAL","numberOfPeriods":1,
+ "targetSubscriptionPlanType":"UPFRONT"}}}
+```
+
+### 15.3 Read-back evidence (acceptance criterion 1)
+
+```
+$ asc subscriptions offers introductory list --subscription-id 6807153048
+{"data":[{"type":"subscriptionIntroductoryOffers","attributes":{"startDate":"2026-10-01",
+ "duration":"ONE_MONTH","offerMode":"FREE_TRIAL","numberOfPeriods":1,
+ "targetSubscriptionPlanType":"UPFRONT"}}],"meta":{"paging":{"total":1,"limit":50}}}
+
+$ asc subscriptions offers introductory list --subscription-id 6807153583
+{"data":[{…same shape…}],"meta":{"paging":{"total":1,"limit":50}}}
+```
+
+`total` is **1** for each product (was 0). Read directly from
+`GET /v1/subscriptions/<id>/introductoryOffers`; unexpired, no end date.
+
+> Tooling note: `asc` renders long resource ids truncated in its JSON output
+> (`"eyJzIj...MCJ9"`). That is a display artifact of the CLI — the underlying
+> ids are full 76-char strings. Read them from the public API directly if you
+> need them verbatim (a stdlib-only ES256 JWT helper is enough; no extra deps).
+
+### 15.4 Offer identity and rollback
+
+Both offer ids are base64url of
+`{"s":"<subscription-id>","d":1790838000,"i":"US","t":"","p":"0"}` — i.e.
+subscription + US storefront + start date `2026-10-01`:
+
+```
+village.monthly  eyJzIjoiNjgwNzE1MzA0OCIsImQiOjE3OTA4MzgwMDAsImkiOiJVUyIsInQiOiIiLCJwIjoiMCJ9
+village.annual   eyJzIjoiNjgwNzE1MzU4MyIsImQiOjE3OTA4MzgwMDAsImkiOiJVUyIsInQiOiIiLCJwIjoiMCJ9
+```
+
+Rollback (removes the offer; touches nothing else):
+
+```bash
+asc subscriptions offers introductory delete --id "<offer-id>" --confirm
+```
+
+### 15.5 Territory parity — resolved from live Android, not assumed
+
+Read live from Google Play (`androidpublisher` v3, read-only):
+
+```
+monthly-freetrial  ACTIVE  phases[{P1M ×1, regionalConfigs[{US, free{}}]}]
+                           otherRegionsConfig{otherRegionsNewSubscriberAvailability:false}
+annual-freetrial   ACTIVE  (identical shape)
+```
+
+**Android's trial is USA-only.** iOS subscription availability is also USA-only
+(1 of the app's 175 territories, §11.3), so parity = **USA only** — there is no
+wider set to copy. The approved commands therefore carry `--territory USA`
+exactly as written.
+
+### 15.6 Acceptance criterion 3 — paywall copy vs. the delivered StoreKit object
+
+`lib/features/family/pages/subscription_page.dart`:
+
+- L419–423: `'First month free'` / `'Cancel anytime during your trial — you
+  won\'t be charged.'`
+- L463–468: `'…The free trial is for new subscribers only.'`
+
+A `ONE_MONTH` / `FREE_TRIAL` / 1-period introductory offer **is** "first month
+free", and StoreKit grants an introductory offer to new subscribers only.
+**Copy and the delivered StoreKit object agree — no code change required.** The
+offer is applied by StoreKit automatically at purchase; the app still needs no
+code change to receive it.
+
+### 15.7 Ordering constraint for the next submission (unchanged, now unblocked)
+
+These offers had to exist **before** the next app version is submitted: CYB-49
+re-attaches both subscriptions *via the app version page*, so a missing offer
+would have gone to Apple with the subscriptions. That prerequisite is now
+satisfied. Blast radius of this change: two new offer objects — no price,
+product, version, submission, localization, image or availability flag was
+touched, and nothing was submitted to Apple.
+
+### 15.8 Not done by this issue (deliberate)
+
+- No territory widening of the subscriptions themselves (§11.3, decision owner
+  Ryan) — the offers match today's USA-only availability.
+- No sandbox purchase proof: `asc sandbox list` still returns **total 0**
+  (no sandbox tester), so the offer cannot be exercised end-to-end here.
+- The 2.3.2 promotional-image work stays with CYB-49.
 
 
