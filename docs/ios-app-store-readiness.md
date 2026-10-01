@@ -1199,3 +1199,149 @@ reviewer outside the USA.
 Nothing was submitted to Apple by this round. Build 7 stays the current
 candidate; the resubmission still waits on CYB-49 (`attachedCount 0` —
 neither subscription is attached to the next app version).
+
+## 17. 2026-10-01 — CYB-48 round 4: the rejection is unwound and **build 7 is IN REVIEW**
+
+Ryan's wake comment `still rejected` (2026-10-01T22:55Z) on CYB-48.
+Diagnosis before acting: the app was still `REJECTED` for the simplest possible
+reason — **nothing had ever been submitted.** Rounds 1–3 ended at "asking for a
+decision" while App Store Connect still held the 2026-09-24 submission
+`4d62cd5b` in `UNRESOLVED_ISSUES` carrying build 6. The §12.6 sequence had never
+been run.
+
+### 17.1 The inflight lock (§12.2) is now actually cleared
+
+`asc review items remove` is refused on a submission that was already submitted:
+
+```
+$ asc review items remove --id <subscriptionVersionItemId> --confirm
+Error: review items remove: Resource state is invalid.: Item was already submitted
+```
+
+Cancelling the dead submission releases its items (the §12.2 alternative):
+
+```
+$ asc review submissions-update --id 4d62cd5b-17a5-4e14-bf6f-5b411d4a4b70 --canceled=true --confirm
+{"attributes":{"state":"CANCELING", ...}}          # -> COMPLETE
+$ asc subscriptions versions list --subscription-id 6807153048
+  cabac1de-7482-4fde-9f83-5bd696f3e034  state DEVELOPER_REJECTED   (was READY_FOR_REVIEW)
+$ asc subscriptions versions list --subscription-id 6807153583
+  38f315ce-5125-4726-8fbd-1d3172aa4532  state DEVELOPER_REJECTED   (was READY_FOR_REVIEW)
+```
+
+A `DEVELOPER_REJECTED` subscription version **still counts as inflight** — a
+replacement version cannot be created:
+
+```
+$ asc subscriptions versions create --subscription-id 6807153048
+Error: failed to create: Version already exists.: There is already an inflight
+       version with id 'cabac1de-...'
+```
+
+The existing version *is* modifiable, which is what the 2.3.2 image fix needs.
+
+### 17.2 2.3.2 fixed — both promotional images replaced
+
+Only one image is allowed per subscription version, so the app-icon image has to
+be deleted first:
+
+```
+$ asc subscriptions versions images delete --id cbac7921-d737-4f49-a302-dffdaf3e4265 --confirm
+  -> {"deleted":true}
+$ asc subscriptions versions images upload --version-id cabac1de-... --file docs/appstore/promotional-images/promo-monthly.png
+  -> promo-monthly.png 36466  assetDeliveryState COMPLETE
+$ asc subscriptions versions images upload --version-id 38f315ce-... --file docs/appstore/promotional-images/promo-annual.png
+  -> promo-annual.png  33604  assetDeliveryState UPLOAD_COMPLETE -> COMPLETE
+```
+
+Pre-upload verification by decoding the PNG and hashing raw pixels (no image
+viewer needed): pixel sha256 `cd12ae3d…` (monthly) and `75ede247…` (annual) —
+**exactly** the values §12.3 recorded, and both differ from the app icon
+`307a99d7…`. 1024×1024, 8-bit RGB, no alpha, no rounded corners.
+
+### 17.3 Build 7 export compliance set
+
+Build 7 carried no `usesNonExemptEncryption` (§16.5) — the "Missing Compliance"
+state that stops a build being selected for a version submission. Answered the
+same way as build 6 (standard HTTPS only):
+
+```
+$ asc builds update --build-id 335733d2-ced2-4f68-9513-1899557e7e3e --uses-non-exempt-encryption=false
+  -> usesNonExemptEncryption false
+```
+
+### 17.4 `MISSING_METADATA` is real but NOT blocking — use the API item route
+
+The web attach flow is a dead end on this account, both **before** and **after**
+the images were replaced:
+
+```
+$ asc web review subscriptions list --app 6803645374
+  attachedCount 0
+  village.monthly  6807153048  MISSING_METADATA  submitWithNextAppStoreVersion false
+  village.annual   6807153583  MISSING_METADATA  submitWithNextAppStoreVersion false
+$ asc web review subscriptions attach --app 6803645374 --subscription-id 6807153048 --confirm
+Attach preflight: subscription "Village Monthly" (6807153048) is MISSING_METADATA,
+so Apple will not attach it to the next app version review yet.
+```
+
+…while the public API disagrees and `asc validate subscriptions` returns
+**0 errors / 0 blocking** (§12.4's discrepancy, still unexplained). Creating the
+draft submission first does not change it either.
+
+The **API item route accepts them without complaint** — which is how the rejected
+submission `4d62cd5b` carried them in the first place:
+
+```
+$ asc review items add --submission 9f8ed584-... --item-type subscriptionVersions --item-id cabac1de-...
+  -> reviewSubmissionItems state READY_FOR_REVIEW        # both products
+$ asc review items add --submission 9f8ed584-... --item-type subscriptionGroupVersions --item-id af642536-...
+  -> reviewSubmissionItems state READY_FOR_REVIEW
+```
+
+So `asc review doctor`'s "first-time subscriptions must be submitted via the app
+version page, not the API" is a caution about Apple's *UI*, not an API
+enforcement: the item route works and is what §12.6 step 3 actually needed.
+
+### 17.5 SUBMITTED — build 7, new submission `9f8ed584`
+
+```
+$ asc versions attach-build --version-id f6ba0c4c-... --build-id 335733d2-...
+  -> {"versionId":"f6ba0c4c-...","buildId":"335733d2-...","attached":true}
+$ asc versions view --version-id f6ba0c4c-...
+  -> versionString 1.0.1  state READY_FOR_REVIEW  buildVersion 7
+$ asc review submissions-create --app 6803645374 --platform IOS
+  -> 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e
+$ asc review submissions-submit --id 9f8ed584-... --confirm
+  -> state WAITING_FOR_REVIEW  submittedDate 2026-10-01T23:04:50.439Z
+$ asc review doctor --app 6803645374
+  -> summary {errors: 0, warnings: 5, blocking: 0}       # was errors:1 blocking:1
+$ asc status --app 6803645374
+  -> appstore.version 1.0.1  state WAITING_FOR_REVIEW    # was REJECTED
+  -> submission {inFlight: true, blockingIssues: []}
+  -> summary {health: yellow, nextAction: "Wait for App Store review outcome."}
+```
+
+The submission carries all four items, every one `READY_FOR_REVIEW`: two
+`subscriptionVersion`s, one `subscriptionGroupVersion`, and one `appStoreVersion`
+(build 7). Submission `4d62cd5b` is closed; **build 6 is not resubmitted**.
+
+### 17.6 Still unexplained — and why §11.3 still matters
+
+`MISSING_METADATA` on Apple's own web surface, with every metadata check green on
+the API surface, is **not** explained by this round; neither is the original
+empty product list. The one measured store-side asymmetry remains §11.3: both
+subscriptions are sold in **USA only** while the app is sold in **175
+territories**, with `availableInNewTerritories: false`. A client whose storefront
+is outside a product's availability gets an **empty product list with no error** —
+byte-for-byte the build-6 symptom (Apple TN3186).
+
+`keep_usa` was Ryan's call and was **left as-is** in this round: no App Store
+Connect write was made to subscription availability. Widening both products is
+the first thing to change if this cycle fails again, and it is the last
+unexplained asymmetry standing between this app and an approval.
+
+Build 7 is what makes another failure diagnosable: the paywall now renders the
+resolved **storefront**, `notFoundIDs` and the `IAPError` code, and never offers
+an unloadable product as purchasable — so a third failure comes back with the
+actual storefront rather than a dead-end toast.
