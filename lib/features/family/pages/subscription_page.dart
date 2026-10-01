@@ -28,6 +28,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   bool _actionLoading = false;
   String? _error;
   List<ProductDetails> _products = const [];
+  bool _productsLoading = false;
+  String? _productError;
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
 
   bool get _isStoreBilling => !kIsWeb;
@@ -61,13 +63,26 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     }
   }
 
+  /// Load store products and keep the failure visible.
+  ///
+  /// App Review 2.1(b) (2026-10-01) was raised because a StoreKit failure was
+  /// swallowed here and the paywall still rendered purchasable plan cards. The
+  /// result now carries the store error, the unresolved identifiers and the
+  /// device storefront, and an empty result keeps the purchase buttons disabled.
   Future<void> _loadProducts() async {
-    try {
-      final products = await ref.read(billingServiceProvider).fetchProducts();
-      if (mounted) setState(() => _products = products);
-    } catch (_) {
-      // Products unavailable — plan cards fall back to a disabled state.
-    }
+    if (!mounted) return;
+    setState(() {
+      _productsLoading = true;
+      _productError = null;
+    });
+    final fetched =
+        await ref.read(billingServiceProvider).fetchProductsWithRetry();
+    if (!mounted) return;
+    setState(() {
+      _products = fetched.products;
+      _productError = fetched.isEmpty ? fetched.diagnosticsSummary() : null;
+      _productsLoading = false;
+    });
   }
 
   Future<void> _purchase(String tier) async {
@@ -94,19 +109,30 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     }
   }
 
-  ProductDetails? _findProduct(String tier) {
-    final ids = BillingService.storeProductIds();
-    final targetId = tier == 'annual' ? ids[1] : ids[0];
-    for (final p in _products) {
-      if (p.id == targetId) return p;
-    }
-    return null;
-  }
+  /// The store product for [tier], or null when the store did not return it.
+  /// Null must be rendered as NOT PURCHASABLE.
+  ProductDetails? _findProduct(String tier) =>
+      BillingService.productForTier(_products, tier);
+
+  /// StoreKit's own localized price string, or an em dash while the products
+  /// have not resolved. A hardcoded price is never shown for a product the
+  /// store has not returned (Apple rejects both misleading prices and prices
+  /// that are not sourced from StoreKit — the build-6 reviewer screenshot shows
+  /// "$5.99/month" next to a disabled-in-fact product).
+  String _priceLabel(String tier) =>
+      BillingService.planPriceLabel(_findProduct(tier));
 
   Future<void> _buyViaStore(String tier) async {
     final product = _findProduct(tier);
     if (product == null) {
-      _showSnack('Subscription product unavailable. Please try again shortly.');
+      // Belt-and-braces: the plan card button is disabled in this state, so
+      // reaching here means the product list emptied after the last build of
+      // the page. Never open a purchase for a product the store did not return.
+      _showSnack(
+        'Subscription is not available right now. Please try again shortly.'
+        '${_productError != null ? '\n$_productError' : ''}',
+      );
+      await _loadProducts();
       return;
     }
     setState(() => _actionLoading = true);
@@ -396,25 +422,41 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           Text('Cancel anytime during your trial — you won\'t be charged.',
               style: TextStyle(color: context.palette.textTertiary, fontSize: 14)),
           const SizedBox(height: 16),
+
+          // Store products status. A StoreKit failure must be visible (and must
+          // keep the purchase buttons disabled) rather than presenting a plan
+          // the store has not returned — that is what App Review 2.1(b) hit on
+          // build 6.
+          if (_productsLoading || _productError != null) ...[
+            _storeProductsNotice(),
+            const SizedBox(height: 16),
+          ],
+
           _PlanCard(
             title: 'Monthly',
-            price: '\$5.99',
+            price: _priceLabel('monthly'),
             period: '/month',
             features: const ['Full access', 'Up to 2 families', '12 members each'],
             highlighted: tier == 'monthly',
             isCurrent: tier == 'monthly' && !isInTrial,
             isLoading: _actionLoading,
+            purchasable: _findProduct('monthly') != null,
+            unavailableLabel:
+                _productsLoading ? 'Checking…' : 'Currently unavailable',
             onTap: () => _purchase('monthly'),
           ),
           const SizedBox(height: 12),
           _PlanCard(
             title: 'Annual',
-            price: '\$49.99',
+            price: _priceLabel('annual'),
             period: '/year',
-            features: const ['Everything in Monthly', 'Save 30% (\$4.17/mo)'],
+            features: const ['Everything in Monthly', 'Save 30% vs monthly'],
             highlighted: tier == 'annual',
             isCurrent: tier == 'annual' && !isInTrial,
             isLoading: _actionLoading,
+            purchasable: _findProduct('annual') != null,
+            unavailableLabel:
+                _productsLoading ? 'Checking…' : 'Currently unavailable',
             onTap: () => _purchase('annual'),
           ),
           const SizedBox(height: 16),
@@ -539,6 +581,69 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
+  /// Visible status of the App Store product fetch.
+  ///
+  /// Shows the StoreKit diagnostic (error code, unresolved identifiers, device
+  /// storefront) so the next failure is reportable from a screenshot instead of
+  /// being invisible in the field — the exact gap that hid the build-6 failure.
+  Widget _storeProductsNotice() {
+    final loading = _productsLoading;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: context.palette.surfaceCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: context.palette.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (loading)
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Icon(Icons.error_outline_rounded,
+                    size: 18, color: context.palette.warning),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  loading
+                      ? 'Checking the App Store for subscription products…'
+                      : 'Subscriptions could not be loaded from the App Store.',
+                  style: TextStyle(
+                      fontSize: 13, color: context.palette.textSecondary),
+                ),
+              ),
+            ],
+          ),
+          if (!loading) ...[
+            const SizedBox(height: 8),
+            Text(
+              _productError ?? 'Store returned no products.',
+              style: TextStyle(
+                  fontSize: 11, color: context.palette.textTertiary),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: _loadProducts,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Retry'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   IconData _statusIcon(String status) {
     switch (status) {
       case 'active': return Icons.check_circle_rounded;
@@ -570,6 +675,14 @@ class _PlanCard extends StatelessWidget {
   final bool highlighted;
   final bool isCurrent;
   final bool isLoading;
+
+  /// True only when the store returned this product. The purchase button is
+  /// disabled whenever it is false, so an unloadable product can never be
+  /// presented as purchasable (App Review 2.1(b), build 6).
+  final bool purchasable;
+
+  /// Button label used while the product is not purchasable.
+  final String unavailableLabel;
   final VoidCallback onTap;
 
   const _PlanCard({
@@ -580,6 +693,8 @@ class _PlanCard extends StatelessWidget {
     this.highlighted = false,
     this.isCurrent = false,
     this.isLoading = false,
+    this.purchasable = false,
+    this.unavailableLabel = 'Currently unavailable',
     required this.onTap,
   });
 
@@ -637,7 +752,7 @@ class _PlanCard extends StatelessWidget {
                       child: const Text('Current Plan'),
                     )
                   : FilledButton(
-                      onPressed: isLoading ? null : onTap,
+                      onPressed: (isLoading || !purchasable) ? null : onTap,
                       style: FilledButton.styleFrom(
                         backgroundColor: highlighted ? VillageTheme.primary : VillageTheme.danger,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -647,7 +762,9 @@ class _PlanCard extends StatelessWidget {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : Text(highlighted ? 'Switch to $title' : 'Choose $title'),
+                          : Text(purchasable
+                              ? (highlighted ? 'Switch to $title' : 'Choose $title')
+                              : unavailableLabel),
                     ),
             ),
           ],

@@ -388,3 +388,89 @@ submission.
 - **CYB-31** — promoted to `todo`: the intro-offer work's "do not disturb the in-flight
   review" constraint is void and its gate condition #2 (next release cycle) is met. Create
   the intro offers **before** the next submission.
+
+## 11. CYB-48 — Guideline 2.1(b) "subscription product unavailable" (build 6)
+
+### 11.1 What Apple hit
+Rejection `d07de555-c5eb-464b-bcc3-a8764c039521` (2026-10-01T17:18:30Z, thread
+`8c531ec1-dffc-3d80-af54-edb05ef0306f`) on iPad Air 11-inch (M3) / iPadOS 27.0 and
+iPhone 17 Pro Max / iOS 27.0: tapping a plan card produced the toast
+"Subscription product unavailable. Please try again shortly."
+
+The string is `subscription_page.dart:109` and is raised **only** when
+`_findProduct(tier)` returns null, i.e. `queryProductDetails` resolved neither
+`village.monthly` nor `village.annual`.
+
+### 11.2 Store environment ruled OUT (live App Store Connect, asc 5.5.0)
+| Check | Command | Result |
+|---|---|---|
+| Product IDs | `asc subscriptions list --app 6803645374` | `village.monthly` (6807153048), `village.annual` (6807153583) — **exact match** with `lib/core/config.dart` |
+| Prices | `asc subscriptions pricing summary --app 6803645374` | 5.99 USD / 49.99 USD, `planType UPFRONT` |
+| Localizations (version-scoped) | `asc subscriptions versions localizations list --version-id <ver>` | en-US "Village Monthly" / "Village Annual" + description, **present** |
+| Group localization | `asc subscriptions groups versions localizations list --version-id af642536…` | en-US "Village", **present** |
+| Review screenshots | `asc subscriptions review app-store-screenshot view` | present, `assetDeliveryState COMPLETE`, 1206×2622 |
+| Subscription versions | `asc subscriptions versions list` | v1 `READY_FOR_REVIEW` |
+| Bundle-ID capability | `asc bundle-ids capabilities list --bundle MKBKBKA6Q7` | `IN_APP_PURCHASE` **enabled** |
+| Paid Apps Agreement | `asc web agreements status` | active (v5031, `pending:false`) — not the cause |
+| Intro offers | `asc subscriptions offers introductory list` | **0** (separate defect — CYB-31) |
+
+### 11.3 The one configuration asymmetry — subscription availability
+```
+asc subscriptions pricing availability available-territories --availability-id 6807153048
+  -> total 1: [USA]
+asc subscriptions pricing availability view --subscription-id 6807153048
+  -> availableInNewTerritories: false
+asc subscriptions pricing plan-availability show --subscription-id 6807153048
+  -> planType UPFRONT, availableTerritories: [USA]  (total 1)
+asc pricing availability view --app 6803645374
+  -> availableInNewTerritories: true   (app itself is broadly available: 175 territories)
+```
+Both subscriptions are sold in **exactly one territory (USA)** while the app is
+available in all 175. A client whose storefront is outside a product's
+availability gets that product back in `invalidProductIdentifiers` — an **empty
+product list with no error**, which is byte-for-byte the observed symptom
+(Apple TN3186, "Troubleshooting In-App Purchases availability in the sandbox").
+
+Not yet provable from here: the App Review sandbox account's storefront. That is
+now instrumented — see §11.5.
+
+### 11.4 StoreKit 1 vs StoreKit 2 — ruled out
+`pubspec.lock` resolves `in_app_purchase 3.3.0` + `in_app_purchase_storekit 0.4.11+1`.
+In that version `InAppPurchaseStoreKitPlatform._useStoreKit2 = true` is the
+**default** (`lib/src/in_app_purchase_storekit_platform.dart:34`;
+`enableStoreKit2()` is deprecated with the note "StoreKit 2 is now the default").
+The app therefore queries via StoreKit 2 `Product.products(for:)`, not the
+StoreKit 1 `SKProductsRequest` path. `enableStoreKit1()` exists but is never
+called. Source-verified, not assumed.
+
+### 11.5 Fixes shipped (build 7)
+1. **`BillingService.fetchProducts()` no longer discards the diagnosis.** It
+   returns a `ProductFetchResult` carrying `products`, `notFoundIDs`,
+   `errorCode`/`errorMessage` (`IAPError`) and the **device storefront country
+   code**; it never throws; every query is logged with a `[StoreKit]` prefix.
+   Added `fetchProductsWithRetry()` — StoreKit can legitimately return an empty
+   list on a cold launch, so a single empty response is no longer conclusive.
+2. **An unloadable product is never presented as purchasable.**
+   `BillingService.productForTier()` is the single purchasable gate; when it
+   returns null the plan card's `FilledButton` is `onPressed: null` ("Currently
+   unavailable" / "Checking…"). `planPriceLabel()` renders the store's own
+   `ProductDetails.price` and an em dash before it resolves — no hardcoded
+   `$5.99` / `$49.99` anywhere in the purchase UI.
+3. **The failure is visible.** When the fetch fails the paywall shows the
+   StoreKit diagnostic line (error code, notFoundIDs, storefront) and a Retry
+   button, so the next failure is reportable from a screenshot.
+4. **Version bumped `1.0.1+6` → `1.0.1+7`.** Build 6 must not be resubmitted.
+5. Regression tests: `test/billing_service_test.dart` (13 tests) pin the exact
+   product IDs, the purchasable gate, the no-hardcoded-price rule and the
+   diagnostic payload.
+
+### 11.6 Open items before resubmission
+- **CYB-49 / web UI:** re-attach both subscriptions to the next app version and
+  clear 2.3.2 (a web-UI step; `asc review doctor` warns first-time subscriptions
+  must be submitted via the app version page, not the API).
+- **Territory availability (§11.3):** widen both subscriptions beyond USA, or
+  confirm the reviewing storefront is US. Decision owner: Ryan.
+- **CYB-31:** create the iOS 30-day introductory offer — the paywall still
+  advertises "First month free" with 0 intro offers configured.
+- Sandbox proof on an iOS 27.0 simulator/device requires a sandbox tester
+  account; `asc sandbox list` currently returns **total 0** (none configured).
