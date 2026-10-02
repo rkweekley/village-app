@@ -1345,3 +1345,82 @@ Build 7 is what makes another failure diagnosable: the paywall now renders the
 resolved **storefront**, `notFoundIDs` and the `IAPError` code, and never offers
 an unloadable product as purchasable — so a third failure comes back with the
 actual storefront rather than a dead-end toast.
+
+## 18. 2026-10-02 — CYB-50 monitor wake 1: build 7 still in review, and the **ASC web session has expired**
+
+Watch issue: CYB-50. Every reading below is read-only, asc 5.5.0 on the Mac Mini.
+
+### 18.1 Outcome — no result yet (2026-10-02T11:1xZ)
+
+```
+asc status --app 6803645374
+-> appstore.version 1.0.1      state WAITING_FOR_REVIEW
+-> submission {inFlight: true, blockingIssues: []}
+-> review {latestSubmissionId: 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e,
+           state: WAITING_FOR_REVIEW, submittedDate: 2026-10-01T23:04:50.439Z}
+-> build 7 (335733d2-ced2-4f68-9513-1899557e7e3e) processingState VALID
+```
+
+`asc review history` shows all four submission items `READY_FOR_REVIEW`: two
+`subscriptionVersion`s (`cabac1de`, `38f315ce`), one `subscriptionGroupVersion`
+(`af642536`), one `appStoreVersion` (build 7). **The subscriptions are attached,
+not merely claimed.**
+
+Also re-confirmed live:
+
+- Both introductory offers still present — `ONE_MONTH` / `FREE_TRIAL` /
+  1 period / `startDate 2026-10-01` on `6807153048` and `6807153583`.
+- `promoted-purchases list --app 6803645374` -> `total: 0`, so the 2.3.2
+  promotional-image vector is still clear.
+- **Still USA-only**: `subscriptionPlanAvailabilities.availableTerritories
+  total: 1` (`USA`) and `availableInNewTerritories: false` on **both**
+  products. §11.3 / §17.6 unchanged — still the first lever if this cycle fails.
+- `asc review doctor` -> `blocking: 1` = `version.state.editable`
+  ("version is in non-editable state WAITING_FOR_REVIEW"). **This is an artifact
+  of being in review**, not a regression: `submission.blockingIssues` is `[]`
+  and `inFlight` is `true`. Remaining warnings: keywords overlap name+subtitle,
+  and `whatsNew` still empty (CYB-28 carry, post-approval action).
+
+### 18.2 NEW RISK — the `asc web` session is dead, so reviewer text is unreadable right now
+
+```
+asc web auth status
+-> {"authenticated": false, "passwordStored": true,
+    "appleId": "rweekley@gmail.com", "developerTeamId": "R9U8JNTV28"}
+
+asc web review show  --app 6803645374 --apple-id rweekley@gmail.com
+asc web agreements status --apple-id rweekley@gmail.com
+-> "Session expired." / "Error: password is required: run in a terminal for an
+    interactive prompt or set ASC_WEB_PASSWORD"
+```
+
+The cached session (`~/.asc/web/session-*.json`, last refreshed
+2026-10-01T23:09:00Z) has expired — Apple's web cookies live on the order of a
+day, and the last human sign-in was 2026-10-01T16:20:41Z.
+
+**A non-interactive re-login was attempted once and failed.** The saved password
+is in the login keychain under `asc-web-password` / `asc:web-password:<apple-id>`,
+but reading it from a non-GUI SSH session returns `errSecInteractionNotAllowed`
+(rc 36) — the login keychain is locked for the SSH security session. **No
+credential fixes this**: it is a macOS session-context problem, so
+`ASC_WEB_PASSWORD` cannot be sourced either. Re-authentication requires Ryan at
+the Mac Mini (double-click `~/Desktop/Apple-Sign-In.command`, which attaches to
+the staged `screen` session and runs `~/asc-web-login.sh`).
+
+**Consequence for the watch:** the *outcome* of build 7's review is fully
+detectable without a web session (`asc status` / `asc review history` move to a
+non-`WAITING_FOR_REVIEW` state). But the **verbatim Resolution Center rejection
+text and the reviewer's screenshot are NOT retrievable** while the web session is
+dead. If build 7 is rejected, capturing it verbatim needs either (a) a fresh
+sign-in before the rejection lands, or (b) a durable alternate channel — Apple
+mails every rejection to `rweekley@gmail.com`, and no mail client on this Mac has
+an account configured, so that needs a Gmail read-only connection.
+
+### 18.3 Agreement watchdog
+
+`asc web agreements status` **could not be read this wake** (same expired
+session). Last known state (2026-10-01, §17-era): Program License Agreement
+v5031 `active`, `pending: false`. Its `dateAgreeBy` was 2026-10-01T23:59:59Z —
+already passed — and nothing is recorded as reacting to that deadline. **Treat
+the agreement state as unverified from 2026-10-02 onward** until a web session
+is restored; a new pending agreement silently holds a review.
