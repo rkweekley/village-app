@@ -1424,3 +1424,110 @@ v5031 `active`, `pending: false`. Its `dateAgreeBy` was 2026-10-01T23:59:59Z —
 already passed — and nothing is recorded as reacting to that deadline. **Treat
 the agreement state as unverified from 2026-10-02 onward** until a web session
 is restored; a new pending agreement silently holds a review.
+
+## 19. 2026-10-02 (wake 2) — build 7 still in review AND still in queue; `asc web` still dark
+
+Watch issue: CYB-50. Every reading below is read-only, asc 5.5.0 on the Mac Mini,
+taken 2026-10-02T23:10Z (run `3745d561-caf7-439d-95e6-ab596b747cca`).
+
+### 19.1 Outcome — no result yet, and the *queue* state is the informative part
+
+```
+asc status --app 6803645374
+-> appstore.version 1.0.1      state WAITING_FOR_REVIEW
+-> submission {inFlight: true, blockingIssues: []}
+-> review {latestSubmissionId: 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e,
+           state: WAITING_FOR_REVIEW, submittedDate: 2026-10-01T23:04:50.439Z}
+-> build 7 (335733d2-ced2-4f68-9513-1899557e7e3e) processingState VALID
+```
+
+Byte-for-byte §18.1 — and that is the information: ~24 h after submission the
+state is still `WAITING_FOR_REVIEW`, not `IN_REVIEW`, i.e. **Apple has not begun
+the review yet**. Compare build 6: submitted 2026-09-24T19:29Z, rejected
+2026-10-01T17:18Z — ~6.9 days. A 24 h wait is inside the normal band; **it is not
+a stall and nothing should be nudged.**
+
+`asc review history` — all four items `READY_FOR_REVIEW`: two
+`subscriptionVersion`s (`cabac1de`, `38f315ce`), one `subscriptionGroupVersion`
+(`af642536`), one `appStoreVersion` (build 7). Subscriptions genuinely attached.
+
+### 19.2 Re-confirmed live (no writes made)
+
+- Intro offers still present on both products — `ONE_MONTH` / `FREE_TRIAL` /
+  1 period / `startDate 2026-10-01` (`6807153048`, `6807153583`).
+- `promoted-purchases list --app 6803645374` -> `total: 0` — 2.3.2 vector still clear.
+- **Still USA-only** on both products: `subscriptionPlanAvailabilities` ->
+  `availableTerritories total: 1` (`USA`), `availableInNewTerritories: false`,
+  vs ~175 app territories. §11.3 / §17.6 / §18.1 unchanged — still the first lever
+  on a repeat 2.1(b), and **still deliberately not pulled**, because editing IAP
+  attached to an in-flight submission can reset the review clock.
+- `asc review doctor` -> `blocking: 1` = `version.state.editable` ("version is in
+  non-editable state WAITING_FOR_REVIEW") — the in-review artifact, not a
+  regression (`submission.blockingIssues` is `[]`, `inFlight` true). Warnings
+  unchanged: keyword repeats name + subtitle, `whatsNew` empty (CYB-28 carry,
+  post-approval action).
+
+### 19.3 `asc web` is STILL dead 12 h on — plus a partial substitute for the watchdog
+
+```
+asc web auth status
+-> {"authenticated": false, "passwordStored": true,
+    "appleId": "rweekley@gmail.com", "developerTeamId": "R9U8JNTV28"}
+
+asc web review threads --app 6803645374 --apple-id rweekley@gmail.com
+-> Session expired.
+   Error: password is required: run in a terminal for an interactive prompt
+          or set ASC_WEB_PASSWORD
+```
+
+Unchanged from §18.2, and **no re-login was attempted this wake**: the single
+attempt in §18.2 failed and repeating it risks an Apple sign-in lockout. There is
+still no agent-side repair (the keychain is locked for the SSH security session).
+The human path is still staged: `~/Desktop/Apple-Sign-In.command` on the Mac Mini
+(~60 s, read-only). Reviewer text remains unreadable, and the pending CYB-50 card
+`a6b9b5af-3169-4aca-9bb1-ed869e574035` ("Restore reviewer-text access …") is now
+12 h old and unanswered.
+
+**Partial substitute for the agreement watchdog — it is not fully dark.** The web
+command is unavailable, but a public-API fact covers the review-relevant half:
+
+> Subscriptions cannot be submitted for review at all unless the Paid
+> Applications agreement is in effect.
+
+Both `subscriptionVersion`s are attached to submission `9f8ed584` in
+`READY_FOR_REVIEW`. **That proves the Paid Applications agreement was in effect at
+2026-10-01T23:04:50Z** — no web session required. The residue that only a live
+session can see is narrower than §18.3 implied:
+
+  1. a **newly posted** agreement version (its own `dateAgreeBy`) silently holding
+     the review, and
+  2. a lapse occurring **since** submission (the shortcut only proves "in effect at
+     submission", not "in effect now").
+
+Last known: Program License Agreement v5031 `active`, `pending: false`,
+`dateAgreeBy` 2026-10-01T23:59:59Z (passed; no recorded reaction).
+
+### 19.4 Monitor re-armed and verified (self-armed, no board action needed)
+
+- `nextCheckAt` **2026-10-03T11:10:00Z** (12 h), `timeoutAt` 2026-10-11T23:59:59Z,
+  `maxAttempts` 24, `recoveryPolicy` `escalate_to_board`
+- read-back from the same response: `monitorNextCheckAt` non-null ✔,
+  `executionState.monitor.status` `scheduled` ✔, `scheduledBy` `assignee` ✔,
+  status `in_progress` ✔, `assigneeAgentId` set ✔, `assigneeUserId` null ✔
+
+### 19.5 Operator notes for the next agent (cheap traps, learned live)
+
+- `asc subscriptions plan-availability …` is **not a command** in 5.5.0. Territory
+  availability is read with
+  `asc subscriptions pricing plan-availability show --subscription-id <ID>`.
+  (`asc subscriptions pricing availability view --subscription-id <ID>` is the
+  older, deprecated resource; `--subscription-id` on the bare
+  `pricing availability` group is rejected with `unknown flag`.)
+- `PATCH /api/issues/<id>` `executionPolicy.monitor.notes` is capped at **500
+  characters**; longer text is rejected with HTTP 400 `too_big`. The other monitor
+  fields (`kind`, `serviceName`, `externalRef`, `nextCheckAt`, `timeoutAt`,
+  `maxAttempts`, `recoveryPolicy` …) have their own caps, so build the payload in a
+  script and assert lengths before sending.
+- The Mac working copy of this repo for the iOS work is
+  `/Users/cyberal/projects/village-app-ios` on the Mac Mini (`/Users/cyberal/village-app`
+  and `/Users/cyberal/build/village-app` are older trees, not the record).
