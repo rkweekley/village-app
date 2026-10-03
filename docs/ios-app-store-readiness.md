@@ -1622,3 +1622,125 @@ License Agreement v5031 `active`, `pending: false`, `dateAgreeBy` 2026-10-01T23:
 - The monitor had fired before this wake (`attemptCount` 3, `nextCheckAt` null), so
   this PATCH is the re-arm. Re-confirmed live again that `executionPolicy.monitor.notes`
   above 500 characters is rejected with HTTP 400 `too_big` (§19.5).
+
+
+## 21. 2026-10-03 (wake 4) — build 7 still `WAITING_FOR_REVIEW` ~48 h in, still queued; `asc web` still dark and now proven unreachable from the agent; monitor re-armed
+
+Watch issue: CYB-50. Every reading read-only, `asc` 5.5.0 on the Mac Mini, taken
+2026-10-03T23:10Z (run `ea7d11b0-bc4b-40e4-9d47-4e0e22c76ef2`). **No write was made
+to App Store Connect.**
+
+### 21.1 Outcome — no result yet; state byte-for-byte §20.1
+
+```
+asc status --app 6803645374
+-> appstore.version 1.0.1 (f6ba0c4c-bc37-4ae7-842f-f2273d0cb7d7) state WAITING_FOR_REVIEW
+-> submission {inFlight: true, blockingIssues: []}
+-> review {latestSubmissionId: 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e,
+           state: WAITING_FOR_REVIEW, submittedDate: 2026-10-01T23:04:50.439Z}
+-> build 7 (335733d2-ced2-4f68-9513-1899557e7e3e) processingState VALID
+-> summary {health: yellow, nextAction: "Wait for App Store review outcome."}
+```
+
+~48 h after submission the state is still `WAITING_FOR_REVIEW`, **still not
+`IN_REVIEW`** — Apple has not begun the review. Build 6 took ~6.9 days
+(2026-09-24T19:29Z -> 2026-10-01T17:18Z), so the *predicted* outcome window opens
+around 2026-10-08. 48 h is well inside the normal band — not a stall, nothing nudged.
+
+`asc review history` — latest submission `9f8ed584`, all four items
+`READY_FOR_REVIEW`: 2x `subscriptionVersion` (`cabac1de`, `38f315ce`), one
+`subscriptionGroupVersion` (`af642536`), one `appStoreVersion` (build 7). Prior
+submission `4d62cd5b` (build 6) `COMPLETE`, all four items `REMOVED`.
+
+### 21.2 Re-confirmed live (no writes made)
+
+Identical to §20.2 — nothing has moved in 12 h:
+
+- Intro offers present on both products — `ONE_MONTH` / `FREE_TRIAL` / 1 period /
+  `startDate 2026-10-01` (`6807153048`, `6807153583`).
+- 2.3.2 vector still clear — `asc subscriptions promoted-purchases view
+  --subscription-id <ID>` -> `{"data":{"type":"","id":""}}` for both products; no
+  promoted purchase linked.
+- **Still USA-only** on both products — `subscriptionPlanAvailabilities` ->
+  `availableTerritories total: 1` (`USA`), `availableInNewTerritories: false`, vs
+  ~175 app territories. Still the first lever on a repeat 2.1(b), still
+  deliberately **not** pulled (editing IAP attached to an in-flight submission can
+  reset the review clock).
+- `asc review doctor` -> `errors 1, warnings 3, infos 1, blocking 1`. The single
+  blocking check is `version.state.editable` — the in-review artifact, not a
+  regression (`submission.blockingIssues` is `[]`, `inFlight` true). Warnings:
+  keyword repeats name, keyword repeats subtitle, `whatsNew` empty (CYB-28 carry).
+  Coverage warning `review.coverage.app_store_regulations_and_permits` `NOT_CHECKED`
+  persists (web-only declarations, behind the same dead session).
+
+### 21.3 `asc web` is STILL dead ~48 h on — and this wake establishes *why it cannot self-heal*
+
+```
+asc web auth status
+-> {"authenticated": false, "passwordStored": true,
+    "appleId": "rweekley@gmail.com", "developerTeamId": "R9U8JNTV28"}
+
+asc web review threads --app 6803645374 --apple-id rweekley@gmail.com
+asc web review show  --app 6803645374 --apple-id rweekley@gmail.com
+asc web agreements status --apple-id rweekley@gmail.com
+-> Session expired.
+   Error: password is required: run in an interactive prompt or set ASC_WEB_PASSWORD
+```
+
+No re-login was attempted (wake 1's single attempt failed; repeating risks an Apple
+sign-in lockout). This wake instead **measured** the repair surface directly — this
+is the new information:
+
+| probe | result |
+|---|---|
+| saved credential exists? | **yes** — login-keychain item, service `asc-web-password`, acct `asc:web-password:rweekley@gmail.com`, keychain `~/Library/Keychains/login.keychain-db` |
+| readable from the agent's SSH session? | **no** — `security find-generic-password ... -w` -> `rc=36`, `show-keychain-info` -> *"User interaction is not allowed."* The login keychain is locked for the SSH security session |
+| `sudo` to reach the GUI session? | **no** — `sudo -n true` -> *"a password is required"* |
+| GUI session alive? | **yes** — `launchctl print gui/501` -> `type = login` (uid 501) |
+| a waiting `screen` login prompt? | **no** — `screen -ls` -> *No Sockets found* |
+| session cache | `~/.asc/web/session-0bc7f986….json`, `updated_at 2026-10-01T23:09:00.382746Z` (last good sign-in 2026-10-01) |
+| mail fallback (Apple mails every rejection)? | **none configured** — no himalaya/mutt/Mail account on the Mac Mini, no Gmail/IMAP credential anywhere on the WSL box |
+
+Conclusion, stated plainly: **the agent has no path to the reviewer's verbatim text
+or the agreement watchdog.** It is not a missing command; it is a locked-credential
+boundary that only a human at the Mac Mini (or a mail/IMAP channel) can cross. The
+human path stays staged and read-only: `~/Desktop/Apple-Sign-In.command`
+(~60 s). The CYB-50 card `a6b9b5af-3169-4aca-9bb1-ed869e574035` ("Restore
+reviewer-text access …", `ask_user_questions`, `wake_assignee`) is now **36 h old and
+unanswered** — deliberately not re-asked, per the no-repeat rule.
+
+Unchanged public-API substitute: both `subscriptionVersion`s attached to `9f8ed584`
+in `READY_FOR_REVIEW` -> the Paid Applications agreement was in effect at
+2026-10-01T23:04:50Z. Only a live session can still see (a) a newly posted agreement
+version holding the review and (b) a lapse since submission. Last known: Program
+License Agreement v5031 `active`, `pending: false`, `dateAgreeBy` 2026-10-01T23:59:59Z
+(passed; no recorded reaction).
+
+### 21.4 Monitor re-armed, and the watch window widened to cover the measured review length
+
+- `nextCheckAt` **2026-10-04T11:10:00Z** (12 h cadence), `scheduledBy` `assignee`,
+  `kind` `external_service`, `serviceName` "App Store Connect", `externalRef`
+  `9f8ed584-ac0f-4df8-9432-97e2f3b05a3e`, `recoveryPolicy` `escalate_to_board`.
+- **Changed this wake:** `timeoutAt` **2026-10-11T23:59:59Z -> 2026-10-18T23:59:59Z**
+  and `maxAttempts` **24 -> 40**. Rationale: the only measured review length is build
+  6's **~6.9 days**, which from the 2026-10-01T23:04Z submission predicts an outcome
+  ~2026-10-08 — leaving barely 3 days of margin under the old cap. A monitor that
+  expires before Apple answers would re-create exactly the gap CYB-50 exists to
+  close. Flagged for the board to dial back if it prefers the earlier escalation.
+- Verified from the read-back of the same response: `monitorNextCheckAt` non-null ✔,
+  `executionState.monitor.status` `scheduled` ✔, `scheduledBy` `assignee` ✔, status
+  `in_progress` ✔, `assigneeAgentId` set ✔, `assigneeUserId` null ✔.
+- The monitor had fired before this wake (`attemptCount` 4, `nextCheckAt` null), so
+  this PATCH is the re-arm.
+
+### 21.5 Operator notes added this wake
+
+- A locked login keychain under SSH fails **`rc=36` / "User interaction is not
+  allowed"** — that, not a missing item, is why `ASC_WEB_PASSWORD` is unsourceable.
+  Confirm with `security show-keychain-info ~/Library/Keychains/login.keychain-db`.
+- The human sign-in path is a `screen` session (`~/asc-web-login.sh`), so it is
+  reattachable: a bare `screen -ls` showing *No Sockets found* means nobody has
+  started it yet.
+- `~/asc-login-attempts.log` records every sign-in attempt and its rc — check it
+  before assuming a human acted. Last entries: three `rc=1` at 2026-10-01T12:16-12:17
+  local, then `rc=0` at 2026-10-01T12:20:41 local.
