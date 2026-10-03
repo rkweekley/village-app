@@ -1531,3 +1531,94 @@ Last known: Program License Agreement v5031 `active`, `pending: false`,
 - The Mac working copy of this repo for the iOS work is
   `/Users/cyberal/projects/village-app-ios` on the Mac Mini (`/Users/cyberal/village-app`
   and `/Users/cyberal/build/village-app` are older trees, not the record).
+
+## 20. 2026-10-03 (wake 3) — build 7 still `WAITING_FOR_REVIEW` ~36 h in, still queued; `asc web` still dark; monitor re-armed
+
+Watch issue: CYB-50. Every reading read-only, `asc` 5.5.0 on the Mac Mini, taken
+2026-10-03T11:10Z (run `9b9a6079-8bc5-451c-aa67-cd54f51670f4`). **No write was made
+to App Store Connect.**
+
+### 20.1 Outcome — no result yet, and the state is unchanged from §19
+
+```
+asc status --app 6803645374
+-> appstore.version 1.0.1 (f6ba0c4c-bc37-4ae7-842f-f2273d0cb7d7) state WAITING_FOR_REVIEW
+-> submission {inFlight: true, blockingIssues: []}
+-> review {latestSubmissionId: 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e,
+           state: WAITING_FOR_REVIEW, submittedDate: 2026-10-01T23:04:50.439Z}
+-> build 7 (335733d2-ced2-4f68-9513-1899557e7e3e) processingState VALID
+-> summary {health: yellow, nextAction: "Wait for App Store review outcome."}
+```
+
+~36 h after submission the state is still `WAITING_FOR_REVIEW`, **still not
+`IN_REVIEW`** — Apple has not begun the review. Build 6 took ~6.9 days
+(2026-09-24T19:29Z -> 2026-10-01T17:18Z); 36 h is well inside the normal band. Not
+a stall; nothing was nudged.
+
+`asc review history` — latest submission `9f8ed584`, all four items
+`READY_FOR_REVIEW`: 2x `subscriptionVersion` (`cabac1de`, `38f315ce`), one
+`subscriptionGroupVersion` (`af642536`), one `appStoreVersion` (build 7). The prior
+submission `4d62cd5b` (build 6) is `COMPLETE` with all four items `REMOVED`.
+
+### 20.2 Re-confirmed live (no writes made)
+
+- Intro offers present on both products — `ONE_MONTH` / `FREE_TRIAL` / 1 period /
+  `startDate 2026-10-01` (`6807153048`, `6807153583`).
+- 2.3.2 vector still clear — `asc subscriptions promoted-purchases view
+  --subscription-id <ID>` returns empty `data` (`{"type":"","id":""}`) for both
+  products: no promoted purchase linked.
+- **Still USA-only** on both products: `subscriptionPlanAvailabilities` ->
+  `availableTerritories total: 1` (`USA`), `availableInNewTerritories: false`,
+  vs ~175 app territories. Unchanged §11.3 / §17.6 / §18.1 / §19.2 — still the
+  first lever on a repeat 2.1(b), and still deliberately **not** pulled, because
+  editing IAP attached to an in-flight submission can reset the review clock.
+- `asc review doctor` -> `errors 1, warnings 3, infos 1, blocking 1`. The single
+  blocking check is `version.state.editable` ("version is in non-editable state
+  WAITING_FOR_REVIEW") — the in-review artifact, not a regression
+  (`submission.blockingIssues` is `[]`, `inFlight` true). Warnings: keyword repeats
+  name, keyword repeats subtitle, `whatsNew` empty (CYB-28 carry, post-approval).
+  New coverage warning seen this wake:
+  `review.coverage.app_store_regulations_and_permits` `NOT_CHECKED` — the App Store
+  Regulations and Permits declarations (incl. the personal-service declaration) are
+  web-only and not covered by `review doctor`; they sit behind the same dead session
+  (`asc web apps declarations list`).
+
+### 20.3 `asc web` is STILL dead 36 h on — reviewer text and the agreement watchdog remain unreadable
+
+```
+asc web auth status
+-> {"authenticated": false, "passwordStored": true,
+    "appleId": "rweekley@gmail.com", "developerTeamId": "R9U8JNTV28"}
+
+asc web review show --app 6803645374 --apple-id rweekley@gmail.com
+-> Session expired.
+   Error: password is required: run in a terminal for an interactive prompt
+          or set ASC_WEB_PASSWORD
+asc web agreements status --apple-id rweekley@gmail.com
+-> (identical failure)
+```
+
+Unchanged from §18.2 / §19.3, and **no re-login was attempted** (wake 1's single
+attempt failed with `errSecInteractionNotAllowed` rc 36; repeating risks an Apple
+sign-in lockout). The human path is still staged: `~/Desktop/Apple-Sign-In.command`
+on the Mac Mini (~60 s, read-only). The CYB-50 card
+`a6b9b5af-3169-4aca-9bb1-ed869e574035` ("Restore reviewer-text access …") is now
+**24 h old and unanswered** — deliberately not re-asked, per the no-repeat rule.
+
+The public-API substitute still holds: both `subscriptionVersion`s are attached to
+`9f8ed584` in `READY_FOR_REVIEW` -> the Paid Applications agreement was in effect at
+2026-10-01T23:04:50Z. Only a live session can still see (a) a newly posted agreement
+version holding the review and (b) a lapse since submission. Last known: Program
+License Agreement v5031 `active`, `pending: false`, `dateAgreeBy` 2026-10-01T23:59:59Z
+(passed; no recorded reaction).
+
+### 20.4 Monitor re-armed and verified (self-armed, no board action needed)
+
+- `nextCheckAt` **2026-10-03T23:10:00Z** (12 h), `timeoutAt` 2026-10-11T23:59:59Z,
+  `maxAttempts` 24, `recoveryPolicy` `escalate_to_board`.
+- Verified from the read-back: `monitorNextCheckAt` non-null ✔,
+  `executionState.monitor.status` `scheduled` ✔, `scheduledBy` `assignee` ✔, status
+  `in_progress` ✔, `assigneeAgentId` set ✔, `assigneeUserId` null ✔.
+- The monitor had fired before this wake (`attemptCount` 3, `nextCheckAt` null), so
+  this PATCH is the re-arm. Re-confirmed live again that `executionPolicy.monitor.notes`
+  above 500 characters is rejected with HTTP 400 `too_big` (§19.5).
