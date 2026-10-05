@@ -1871,3 +1871,74 @@ outcome is detected, and the text will be reported as *not retrievable* rather t
   `in_progress` ✔, `assigneeAgentId` set ✔, `assigneeUserId` null ✔.
 - the monitor had fired before this wake (`attemptCount` 6, `nextCheckAt` null) → this
   PATCH is the re-arm. `monitor.notes` is capped at 500 chars (HTTP 400 `too_big` if longer).
+
+## 24. Monitor wake 7 — 2026-10-05T11:10Z — build 7 still `WAITING_FOR_REVIEW` (~84 h in, still queued); monitor re-armed
+
+Read-only, `asc` 5.5.0 on the Mac Mini. **No write was made to App Store Connect.**
+
+### 24.1 Outcome — no result yet; state unchanged from §23.1
+
+- Submission `9f8ed584-ac0f-4df8-9432-97e2f3b05a3e` `WAITING_FOR_REVIEW`, submitted
+  2026-10-01T23:04:50.439Z.
+- `appstore.version` 1.0.1 (`f6ba0c4c…`) `WAITING_FOR_REVIEW`; `submission.inFlight
+  true`, `blockingIssues []`; build 7 (`335733d2…`) `processingState VALID`.
+- `asc review history`: the latest submission `9f8ed584` shows all four items
+  `READY_FOR_REVIEW` — 2× `subscriptionVersion` (`cabac1de`, `38f315ce`),
+  `subscriptionGroupVersion` (`af642536`), `appStoreVersion` (build 7). Prior submission
+  `4d62cd5b` (build 6) `COMPLETE`, all items `REMOVED`.
+- `asc status` `summary.health` **yellow**, `nextAction` "Wait for App Store review outcome."
+
+**~84 h in (3.5 days), the state is still `WAITING_FOR_REVIEW`, not `IN_REVIEW`** — Apple
+has not begun the review. Build 6 took ~6.9 days (2026-09-24T19:29Z → 2026-10-01T17:18Z),
+so the predicted outcome window still opens **~2026-10-08** (≈3 days out). Inside the
+normal band; not a stall; the in-flight submission was **not** nudged.
+
+### 24.2 Re-confirmed live (no writes made)
+
+- intro offers present on both products (`ONE_MONTH` / `FREE_TRIAL` / 1 period /
+  `startDate 2026-10-01`) — `meta.total 1` on each
+- 2.3.2 vector clear — `asc subscriptions promoted-purchases list --app 6803645374`
+  → `data []`, `meta.total 0`
+- **still USA-only** on both products (`availableTerritories total: 1` = `USA`,
+  `availableInNewTerritories: false`, `planType UPFRONT`) vs ~175 app territories
+- `asc review doctor`: `errors 1`, `warnings 3`, `infos 1`, `blocking 1` — the `blocking 1`
+  is `version.state.editable` (`version is in non-editable state "WAITING_FOR_REVIEW"`), the
+  **in-review artifact** (`blockingIssues []` + `inFlight true`), not a regression; warnings
+  unchanged (keywords repeat name + subtitle; `whatsNew` empty = CYB-28 carry). Coverage
+  warning unchanged: App Store Regulations/Permits declarations are web-only, not checked by
+  `review doctor`.
+
+### 24.3 `asc web` still dead — reviewer text and agreement watchdog still unreachable
+
+```
+asc web auth status -> {"authenticated": false, "passwordStored": true,
+                        "appleId": "rweekley@gmail.com", "developerTeamId": "R9U8JNTV28"}
+asc web review show / asc web review threads / asc web agreements status
+-> Session expired. / Error: password is required: run in a terminal for an
+   interactive prompt or set ASC_WEB_PASSWORD
+```
+
+Unchanged from wakes 1–6 (measured unreachable from the agent in §21.3). **No re-login
+attempted** — repeating a failed login risks an Apple sign-in lockout. Human path still
+staged: **double-click `~/Desktop/Apple-Sign-In.command` on the Mac Mini (~60 s, read-only)**.
+Card `a6b9b5af-3169-4aca-9bb1-ed869e574035` is now **~72 h old and unanswered** — not
+re-asked, per the no-repeat rule.
+
+**No reviewer message exists to quote verbatim this wake.** If a rejection arrives, the
+outcome is detected and the text reported as *not retrievable* rather than guessed.
+
+New this wake: the durable alternative is confirmed **not yet connected** —
+`connections_search {query: "gmail"}` → Gmail `state: "available"` with no `connectionId`.
+So the Gmail read-only channel the card offers is a real, available option rather than an
+existing capability; it needs the user's own Google OAuth app plus a one-time authorisation.
+
+### 24.4 Monitor re-armed and verified
+
+- `nextCheckAt` **2026-10-05T23:10:00Z** (12 h); `kind` `external_service`; `serviceName`
+  "App Store Connect"; `externalRef` `9f8ed584…`; `timeoutAt` 2026-10-18T23:59:59Z;
+  `maxAttempts` 40; `recoveryPolicy` `escalate_to_board`.
+- read-back from the same response: `monitorNextCheckAt` non-null ✔,
+  `executionState.monitor.status` `scheduled` ✔, `scheduledBy` `assignee` ✔, status
+  `in_progress` ✔, `assigneeAgentId` set ✔, `assigneeUserId` null ✔.
+- the monitor had fired before this wake (`attemptCount` 7, `nextCheckAt` null) → this
+  PATCH is the re-arm.
