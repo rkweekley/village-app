@@ -2235,3 +2235,70 @@ session anyway (`rc=36`), same boundary that blocks `asc web`.
 `git push origin production/v1` works. Then fast-forward (or `git reset --hard`) the Mac
 working copy to `origin/production/v1`. Commits authored on the Mac are superseded by the
 pushed ones (same message/content, different hash) exactly as in wakes 1–10.
+
+## 29. Monitor wake 12 — 2026-10-07T23:10Z — build 7 still `WAITING_FOR_REVIEW` (~144 h / 6.0 days in); `asc web` still dark; monitor re-armed
+
+All readings read-only, `asc` 5.5.0 on the Mac Mini, 2026-10-07T23:10Z.
+**No write was made to App Store Connect.**
+
+### 29.1 Outcome — no result yet; state unchanged from §28.1
+
+- submission **`9f8ed584-ac0f-4df8-9432-97e2f3b05a3e`** `WAITING_FOR_REVIEW`,
+  submitted 2026-10-01T23:04:50.439Z
+- `appstore.version` 1.0.1 (`f6ba0c4c…`) `WAITING_FOR_REVIEW`;
+  `submission.inFlight true`, `blockingIssues []`; build 7 (`335733d2…`) `processingState VALID`
+- `asc review history`: all four items `READY_FOR_REVIEW` — 2× `subscriptionVersion`
+  (`cabac1de`, `38f315ce`), `subscriptionGroupVersion` (`af642536`), `appStoreVersion` (build 7).
+  Prior submission `4d62cd5b` (build 6) `COMPLETE`, all items `REMOVED`.
+- `asc status` `summary.health` **yellow**, `nextAction` "Wait for App Store review outcome."
+
+**~144 h in (6.0 days), still `WAITING_FOR_REVIEW`, not `IN_REVIEW`** — Apple has not begun the
+review. Build 6 took ~6.9 days (2026-09-24T19:29Z → 2026-10-01T17:18Z), so the predicted outcome
+window still opens **~2026-10-08 — tomorrow**, i.e. the next one to two wakes are the likely ones
+to carry the result. Inside the normal band; not a stall; the in-flight submission was **not**
+nudged.
+
+### 29.2 Re-confirmed live (no writes made)
+
+- intro offers present on both products (`ONE_MONTH` / `FREE_TRIAL` / 1 period / `startDate 2026-10-01`)
+- 2.3.2 vector clear — `asc subscriptions promoted-purchases list --app 6803645374` → `data []`, `total 0`
+- **still USA-only** on both products (`availableTerritories total: 1` = `USA`,
+  `availableInNewTerritories: false`) vs ~175 app territories — still the first lever on a repeat
+  2.1(b), still not pulled
+- `asc review doctor`: `errors 1`, `warnings 3`, `infos 1`, `blocking 1` — the `blocking 1` is
+  `version.state.editable`, the **in-review artifact** (`blockingIssues []` + `inFlight true`), not a
+  regression; warnings unchanged (keywords repeat name + subtitle, `whatsNew` empty = CYB-28 carry)
+
+### 29.3 `asc web` still dead — reviewer text and agreement watchdog still unreachable
+
+```
+asc web auth status -> {"authenticated":false,"passwordStored":true,
+                        "appleId":"rweekley@gmail.com","developerTeamId":"R9U8JNTV28"}
+asc web review threads / review show / agreements status
+-> Session expired. / Error: password is required: run in a terminal for an
+   interactive prompt or set ASC_WEB_PASSWORD
+```
+
+Unchanged from wakes 1–11, already measured unreachable from the agent (§21.3): the saved password
+is a login-keychain item a non-GUI SSH session cannot read (`rc=36`, *"User interaction is not
+allowed."*); no `sudo`; no mail/IMAP channel on either box. **No re-login attempted** — repeating a
+failed login risks an Apple sign-in lockout. Human path remains staged and read-only: **double-click
+`~/Desktop/Apple-Sign-In.command` on the Mac Mini (~60 s)**. Card
+`a6b9b5af-3169-4aca-9bb1-ed869e574035` is now **~132 h old and still pending** — not re-asked, per
+the no-repeat rule.
+
+**There is no reviewer message to quote verbatim this wake.** If a rejection arrives, the outcome is
+detected and the verbatim text will be reported as *not retrievable* rather than guessed. Public-API
+substitute still holds: both `subscriptionVersion`s attached in `READY_FOR_REVIEW` ⇒ the Paid
+Applications agreement was in effect at submission.
+
+### 29.4 Monitor re-armed and verified (self-armed, no board action needed)
+
+- `nextCheckAt` **2026-10-08T11:10:00Z** (12 h); `kind` `external_service`; `serviceName`
+  "App Store Connect"; `externalRef` `9f8ed584…`; `timeoutAt` 2026-10-18T23:59:59Z; `maxAttempts` 40;
+  `recoveryPolicy` `escalate_to_board`
+- read-back from the same response: `monitorNextCheckAt` **2026-10-08T11:10:00.000Z** (non-null ✔),
+  `executionState.monitor.status` `scheduled` ✔, `scheduledBy` `assignee` ✔, status `in_progress` ✔,
+  `assigneeAgentId` set ✔, `assigneeUserId` null ✔
+- the monitor had fired before this wake (`attemptCount` 12, `nextCheckAt` null) → this PATCH is the re-arm
+- full monitor object sent (the §27.4 wholesale-replacement lesson applied)
