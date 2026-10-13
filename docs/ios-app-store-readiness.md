@@ -2657,3 +2657,30 @@ Successor issue **CYB-67** was created and its monitor armed (verified from the 
 - **~5 d 1 h platform wake gap** (`2026-10-08T11:10:23Z` -> `2026-10-13T12:35:28.895Z`), while
   unrelated monitors (CYB-63/64/65) resumed in the same minute — a runtime/scheduler defect, not
   this project's config. Impact: the `2026-10-09T22:39Z` rejection sat unseen ~3.5 days.
+
+## 34. 2026-10-13T13:38Z — post-close confirmation: verbatim text verified first-hand, CYB-67 cadence corrected, and the web-only declarations surface read
+
+Follow-up to §33, written after the Account Holder comment (`184a6fff`, 2026-10-13T13:20:02Z) that
+reported the human Apple-ID sign-in. Full evidence: CYB-50 document `verbatim-reconfirm-2026-10-13t1338`.
+
+- **Verbatim text re-retrieved first-hand.** `asc web review show --app 6803645374
+  --submission 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e --plain-text` -> thread `883e04bb…`, message
+  `431a7569-31a3-452e-97f6-57eaa6632f65` from `APPLE` (created `2026-10-09T22:39:30.77Z`), rejection
+  `8e1779d8-5463-41c3-b08b-c2c7b2570738` with `reasons[0] = {section 2.1, code 2.1.0,
+  "Performance: App Completeness"}`, artifact `appStoreVersions 1.0.1`, **0 screenshots**. The Account
+  Holder's quoted block matches Apple's text exactly — it is an excerpt starting at `Review Environment`
+  and omits the opening "Hello, Thank you for your resubmission…" sentence and the trailing
+  Resources/Support boilerplate. **Operational note: the latest-submission call does not return an old
+  submission's message bodies — pass `--submission <id>` explicitly to read a specific rejection.**
+- **CYB-67 cadence corrected.** The successor monitor had been armed at **24 h** (§33 recorded ~12 h);
+  it was re-armed to `nextCheckAt 2026-10-14T01:30:00Z` with the **full** monitor object, read back from
+  the same response (`scheduled`, `scheduledBy assignee`, `attemptCount 0`, `timeoutAt 2026-11-01`,
+  `maxAttempts 44`, `recoveryPolicy escalate_to_board`).
+- **Web-only compliance surface is readable while a session lives.** `asc review doctor` marks
+  `review.coverage.app_store_regulations_and_permits` as `NOT_CHECKED` (§30), but
+  `asc web apps declarations list --app 6803645374` returns one requirement:
+  `{"requirementName":"MEDICAL_DEVICE","status":"PENDING_COLLECTION","required":false}` — **not** a
+  submission blocker and unrelated to the 2.1 finding. Watch item on CYB-67; it can only be re-read
+  while a web session exists.
+- **Disposition.** CYB-50 `done` (monitor retired — its submission is decided). CYB-67 owns the watch on
+  `708d8676`; the durable Gmail read-only ask lives there as card `6ba4eaad-a073-4c43-9047-09f579bd3a88`.
