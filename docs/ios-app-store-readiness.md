@@ -2442,3 +2442,173 @@ The outcome is known, so there is nothing left to poll. No `executionPolicy.moni
 - Outcome recorded (this section) and the non-retrieval stated exactly as required by Step 3.
 - Fix work gets its own issue (Step 3): **CYB-66 — "iOS: resolve the Village 1.0.1+7 App Store rejection"**, which leads with retrieving the reviewer text and carries the API-visible post-rejection facts above plus the two candidate levers.
 - CYB-50's remaining unmet acceptance clause is "recorded here **verbatim**", which needs the human sign-in; the issue is parked on that named unblock owner/action rather than closed over it.
+
+## 32. 2026-10-13 — rejection #3 DIAGNOSED AND FIXED: Guideline 2.1 "Information Needed" (a demo account with an EXPIRED subscription), resubmitted as submission `708d8676`
+
+Everything in this section was verified live against App Store Connect and the
+production API on 2026-10-13. `asc` 5.5.0 on the Mac Mini.
+
+### 32.1 What was actually rejected — and it was not the app
+
+The reviewer text was **unreadable for 5 days** (§31.4: the `asc web` session died
+2026-10-01). It was recovered at 2026-10-13T13:07Z after Ryan's 60-second
+Apple-ID sign-in on the Mac Mini (`~/Desktop/Apple-Sign-In.command`, rc=0), then:
+
+```
+asc web review show --app 6803645374 --plain-text
+```
+
+**Verbatim (thread `883e04bb-51bb-388f-8163-a09b4ef62c0d`, created 2026-10-09T22:39:30.77Z):**
+
+> Hello,
+>
+> Thank you for your resubmission, but we need additional information before we can
+> continue our review.
+>
+> Review Environment
+> Submission ID: 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e
+> Review date: October 09, 2026
+> Review Device: iPad Air (5th generation)
+> Version reviewed: 1.0.1 (7)
+>
+> **App Version — Guideline 2.1 - Information Needed**
+> We are not able to continue our review because we need access to a demo account
+> with an expired subscription to review the entire purchase flow.
+>
+> **Next Steps**
+> To resolve this issue, provide a user name and password for a demo account with
+> expired subscriptions in the App Review Information section of App Store Connect.
+
+`rejections[0].reasons` = `{"reasonSection":"2.1","reasonDescription":"Performance: App Completeness","reasonCode":"2.1.0"}`.
+
+**Root cause.** The single demo account documented in App Review Information,
+`parent@village.app`, belongs to **Smith Family**, whose subscription is `active`
+until **2030-01-01**. Subscription state is **family-level**
+(`Families.SubscriptionStatus` / `SubscriptionExpiresAt` / `TrialEndsAt`), and the
+app only redirects to the paywall when `status == 'trial' && expiresAt == null`
+(`lib/features/hub/pages/hub_page.dart:52`). An `active` family therefore can never
+reach the purchase flow, so Apple had no way to review it. Nothing in the binary
+was at fault — no code change and **no new build** were needed, which is exactly
+what a 2.1 "Information Needed" rejection means.
+
+### 32.2 The fix — a production demo account whose subscription is EXPIRED
+
+Created in the production database (`village-postgres-1`, db `village`), additive only:
+
+| field | value |
+|---|---|
+| family | `Village App Review (Expired Subscription)` (`decb385b-4d04-4cd4-9d17-a976fcec3348`), invite `APPREVW1` |
+| subscription | `SubscriptionStatus='expired'`, tier `annual`, `SubscriptionExpiresAt 2026-09-01`, `TrialEndsAt 2026-08-01` |
+| user | `expired@village.app` / `Village2026!`, DisplayName `Reviewer`, `Role 0` (Parent, so `canManage` and the subscription page are reachable) |
+
+Verified end-to-end against the live API:
+
+```
+POST /api/auth/login {expired@village.app}   -> HTTP 200, role Parent, family Village App Review
+GET  /api/billing/status                     -> {"status":"expired","tier":"annual",
+                                                 "expiresAt":"2026-09-01T00:00:00",
+                                                 "trialEndsAt":"2026-08-01T00:00:00"}
+POST /api/auth/login {parent@village.app}    -> HTTP 200   (control; unchanged)
+GET  /api/billing/status  (parent)           -> {"status":"active", expiresAt 2030-01-01}
+```
+
+**App Review Information updated** (review detail `860e4e7c-6787-41c5-a64b-645a63549e70`,
+`asc review details-update`, read back and confirmed):
+demo account = `expired@village.app` / `Village2026!`, `demoAccountRequired: true`,
+and notes that (a) tell the reviewer to start with the expired account, naming the
+guideline, (b) give the exact path to the purchase flow, (c) give the second,
+ACTIVE account `parent@village.app` / `Parent123!` for reviewing features with the
+Smith Family demo content, and (d) list both products, prices, the group and the
+30-day free-trial intro offers.
+
+### 32.3 The unwind + resubmit recipe (§17.1 re-confirmed, with one addition)
+
+Items cannot be moved into a new submission while they are still held by the
+previous one, so the dead submission must be cancelled first:
+
+```
+asc review submissions-update --id 9f8ed584-... --canceled=true --confirm
+  -> state CANCELING  -> COMPLETE
+asc subscriptions versions list        -> cabac1de (monthly) / 38f315ce (annual)  DEVELOPER_REJECTED
+asc subscriptions groups versions list -> af642536  DEVELOPER_REJECTED
+asc review submissions-create --app 6803645374 --platform IOS   -> 708d8676-3637-4507-ab6d-bfa1e32ec5d6
+asc review items add --submission 708d8676-... --item-type appStoreVersions          --item-id <version 890071886 / f6ba0c4c>
+asc review items add --submission 708d8676-... --item-type subscriptionVersions      --item-id cabac1de-7482-4fde-9f83-5bd696f3e034
+asc review items add --submission 708d8676-... --item-type subscriptionVersions      --item-id 38f315ce-5125-4726-8fbd-1d3172aa4532
+asc review items add --submission 708d8676-... --item-type subscriptionGroupVersions --item-id af642536-ff67-4ae9-952e-26bc8a8d5756
+asc review submissions-submit --id 708d8676-... --confirm
+  -> state WAITING_FOR_REVIEW  submittedDate 2026-10-13T13:18:23.676Z
+```
+
+All four items read back `READY_FOR_REVIEW`; `asc review status` -> `WAITING_FOR_REVIEW`,
+`asc status` -> `health yellow`, `blockers []`, build 7 `VALID`.
+
+**Two failure modes worth keeping:**
+
+- `asc review items add --item-type subscriptionVersions` is refused while a version is
+  `READY_FOR_REVIEW`: *"Only versions in 'Prepare for Submission' or 'Developer
+  Rejected' state can be submitted."* Cancelling the holding submission is what flips
+  them to `DEVELOPER_REJECTED`.
+- `whatsNew` cannot be PATCHed while the version is `REJECTED` (*"Attribute 'whatsNew'
+  cannot be edited at this time"*). It is a non-blocking warning; fill it after the
+  version next reaches an editable state.
+- The web-only attach path is STILL a dead end — `asc web review subscriptions
+  attach-group` refuses with *"subscription group 'Village' (22349177) has no
+  READY_TO_SUBMIT subscriptions for first-submission attachment yet"* even though
+  `asc validate subscriptions` reports 0 errors / state `READY_TO_SUBMIT`, the review
+  screenshot is `COMPLETE` on both products, localizations/prices/intro offers all
+  present, and the group version is `READY_FOR_REVIEW`. `MISSING_METADATA` on the web
+  surface (§17.4) is **still unexplained and still not blocking** — the API item route
+  accepts everything. Do not burn a cycle on it; use the item route.
+
+### 32.4 Resolution Center reply — could NOT be sent (recorded, not guessed)
+
+`asc web review reply --thread-id 883e04bb-... --confirm` failed **twice, identically**:
+
+```
+Error: web review reply failed: web api error (status 409),
+codes=[ENTITY_ERROR.RELATIONSHIP.INVALID]
+```
+
+The thread is bound to submission `9f8ed584`, which is now cancelled, so the write's
+relationship is invalid. Not retried further (bounded-write rule). Apple's stated
+requirement — *"provide a user name and password for a demo account with expired
+subscriptions in the App Review Information section"* — **is satisfied**; the review
+notes carry the same information the reply would have.
+
+### 32.5 Decision: subscription territory availability deliberately NOT changed
+
+Both products remain **USA-only** (`availableTerritories total 1`,
+`availableInNewTerritories false`) while the app sells in **175 territories** (§11.3,
+§30.2, §17.6). This cycle changes **exactly one thing** — the demo account Apple asked
+for — so the next verdict is diagnosable:
+
+- the reviewer's message named only the missing expired-subscription account; it did
+  **not** report a product-unavailable state, so there is no evidence the availability
+  asymmetry is live;
+- widening an availability matrix that currently has a price for **one** territory to
+  175 risks landing the product in a genuine *missing-pricing* state, which would block
+  submission outright — a worse failure than the one being fixed.
+
+**If this cycle fails with 2.1(b) "subscription product unavailable" again, widening
+both products to the app's territory set (and re-saving the complete equalized price
+matrix) is the first change to make.**
+
+### 32.6 Where things stand
+
+| | iOS |
+|---|---|
+| submission | `708d8676-3637-4507-ab6d-bfa1e32ec5d6` — `WAITING_FOR_REVIEW`, submitted 2026-10-13T13:18:23.676Z |
+| items | app version (build 7) + 2 subscription versions + group version, all `READY_FOR_REVIEW` |
+| demo login | `expired@village.app` / `Village2026!` (expired sub) and `parent@village.app` / `Parent123!` (active) — both verified 200 |
+| review notes | updated, read back |
+| `asc web` session | ALIVE as of 2026-10-13T13:07Z (short-lived; the only way to read rejection text) |
+| reply to Apple | not sent (409); information carried in the review notes |
+
+Rejection history: 2026-09-16 (2.1(a) login + 2.3.2 promo image) -> 2026-10-01
+(2.1(b) IAP unavailable + repeat 2.3.2) -> **2026-10-09 (2.1 Information Needed:
+expired-subscription demo account)** -> resubmitted build 7 on 2026-10-13.
+
+Standing rule that has now earned its place: **before every submission, verify the
+demo-account set covers the states the reviewer must reach — not just "the login
+works".** A single account in an `active` family cannot demonstrate a purchase flow.
