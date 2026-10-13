@@ -2612,3 +2612,48 @@ expired-subscription demo account)** -> resubmitted build 7 on 2026-10-13.
 Standing rule that has now earned its place: **before every submission, verify the
 demo-account set covers the states the reviewer must reach — not just "the login
 works".** A single account in an `active` family cannot demonstrate a purchase flow.
+
+---
+
+## 33. 2026-10-13 (later) — CYB-50 closed `done`; the build-7 resubmission `708d8676` is now watched by **CYB-67**
+
+CYB-50 (the monitor for the first build-7 submission) is **closed `done`** with both acceptance
+criteria met:
+
+- **Outcome known, recorded verbatim** — build 7 (`9f8ed584-ac0f-4df8-9432-97e2f3b05a3e`) was rejected
+  under **Guideline 2.1 "Information Needed"**. The reviewer text quoted in §32 was re-retrieved
+  **first-hand** this wake from the Resolution Center
+  (`asc web review show --submission 9f8ed584… --plain-text`, thread `883e04bb-51bb-388f-8163-a09b4ef62c0d`,
+  created `2026-10-09T22:39:30.77Z`), i.e. Apple's own text rather than a relayed claim. The `asc web`
+  session is alive again (`authenticated: true, source: cache`) after the human Apple-ID sign-in at
+  `2026-10-13T13:07Z`.
+- **Acted on** — see §32 (CYB-66, `done`).
+
+### Independent re-verification this wake (read-only, `asc` 5.5.0, 2026-10-13T13:20Z)
+
+| check | result |
+|---|---|
+| App Review Information `860e4e7c-6787-41c5-a64b-645a63549e70` | `demoAccountName expired@village.app`, password **set**, `demoAccountRequired true`; notes name the 09 Oct Guideline 2.1 message and give the exact path to the purchase flow — the reviewer's stated requirement is **met** |
+| resubmission | `708d8676-3637-4507-ab6d-bfa1e32ec5d6` `WAITING_FOR_REVIEW`, submitted `2026-10-13T13:18:23.676Z`; 4 items `READY_FOR_REVIEW` (appStoreVersion + 2x subscriptionVersion + subscriptionGroupVersion) |
+| `asc status` | health **yellow**, `blockingIssues []`, `inFlight true`; build 7 `processingState VALID` |
+| `asc review doctor` | `blocking 1` = `version.state.editable` — the **in-review artifact**, not a blocker |
+| agreement watchdog | PLA v5031 `active`, `pending false` — nothing holding reviews |
+| old submission `9f8ed584` | reads `COMPLETE` with items `REMOVED` (unwound during remediation); its thread keeps the rejection (1 message, 0 screenshots) |
+
+### The resubmission is now watched — CYB-67
+
+The resubmission was **unwatched**, which is exactly the gap this monitor chain exists to close.
+Successor issue **CYB-67** was created and its monitor armed (verified from the read-back):
+`kind external_service`, `serviceName "App Store Connect"`, `externalRef 708d8676…`, ~12 h cadence,
+`nextCheckAt 2026-10-14T01:25Z`, `timeoutAt 2026-11-01T23:59:59Z`, `maxAttempts 44`,
+`recoveryPolicy escalate_to_board`, `scheduledBy assignee`, status `in_progress`.
+
+### Housekeeping / carried flags
+
+- Connection card `fffa8c83-…` (Gmail read-only) **expired** when CYB-50 closed, as did the Mac
+  sign-in card `a6b9b5af-…`. The Gmail channel is still unrequested; it should be re-requested on
+  CYB-67's own issue when reviewer-text access next matters. It remains the only channel that would
+  make a rejection's *text* readable with no Mac sign-in.
+- **~5 d 1 h platform wake gap** (`2026-10-08T11:10:23Z` -> `2026-10-13T12:35:28.895Z`), while
+  unrelated monitors (CYB-63/64/65) resumed in the same minute — a runtime/scheduler defect, not
+  this project's config. Impact: the `2026-10-09T22:39Z` rejection sat unseen ~3.5 days.
