@@ -2359,3 +2359,86 @@ Applications agreement was in effect at submission.
 - the monitor had fired before this wake (`attemptCount` 13, `nextCheckAt` null) → this PATCH is the re-arm
 - full monitor object sent (the §27.4 wholesale-replacement lesson applied)
 - **tooling note:** `jq` is **not installed** on the WSL box; build the PATCH body with `python3` (a `jq -n … | curl --data-binary @-` pipeline silently sends an empty body and the PATCH becomes a no-op).
+
+## 31. Monitor wake 14 (FINAL) — 2026-10-13T12:35Z — build 7 was **REJECTED**; submission `9f8ed584` is `UNRESOLVED_ISSUES`; the reviewer text is **NOT retrievable** (web session dead since 2026-10-01); a ~5-day platform-wide wake gap delayed the detection
+
+All readings read-only, `asc` 5.5.0 on the Mac Mini, 2026-10-13T12:35Z. **No write was made to App Store Connect.**
+
+### 31.1 Outcome — REJECTED (this is the result this monitor existed to catch)
+
+- submission **`9f8ed584-ac0f-4df8-9432-97e2f3b05a3e`** state **`UNRESOLVED_ISSUES`**, submitted 2026-10-01T23:04:50.439Z
+- `asc review history` → this submission, `"outcome":"rejected"` (the field is the only API-visible statement of the result)
+- `appstore.version` 1.0.1 (`f6ba0c4c-bc37-4ae7-842f-f2273d0cb7d7`) state **`REJECTED`** (`asc versions view` → `{"state":"REJECTED","downloadable":true}`)
+- `asc status` → `summary.health` **red**, `nextAction` "Resolve blocker: App Store review has unresolved issues", blockers:
+  - `App Store review has unresolved issues`
+  - `App Store version is in blocking state REJECTED`
+  - `submission 9f8ed584-ac0f-4df8-9432-97e2f3b05a3e has unresolved issues`
+- `submission.inFlight` still **true**; build 7 (`335733d2…`) `processingState VALID`, not expired
+- **No rejection timestamp is exposed.** `asc review submissions-get 9f8ed584` returns only `{platform, state, submittedDate}` — no `lastUpdatedDate`, no date on the rejection. The last confirmed **pre**-rejection reading is §30 (2026-10-08T11:10Z, `WAITING_FOR_REVIEW`). Build 6's own latency was ~6.9 days, which predicts ~2026-10-08T22:00Z, i.e. shortly **after** that last reading — but that is an inference, not a reading, and is labelled as such.
+
+### 31.2 Review items — the app version carries the rejection, the subscriptions do not
+
+`asc review items list --submission 9f8ed584…` → 4 items (`total 4`):
+
+| item type | state |
+|---|---|
+| `subscriptionVersion` `cabac1de` (monthly) | `READY_FOR_REVIEW` |
+| `subscriptionVersion` `38f315ce` (annual) | `READY_FOR_REVIEW` |
+| `subscriptionGroupVersion` `af642536` | `READY_FOR_REVIEW` |
+| `appStoreVersion` (build 7 / `f6ba0c4c`) | **`REJECTED`** |
+
+The subscriptions are still attached and were **not** rejected as items; the rejection is on the app version item.
+
+### 31.3 `asc review doctor` — the blocking check changed shape (this is a real regression signal now, not the old artifact)
+
+`{"errors":1,"warnings":5,"infos":1,"blocking":1}`
+
+- `blocking 1` = **`review.submission.unresolved_issues`** — "Latest review submission has unresolved issues in App Review".
+  This is **different** from wakes 1–13, where `blocking 1` was `version.state.editable` and was explicitly recorded as an *in-review artifact* (§22–§30). The old artifact is gone; the new blocker is the genuine rejection. The earlier "do not read `blocking: 1` as a regression" caveat **no longer applies**.
+- warnings (5) — two are **new this wake**:
+  - `metadata.keywords.overlap_name`, `metadata.keywords.overlap_subtitle` (unchanged, cosmetic)
+  - `metadata.required.whats_new` — empty (unchanged; CYB-28 carry)
+  - **`subscriptions.review_readiness.needs_attention` × 2** — "Village Annual" (`village.annual` / `6807153583`) and "Village Monthly" (`village.monthly` / `6807153048`) are each **`READY_TO_SUBMIT`**; remediation verbatim: *"Submit this subscription for review in App Store Connect so it is attached to the next app review submission; note: first-time subscriptions must be submitted via the app version page in App Store Connect (not the API)."* These two warnings did **not** exist pre-rejection (§30 had 3 warnings), so the rejection moved both products back to a submit-with-the-next-version state.
+- coverage warning unchanged: `review.coverage.app_store_regulations_and_permits` `NOT_CHECKED` (web-only; needs `asc web apps declarations list`).
+
+### 31.4 Exactly what could NOT be retrieved (recorded per the issue's Step 3, not guessed)
+
+The rejection **reason** — the Guidance/guideline text and the reviewer's message — **was not retrievable by the agent this wake.** This is a hard credential boundary, re-verified, not a missing command:
+
+```
+asc web auth status -> {"authenticated":false,"passwordStored":true,
+                        "appleId":"rweekley@gmail.com","developerTeamId":"R9U8JNTV28"}
+asc web review show --app 6803645374 --apple-id rweekley@gmail.com
+asc web review threads --app 6803645374 --apple-id rweekley@gmail.com
+asc web agreements status --apple-id rweekley@gmail.com
+-> Session expired.
+   Error: password is required: run in a terminal for an interactive prompt
+          or set ASC_WEB_PASSWORD
+```
+
+- the session cache `~/.asc/web/session-0bc7f986…json` has `updated_at` **2026-10-01T23:09:00.382746Z** (4 cookies) — i.e. it last refreshed ~4 minutes **after** the build-7 submission and has been dead ever since; there is no later generation
+- the saved password is a macOS **login-keychain** item a non-GUI SSH session cannot read (`security find-generic-password … -w` → `rc=36`, "User interaction is not allowed."), so `ASC_WEB_PASSWORD` is unsourceable; no `ASC_WEB_PASSWORD` exists in any dotfile/script on the Mac
+- **no re-login was attempted** — the only prior attempt failed *locally* (keychain, before reaching Apple), so re-trying cannot succeed and is not worth the sign-in-lockout risk
+- no mail/IMAP channel exists on either box, and the reviewer screenshot cache `~/.asc/web-review/6803645374/` contains **only** `4d62cd5b…` (build 6) — there is **no** `9f8ed584…` directory, i.e. no web query for build 7 ever succeeded
+
+Consequence, stated plainly: **the guideline number and the reviewer's words for this rejection are unknown.** They must not be inferred from the previous (build 6) rejection. The two candidate levers the monitor had already recorded are *unchanged and unproven as causes*: (a) the USA-only subscription territory asymmetry (§30.2 — a reviewer cannot buy where the product is not sold), and (b) a runtime IAP defect of the kind CYB-48 addressed, on which build 7's storefront/IAPError diagnostics were the fix.
+
+Human paths, both already staged and read-only: **double-click `~/Desktop/Apple-Sign-In.command` on the Mac Mini (~60 s)**, or connect the durable **Gmail read-only** channel (Apple e-mails every rejection to `rweekley@gmail.com`). Card `a6b9b5af-3169-4aca-9bb1-ed869e574035` (pending since 2026-10-02T11:19Z, `wake_assignee`) carries exactly this choice.
+
+### 31.5 The detection was delayed ~5 days by a platform-wide wake gap (new finding)
+
+The monitor's recorded wake history on CYB-50 (`GET /api/issues/…/diagnostics/wakes`, 18 events) runs at the intended ~12 h cadence — 2026-10-02T11:10, 23:10, 10-03…, …10-07T23:10, **2026-10-08T11:10:23Z** — and then **nothing** until **2026-10-13T12:35:28.895Z**: a gap of **5 d 1 h**.
+
+This is **not** a CYB-50 config error: the wake that would have landed at 2026-10-08T23:10 never fired, and in the same minute this wake fired (12:35), unrelated monitors woke as well — **CYB-63 (OhioValleyDinosaur Weekly Report)**, **CYB-64 (Weekly Reach & Analytics Brief)** and **CYB-65 (Weekly Content Loop)** all have `updatedAt` 2026-10-13T12:35:3x/12:37, having previously been last touched 2026-10-05/10-07. Several independent ~12 h and weekly monitors resumed at the same instant, so the gap is at the runtime/scheduler level, not per-issue.
+
+Honest impact: on the recorded cadence the rejection would have been seen within ~12 h; instead it was first seen ~5 days after the last successful check. That widens the exposure window this issue exists to close, and it is the second time an outcome has sat unseen for days. **This is worth a board-level look at monitor delivery** — it is the one part of this monitor that failed independently of the app.
+
+### 31.6 The monitor is retired, not re-armed
+
+The outcome is known, so there is nothing left to poll. No `executionPolicy.monitor` PATCH was sent this wake (`executionPolicy.monitor` reads **null**; `executionState.monitor` retains the completed record: `attemptCount` 14, `lastTriggeredAt` 2026-10-13T12:35:28.652Z, `status` `triggered`). Polling a decided submission every 12 h would be noise.
+
+### 31.7 Disposition
+
+- Outcome recorded (this section) and the non-retrieval stated exactly as required by Step 3.
+- Fix work gets its own issue (Step 3): **CYB-66 — "iOS: resolve the Village 1.0.1+7 App Store rejection"**, which leads with retrieving the reviewer text and carries the API-visible post-rejection facts above plus the two candidate levers.
+- CYB-50's remaining unmet acceptance clause is "recorded here **verbatim**", which needs the human sign-in; the issue is parked on that named unblock owner/action rather than closed over it.
