@@ -252,7 +252,10 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => Navigator.of(context).pop(),
+          // Deep-linked from an email there is nothing to pop — fall back to login.
+          onPressed: () => Navigator.of(context).canPop()
+              ? Navigator.of(context).pop()
+              : context.go('/login'),
         ),
         title: const Text('Set New Password'),
         centerTitle: true,

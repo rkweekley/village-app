@@ -98,13 +98,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ForgotPasswordPage(),
       ),
+      // Password reset. The emailed link carries the token as a QUERY param
+      // (`#/reset-password?token=<hex>&email=<addr>`) because GoRouter runs on
+      // hash URLs here, so `/reset-password/<token>` alone produced
+      // "GoException: no routes for location: /reset-password?token=...".
+      // Register the bare path (query form) and keep the path form as a child
+      // so both links keep working.
       GoRoute(
-        path: '/reset-password/:token',
+        path: '/reset-password',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => ResetPasswordPage(
-          token: state.pathParameters['token'],
+          token: state.uri.queryParameters['token'],
           email: state.uri.queryParameters['email'],
         ),
+        routes: [
+          GoRoute(
+            path: ':token',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => ResetPasswordPage(
+              token: state.pathParameters['token'],
+              email: state.uri.queryParameters['email'],
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: '/family-setup',
