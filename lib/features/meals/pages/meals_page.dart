@@ -5,6 +5,7 @@ import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/core/widgets/empty_state.dart';
 import 'package:village_app/features/meals/meals_service.dart';
 import 'package:village_app/features/meals/pages/recipe_ideas_tab.dart';
+import 'package:village_app/features/meals/widgets/recipe_image.dart';
 import 'package:village_app/shared/widgets/adaptive_sheet.dart';
 import 'package:village_app/shared/utils/status_color.dart';
 
@@ -659,21 +660,34 @@ class _RecipeCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Leading color block
-              Container(
+              // Leading photo, or the difficulty colour block when the recipe
+              // has no photo. Saved family recipes have always carried a
+              // photoUrl — this page simply never rendered it (#121).
+              SizedBox(
                 width: 56,
                 height: 56,
-                decoration: BoxDecoration(
-                  color: diffColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.menu_book_rounded,
-                    color: diffColor,
-                    size: 28,
-                  ),
-                ),
+                child: (r.photoUrl?.trim().isNotEmpty ?? false)
+                    ? RecipeImage(
+                        url: r.photoUrl,
+                        width: 56,
+                        height: 56,
+                        cacheWidth: 168,
+                        iconSize: 20,
+                        borderRadius: BorderRadius.circular(14),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: diffColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.menu_book_rounded,
+                            color: diffColor,
+                            size: 28,
+                          ),
+                        ),
+                      ),
               ),
               const SizedBox(width: 14),
               Expanded(

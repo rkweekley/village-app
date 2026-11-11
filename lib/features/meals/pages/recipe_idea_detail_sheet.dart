@@ -6,6 +6,7 @@ import 'package:village_app/core/network/authenticated_client.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/meals/meals_service.dart';
 import 'package:village_app/features/meals/recipe_ideas_service.dart';
+import 'package:village_app/features/meals/widgets/recipe_image.dart';
 import 'package:village_app/features/shopping/shopping_service.dart';
 
 /// Modal bottom sheet showing a recipe from TheMealDB with ingredients,
@@ -20,8 +21,7 @@ class RecipeIdeaDetailSheet extends ConsumerStatefulWidget {
       _RecipeIdeaDetailSheetState();
 }
 
-class _RecipeIdeaDetailSheetState
-    extends ConsumerState<RecipeIdeaDetailSheet> {
+class _RecipeIdeaDetailSheetState extends ConsumerState<RecipeIdeaDetailSheet> {
   bool _addingToShoppingList = false;
   bool _saving = false;
   bool _saved = false;
@@ -45,21 +45,17 @@ class _RecipeIdeaDetailSheetState
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(24)),
-                    child: Image.network(
-                      recipe.image,
+                      top: Radius.circular(24),
+                    ),
+                    // Skeleton / no-photo / retry states live in RecipeImage so
+                    // this sheet, the ideas grid and the saved-recipe list all
+                    // behave the same (#107, #108).
+                    child: RecipeImage(
+                      url: recipe.image,
                       width: double.infinity,
                       height: 220,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        height: 220,
-                        color:
-                            context.palette.primary.withValues(alpha: 0.15),
-                        child: Center(
-                          child: Icon(Icons.restaurant_rounded,
-                              size: 48, color: context.palette.primary),
-                        ),
-                      ),
+                      cacheWidth: 900,
+                      iconSize: 48,
                     ),
                   ),
                   // Gradient overlay
@@ -67,7 +63,8 @@ class _RecipeIdeaDetailSheetState
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(24)),
+                          top: Radius.circular(24),
+                        ),
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -84,12 +81,14 @@ class _RecipeIdeaDetailSheetState
                     top: 12,
                     right: 12,
                     child: CircleAvatar(
-                      backgroundColor:
-                          Colors.black.withValues(alpha: 0.35),
+                      backgroundColor: Colors.black.withValues(alpha: 0.35),
                       radius: 18,
                       child: IconButton(
-                        icon: const Icon(Icons.close_rounded,
-                            size: 20, color: Colors.white),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          size: 20,
+                          color: Colors.white,
+                        ),
                         onPressed: () => Navigator.pop(context),
                         padding: EdgeInsets.zero,
                       ),
@@ -110,18 +109,18 @@ class _RecipeIdeaDetailSheetState
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        if (recipe.category != null ||
-                            recipe.area != null) ...[
+                        if (recipe.category != null || recipe.area != null) ...[
                           const SizedBox(height: 6),
                           Row(
                             children: [
                               if (recipe.category != null)
-                                _badge(recipe.category!,
-                                    context.palette.primary),
+                                _badge(
+                                  recipe.category!,
+                                  context.palette.primary,
+                                ),
                               if (recipe.area != null) ...[
                                 const SizedBox(width: 6),
-                                _badge(
-                                    recipe.area!, context.palette.warning),
+                                _badge(recipe.area!, context.palette.warning),
                               ],
                             ],
                           ),
@@ -135,22 +134,24 @@ class _RecipeIdeaDetailSheetState
               // ── Actions bar ──
               Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 12),
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
                     if (recipe.youtubeUrl != null)
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => launchUrl(
-                              Uri.parse(recipe.youtubeUrl!)),
-                          icon: const Icon(Icons.play_circle_outline,
-                              size: 18),
-                          label: const Text('Watch',
-                              style: TextStyle(fontSize: 13)),
+                          onPressed: () =>
+                              launchUrl(Uri.parse(recipe.youtubeUrl!)),
+                          icon: const Icon(Icons.play_circle_outline, size: 18),
+                          label: const Text(
+                            'Watch',
+                            style: TextStyle(fontSize: 13),
+                          ),
                         ),
                       ),
-                    if (recipe.youtubeUrl != null)
-                      const SizedBox(width: 8),
+                    if (recipe.youtubeUrl != null) const SizedBox(width: 8),
                     Expanded(
                       child: FilledButton.icon(
                         onPressed: _addingToShoppingList
@@ -161,36 +162,42 @@ class _RecipeIdeaDetailSheetState
                                 width: 16,
                                 height: 16,
                                 child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white))
-                            : const Icon(Icons.shopping_cart,
-                                size: 18),
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.shopping_cart, size: 18),
                         label: Text(
-                            _addingToShoppingList
-                                ? 'Adding...'
-                                : 'Add to List',
-                            style: const TextStyle(fontSize: 13)),
+                          _addingToShoppingList ? 'Adding...' : 'Add to List',
+                          style: const TextStyle(fontSize: 13),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed:
-                            (_saving || _saved) ? null : _saveToMyRecipes,
+                        onPressed: (_saving || _saved)
+                            ? null
+                            : _saveToMyRecipes,
                         icon: _saving
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
                                 child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white))
-                            : Icon(_saved
-                                ? Icons.check_rounded
-                                : Icons.bookmark_outline,
-                                size: 18),
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(
+                                _saved
+                                    ? Icons.check_rounded
+                                    : Icons.bookmark_outline,
+                                size: 18,
+                              ),
                         label: Text(
-                            _saved ? 'Saved!' : 'Save Recipe',
-                            style: const TextStyle(fontSize: 13)),
+                          _saved ? 'Saved!' : 'Save Recipe',
+                          style: const TextStyle(fontSize: 13),
+                        ),
                       ),
                     ),
                   ],
@@ -199,53 +206,75 @@ class _RecipeIdeaDetailSheetState
 
               // ── Ingredients ──
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                child: Text('Ingredients',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 4,
+                ),
+                child: Text(
+                  'Ingredients',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               const SizedBox(height: 4),
               ...recipe.ingredients
                   .where((i) => i.name.isNotEmpty)
-                  .map((ing) => ListTile(
-                        dense: true,
-                        leading: Icon(Icons.circle,
-                            size: 8,
-                            color: theme.colorScheme.primary
-                                .withValues(alpha: 0.5)),
-                        title: Text(ing.name,
-                            style: const TextStyle(fontSize: 14)),
-                        trailing: ing.measure.isNotEmpty
-                            ? Text(ing.measure,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: context.palette.textTertiary))
-                            : null,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 20),
-                        visualDensity: VisualDensity.compact,
-                      )),
+                  .map(
+                    (ing) => ListTile(
+                      dense: true,
+                      leading: Icon(
+                        Icons.circle,
+                        size: 8,
+                        color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                      ),
+                      title: Text(
+                        ing.name,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      trailing: ing.measure.isNotEmpty
+                          ? Text(
+                              ing.measure,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: context.palette.textTertiary,
+                              ),
+                            )
+                          : null,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
 
               // ── Instructions ──
               if (recipe.instructions.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 4),
-                  child: Text('Instructions',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700)),
+                    horizontal: 20,
+                    vertical: 4,
+                  ),
+                  child: Text(
+                    'Instructions',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 8),
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
                   child: Text(
                     recipe.instructions,
                     style: TextStyle(
-                        fontSize: 14,
-                        height: 1.6,
-                        color: Colors.grey[800]),
+                      fontSize: 14,
+                      height: 1.6,
+                      color: Colors.grey[800],
+                    ),
                   ),
                 ),
               ],
@@ -259,17 +288,16 @@ class _RecipeIdeaDetailSheetState
   }
 
   Widget _badge(String text, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.25),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(text,
-            style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w600)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.25),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Text(
+      text,
+      style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600),
+    ),
+  );
 
   void _showShoppingListPicker() {
     final listsAsync = ref.read(shoppingListsProvider);
@@ -287,15 +315,24 @@ class _RecipeIdeaDetailSheetState
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.shopping_bag_outlined,
-                      size: 48, color: context.palette.textTertiary),
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 48,
+                    color: context.palette.textTertiary,
+                  ),
                   const SizedBox(height: 12),
-                  const Text('No shopping lists yet',
-                      style: TextStyle(fontSize: 16)),
+                  const Text(
+                    'No shopping lists yet',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   const SizedBox(height: 4),
-                  Text('Create one in the Shopping tab first.',
-                      style: TextStyle(
-                          color: context.palette.textTertiary, fontSize: 13)),
+                  Text(
+                    'Create one in the Shopping tab first.',
+                    style: TextStyle(
+                      color: context.palette.textTertiary,
+                      fontSize: 13,
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   FilledButton(
                     onPressed: () => Navigator.pop(ctx),
@@ -311,28 +348,30 @@ class _RecipeIdeaDetailSheetState
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Add ingredients to:',
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w700)),
+                const Text(
+                  'Add ingredients to:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                ),
                 const SizedBox(height: 12),
-                ...lists.map((list) => ListTile(
-                      leading:
-                          const Icon(Icons.shopping_cart_outlined),
-                      title: Text(list.name),
-                      subtitle: Text('${list.itemCount} items'),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _addToShoppingList(list.id);
-                      },
-                    )),
+                ...lists.map(
+                  (list) => ListTile(
+                    leading: const Icon(Icons.shopping_cart_outlined),
+                    title: Text(list.name),
+                    subtitle: Text('${list.itemCount} items'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _addToShoppingList(list.id);
+                    },
+                  ),
+                ),
               ],
             ),
           );
         },
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
@@ -358,30 +397,18 @@ class _RecipeIdeaDetailSheetState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                '${widget.recipe.ingredients.where((i) => i.name.isNotEmpty).length} ingredients added'),
+              '${widget.recipe.ingredients.where((i) => i.name.isNotEmpty).length} ingredients added',
+            ),
             backgroundColor: VillageTheme.positive,
           ),
         );
       }
-    } on DioException {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-                'Failed to add ingredients. Check your connection.'),
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed: $e'),
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
-      }
+    } catch (error) {
+      _reportFailure(
+        'add the ingredients',
+        error,
+        conflict: 'Those ingredients are already on the list.',
+      );
     } finally {
       if (mounted) setState(() => _addingToShoppingList = false);
     }
@@ -396,8 +423,9 @@ class _RecipeIdeaDetailSheetState
       // Convert TheMealDB recipe to Village Recipe format
       final ingredientsText = recipe.ingredients
           .where((i) => i.name.isNotEmpty)
-          .map((i) =>
-              i.measure.isNotEmpty ? '${i.name} (${i.measure})' : i.name)
+          .map(
+            (i) => i.measure.isNotEmpty ? '${i.name} (${i.measure})' : i.name,
+          )
           .join('\n');
 
       await mealsService.createRecipe(
@@ -427,27 +455,64 @@ class _RecipeIdeaDetailSheetState
           ),
         );
       }
-    } on DioException {
-      if (mounted) {
-        setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-                'Failed to save recipe. Check your connection.'),
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
+    } catch (error) {
+      _reportFailure(
+        'save the recipe',
+        error,
+        conflict: 'You already saved this recipe.',
+        onFailure: () => setState(() => _saving = false),
+      );
+    }
+  }
+
+  /// Explain a failure in terms the user can act on, and log the real cause.
+  ///
+  /// Every non-timeout failure used to say "Check your connection", and the
+  /// fallback printed the raw exception into the snackbar (#110) — so a 401, a
+  /// 409 and genuinely being offline all looked the same.
+  void _reportFailure(
+    String action,
+    Object error, {
+    String? conflict,
+    VoidCallback? onFailure,
+  }) {
+    debugPrint('[RecipeDetail] failed to $action: $error');
+    if (!mounted) return;
+    onFailure?.call();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_describeFailure(action, error, conflict: conflict)),
+        backgroundColor: Colors.red.shade700,
+      ),
+    );
+  }
+
+  String _describeFailure(String action, Object error, {String? conflict}) {
+    if (error is DioException) {
+      final status = error.response?.statusCode;
+      if (status == 401 || status == 403) {
+        return 'Your session expired — sign in again to $action.';
       }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed: $e'),
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
+      if (status == 409) {
+        return conflict ?? 'That already exists.';
+      }
+      if (status == 400) {
+        return 'The server rejected that — try again or check the fields.';
+      }
+      if (status != null && status >= 500) {
+        return 'The server had a problem — try again in a moment.';
+      }
+      switch (error.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
+          return 'The connection is slow — try again.';
+        case DioExceptionType.connectionError:
+          return 'No connection — check your network and try again.';
+        default:
+          break;
       }
     }
+    return "Couldn't $action. Please try again.";
   }
 }
