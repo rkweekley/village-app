@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:village_app/core/theme/village_theme.dart';
 import 'package:village_app/features/meals/recipe_ideas_service.dart';
 import 'package:village_app/features/meals/pages/recipe_idea_detail_sheet.dart';
-import 'package:village_app/core/widgets/empty_state.dart';
+import 'package:village_app/features/meals/widgets/recipe_image.dart';
 
 /// Browse recipe ideas from TheMealDB — categories, search, and "Surprise Me".
 class RecipeIdeasTab extends ConsumerStatefulWidget {
@@ -19,7 +20,6 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
   Timer? _debounceTimer;
   String? _selectedCategory;
   String? _searchQuery;
-  bool _showSearch = false;
 
   @override
   void dispose() {
@@ -57,19 +57,20 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   ),
                   onChanged: (v) {
                     _debounceTimer?.cancel();
-                    _debounceTimer =
-                        Timer(const Duration(milliseconds: 500), () {
-                      final trimmed = v.trim();
-                      setState(() {
-                        _searchQuery = trimmed.isNotEmpty ? trimmed : null;
-                        _selectedCategory = null;
-                      });
-                    });
+                    _debounceTimer = Timer(
+                      const Duration(milliseconds: 500),
+                      () {
+                        final trimmed = v.trim();
+                        setState(() {
+                          _searchQuery = trimmed.isNotEmpty ? trimmed : null;
+                          _selectedCategory = null;
+                        });
+                      },
+                    );
                   },
                 ),
               ),
@@ -79,8 +80,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                 onPressed: _getRandomRecipe,
                 icon: const Icon(Icons.casino_rounded, size: 20),
                 style: IconButton.styleFrom(
-                  backgroundColor: VillageTheme.warning
-                      .withValues(alpha: 0.15),
+                  backgroundColor: VillageTheme.warning.withValues(alpha: 0.15),
                   foregroundColor: context.palette.warning,
                 ),
                 tooltip: 'Surprise Me',
@@ -108,12 +108,12 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                       setState(() => _selectedCategory = null);
                     },
                     showCheckmark: false,
-                    selectedColor:
-                        context.palette.primary.withValues(alpha: 0.15),
+                    selectedColor: context.palette.primary.withValues(
+                      alpha: 0.15,
+                    ),
                   );
                 }
-                final cat =
-                    categories[_searchQuery == null ? i - 1 : i];
+                final cat = categories[_searchQuery == null ? i - 1 : i];
                 return FilterChip(
                   label: Text(cat.name),
                   selected: _selectedCategory == cat.name,
@@ -121,13 +121,15 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                     setState(() {
                       _searchQuery = null;
                       _searchCtrl.clear();
-                      _selectedCategory =
-                          _selectedCategory == cat.name ? null : cat.name;
+                      _selectedCategory = _selectedCategory == cat.name
+                          ? null
+                          : cat.name;
                     });
                   },
                   showCheckmark: false,
-                  selectedColor:
-                      context.palette.primary.withValues(alpha: 0.15),
+                  selectedColor: context.palette.primary.withValues(
+                    alpha: 0.15,
+                  ),
                 );
               },
             ),
@@ -139,9 +141,7 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
         const SizedBox(height: 8),
 
         // ── Results ──
-        Expanded(
-          child: _buildResults(),
-        ),
+        Expanded(child: _buildResults()),
       ],
     );
   }
@@ -151,8 +151,10 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
     if (_searchQuery != null && _searchQuery!.isNotEmpty) {
       final resultsAsync = ref.watch(recipeIdeasSearchProvider(_searchQuery!));
       return resultsAsync.when(
-        data: (recipes) => _recipeGrid(recipes,
-            emptyMessage: 'No recipes found for "$_searchQuery"'),
+        data: (recipes) => _recipeGrid(
+          recipes,
+          emptyMessage: 'No recipes found for "$_searchQuery"',
+        ),
         loading: () => _loadingGrid(),
         error: (e, _) => _errorWidget(),
       );
@@ -160,19 +162,24 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
 
     // Category browse
     if (_selectedCategory != null) {
-      final resultsAsync =
-          ref.watch(recipeIdeasByCategoryProvider(_selectedCategory!));
+      final resultsAsync = ref.watch(
+        recipeIdeasByCategoryProvider(_selectedCategory!),
+      );
       return resultsAsync.when(
-        data: (recipes) => _recipeGrid(recipes,
-            emptyMessage: 'No recipes in $_selectedCategory'),
+        data: (recipes) => _recipeGrid(
+          recipes,
+          emptyMessage: 'No recipes in $_selectedCategory',
+        ),
         loading: () => _loadingGrid(),
         error: (e, _) => _errorWidget(),
       );
     }
 
     // Default — browse "All" (use popular categories for a landing view)
-    return _recipeGrid(const [],
-        emptyMessage: 'Search recipes or pick a category above');
+    return _recipeGrid(
+      const [],
+      emptyMessage: 'Search recipes or pick a category above',
+    );
   }
 
   Widget _recipeGrid(List<RecipeIdea> recipes, {String? emptyMessage}) {
@@ -183,11 +190,16 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.menu_book_rounded,
-                  size: 48, color: context.palette.textTertiary),
+              Icon(
+                Icons.menu_book_rounded,
+                size: 48,
+                color: context.palette.textTertiary,
+              ),
               const SizedBox(height: 12),
-              Text(emptyMessage ?? 'No recipes yet',
-                  style: const TextStyle(fontSize: 16)),
+              Text(
+                emptyMessage ?? 'No recipes yet',
+                style: const TextStyle(fontSize: 16),
+              ),
               const SizedBox(height: 8),
               if (_searchQuery == null && _selectedCategory == null)
                 FilledButton.icon(
@@ -228,17 +240,11 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
             // Image
             Expanded(
               flex: 3,
-              child: Image.network(
-                recipe.image,
+              child: RecipeImage(
+                url: recipe.image,
                 width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: context.palette.primary.withValues(alpha: 0.12),
-                  child: Center(
-                    child: Icon(Icons.restaurant_rounded,
-                        size: 32, color: context.palette.primary),
-                  ),
-                ),
+                cacheWidth: 400,
+                iconSize: 32,
               ),
             ),
             // Title
@@ -263,10 +269,11 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
                     if (recipe.category != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: context.palette.primary
-                              .withValues(alpha: 0.1),
+                          color: context.palette.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -289,56 +296,136 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
   }
 
   Widget _loadingGrid() => GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.72,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: 6,
-        itemBuilder: (_, __) => Card(
-          clipBehavior: Clip.antiAlias,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          elevation: 0,
-          color: context.palette.surfaceCard,
-          child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-      );
+    padding: const EdgeInsets.all(16),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      childAspectRatio: 0.72,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+    ),
+    itemCount: 6,
+    itemBuilder: (_, __) => Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
+      color: context.palette.surfaceCard,
+      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+    ),
+  );
 
   Widget _errorWidget() => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.cloud_off_rounded,
-                  size: 48, color: context.palette.textTertiary),
-              const SizedBox(height: 12),
-              const Text("Recipe ideas aren't available right now",
-                  textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () {
-                  ref.invalidate(recipeCategoriesProvider);
-                  if (_selectedCategory != null) {
-                    ref.invalidate(recipeIdeasByCategoryProvider(
-                        _selectedCategory!));
-                  }
-                },
-                child: const Text('Retry'),
-              ),
-            ],
+    child: Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.cloud_off_rounded,
+            size: 48,
+            color: context.palette.textTertiary,
           ),
-        ),
-      );
+          const SizedBox(height: 12),
+          const Text(
+            "Recipe ideas aren't available right now",
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () {
+              ref.invalidate(recipeCategoriesProvider);
+              if (_selectedCategory != null) {
+                ref.invalidate(
+                  recipeIdeasByCategoryProvider(_selectedCategory!),
+                );
+              }
+            },
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    ),
+  );
 
+  /// Fetch the full recipe, then show it.
+  ///
+  /// The loading sheet is pushed as an explicit [ModalBottomSheetRoute] so the
+  /// exact route can be removed once the fetch finishes. The previous code
+  /// called `Navigator.pop(context)` to dismiss it, which pops whatever route
+  /// happens to be on top — if the detail sheet had already been pushed the
+  /// pop took *that* away and left a blank screen (#105).
   Future<void> _openDetail(RecipeIdea recipe) async {
-    // Show loading sheet while fetching full detail (category browse
-    // results are summaries without ingredients/instructions).
+    final navigator = Navigator.of(context);
+    final loadingRoute = ModalBottomSheetRoute<void>(
+      builder: (_) => const _LoadingSheet(),
+      isScrollControlled: true,
+      backgroundColor: context.palette.surfaceBase,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      capturedThemes: InheritedTheme.capture(
+        from: context,
+        to: navigator.context,
+      ),
+    );
+    unawaited(navigator.push(loadingRoute));
+
+    final service = ref.read(recipeIdeasServiceProvider);
+
+    try {
+      // Category results are summaries without ingredients/instructions, so
+      // the detail endpoint is required here.
+      final fullRecipe = await service.getDetail(recipe.id);
+      if (!mounted) return;
+      _closeIfActive(navigator, loadingRoute);
+      _showDetailSheet(fullRecipe);
+    } on DioException catch (error) {
+      if (!mounted) return;
+      _closeIfActive(navigator, loadingRoute);
+      debugPrint(
+        '[RecipeIdeas] detail ${recipe.id} failed: '
+        '${error.response?.statusCode ?? error.type} — ${error.message}',
+      );
+      _showLoadError(
+        "Couldn't load recipe details",
+        retry: () => _openDetail(recipe),
+      );
+    } catch (error, stack) {
+      if (!mounted) return;
+      _closeIfActive(navigator, loadingRoute);
+      debugPrint('[RecipeIdeas] detail ${recipe.id} failed: $error\n$stack');
+      _showLoadError(
+        "Couldn't load recipe details",
+        retry: () => _openDetail(recipe),
+      );
+    }
+  }
+
+  void _closeIfActive(
+    NavigatorState navigator,
+    ModalBottomSheetRoute<void> route,
+  ) {
+    if (route.isActive) navigator.removeRoute(route);
+  }
+
+  void _showLoadError(String message, {VoidCallback? retry}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        action: retry == null
+            ? null
+            : SnackBarAction(label: 'Retry', onPressed: retry),
+      ),
+    );
+  }
+
+  /// Show an already-complete recipe.
+  ///
+  /// Deliberately *not* wrapped in a nested `ProviderScope`: a second scope
+  /// gave the sheet its own container, so its reads and invalidations never
+  /// touched the root providers the rest of the app relies on — and, before
+  /// the authenticated client attached its interceptor per instance, every
+  /// request made from inside that scope went out unauthenticated (#103, #104).
+  void _showDetailSheet(RecipeIdea recipe) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -346,35 +433,8 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => const _LoadingSheet(),
+      builder: (_) => RecipeIdeaDetailSheet(recipe: recipe),
     );
-
-    try {
-      final service = ref.read(recipeIdeasServiceProvider);
-      final fullRecipe = await service.getDetail(recipe.id);
-
-      if (mounted) {
-        Navigator.pop(context); // dismiss loading
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: context.palette.surfaceBase,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          builder: (_) => ProviderScope(
-            child: RecipeIdeaDetailSheet(recipe: fullRecipe),
-          ),
-        );
-      }
-    } catch (_) {
-      if (mounted) {
-        Navigator.pop(context); // dismiss loading
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Couldn't load recipe details")),
-        );
-      }
-    }
   }
 
   void _clearSearch() {
@@ -384,17 +444,29 @@ class _RecipeIdeasTabState extends ConsumerState<RecipeIdeasTab> {
     });
   }
 
-  void _getRandomRecipe() async {
+  /// Surprise Me.
+  ///
+  /// `getRandom()` already returns a full recipe, so it goes straight to the
+  /// detail sheet. Routing it back through `_openDetail()` performed a second
+  /// network round trip and could open a *different* recipe than the one the
+  /// user was shown (#106).
+  Future<void> _getRandomRecipe() async {
     final service = ref.read(recipeIdeasServiceProvider);
     try {
       final recipe = await service.getRandom();
-      if (mounted) _openDetail(recipe);
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Couldn't load a random recipe")),
-        );
-      }
+      if (!mounted) return;
+      _showDetailSheet(recipe);
+    } on DioException catch (error) {
+      debugPrint(
+        '[RecipeIdeas] random failed: '
+        '${error.response?.statusCode ?? error.type} — ${error.message}',
+      );
+      if (!mounted) return;
+      _showLoadError("Couldn't load a random recipe", retry: _getRandomRecipe);
+    } catch (error, stack) {
+      debugPrint('[RecipeIdeas] random failed: $error\n$stack');
+      if (!mounted) return;
+      _showLoadError("Couldn't load a random recipe", retry: _getRandomRecipe);
     }
   }
 }
