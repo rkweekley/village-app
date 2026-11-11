@@ -231,16 +231,15 @@ class _CreateChoreSheetState extends ConsumerState<_CreateChoreSheet> {
       widget.ref.invalidate(choresListProvider);
       if (mounted) Navigator.pop(context);
     } catch (e) {
+      if (!mounted) return;
       setState(() => _submitting = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to create chore: $e'),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to create chore: $e'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
     }
   }
 }

@@ -716,19 +716,30 @@ class _ChoreCard extends ConsumerWidget {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () async {
-                    await ref.read(choresServiceProvider).updateChore(
-                          chore.id,
-                          name: nameCtrl.text,
-                          description: descCtrl.text,
-                          pointValue: int.tryParse(pointCtrl.text) ??
-                              chore.pointValue,
-                          recurrence: recurrence,
-                          difficulty: difficulty,
-                          requiresApproval: requiresApproval,
-                          requiresPhoto: requiresPhoto,
-                        );
-                    ref.invalidate(choresListProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
+                    final messenger = ScaffoldMessenger.of(ctx);
+                    try {
+                      await ref.read(choresServiceProvider).updateChore(
+                            chore.id,
+                            name: nameCtrl.text,
+                            description: descCtrl.text,
+                            pointValue: int.tryParse(pointCtrl.text) ??
+                                chore.pointValue,
+                            recurrence: recurrence,
+                            difficulty: difficulty,
+                            requiresApproval: requiresApproval,
+                            requiresPhoto: requiresPhoto,
+                          );
+                      ref.invalidate(choresListProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to save changes: $e'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.red.shade700,
+                        ),
+                      );
+                    }
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
