@@ -414,39 +414,50 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                 FilledButton(
                   onPressed: () async {
                     if (titleCtrl.text.isEmpty) return;
-                    await ref
-                        .read(calendarServiceProvider)
-                        .createEvent(
-                          title: titleCtrl.text,
-                          description: descCtrl.text.isNotEmpty
-                              ? descCtrl.text
-                              : null,
-                          location: locCtrl.text.isNotEmpty
-                              ? locCtrl.text
-                              : null,
-                          startTime: start,
-                          endTime: end,
-                          isAllDay: allDay,
+                    try {
+                      await ref
+                          .read(calendarServiceProvider)
+                          .createEvent(
+                            title: titleCtrl.text,
+                            description: descCtrl.text.isNotEmpty
+                                ? descCtrl.text
+                                : null,
+                            location: locCtrl.text.isNotEmpty
+                                ? locCtrl.text
+                                : null,
+                            startTime: start,
+                            endTime: end,
+                            isAllDay: allDay,
+                          );
+                      final monthStart = DateTime(
+                        _focusedMonth.year,
+                        _focusedMonth.month,
+                        1,
+                      );
+                      final monthEnd = DateTime(
+                        _focusedMonth.year,
+                        _focusedMonth.month + 1,
+                        0,
+                        23,
+                        59,
+                      );
+                      ref.invalidate(
+                        calendarEventsProvider(
+                          CalendarDateRange(start: monthStart, end: monthEnd),
+                        ),
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to create event: $e'),
+                            backgroundColor: Colors.red.shade700,
+                            behavior: SnackBarBehavior.floating,
+                          ),
                         );
-                    final monthStart = DateTime(
-                      _focusedMonth.year,
-                      _focusedMonth.month,
-                      1,
-                    );
-                    final monthEnd = DateTime(
-                      _focusedMonth.year,
-                      _focusedMonth.month + 1,
-                      0,
-                      23,
-                      59,
-                    );
-                    // ignore: unused_result
-                    ref.refresh(
-                      calendarEventsProvider(
-                        CalendarDateRange(start: monthStart, end: monthEnd),
-                      ),
-                    );
-                    if (ctx.mounted) Navigator.pop(ctx);
+                      }
+                    }
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
@@ -792,7 +803,19 @@ class _DayEventsList extends ConsumerWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        // Refresh context event list
+        final monthStart = DateTime(day.year, day.month, 1);
+        final monthEnd = DateTime(
+          day.year,
+          day.month + 1,
+          0,
+          23,
+          59,
+        );
+        final provider = calendarEventsProvider(
+          CalendarDateRange(start: monthStart, end: monthEnd),
+        );
+        ref.invalidate(provider);
+        await ref.read(provider.future);
       },
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
