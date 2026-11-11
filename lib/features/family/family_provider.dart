@@ -67,6 +67,7 @@ class FamilyNotifier extends Notifier<FamilyState> {
         isLoading: false,
         error: 'Failed to update family: $e',
       );
+      rethrow;
     }
   }
 

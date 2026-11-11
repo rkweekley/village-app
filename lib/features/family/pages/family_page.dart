@@ -1158,7 +1158,16 @@ class _MemberCard extends ConsumerWidget {
                       }
                     }
                     onChanged();
-                  } catch (_) {}
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to update member: $e'),
+                          backgroundColor: Colors.red.shade700,
+                        ),
+                      );
+                    }
+                  }
                 },
                 itemBuilder: (context) => [
                   if (member.isManaged)
