@@ -199,7 +199,7 @@ class SchoolService {
   }) async {
     final res = await _dio.put('/api/school/$id/edit', data: {
       if (title != null) 'title': title,
-      if (description != null) 'description': description,
+      'description': description ?? '',
       if (dueDate != null) 'dueDate': dueDate,
       if (pointsPossible != null) 'pointsPossible': pointsPossible,
       if (subjectId != null) 'subjectId': subjectId,

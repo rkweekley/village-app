@@ -433,19 +433,31 @@ class SchoolPage extends ConsumerWidget {
                     }
                     final dueDate =
                         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-                    await ref.read(schoolServiceProvider).createSchoolWork(
-                          subjectId: selectedSubjectId,
-                          assignedToId: selectedMember!.id,
-                          title: titleCtrl.text,
-                          description: descCtrl.text.isNotEmpty
-                              ? descCtrl.text
-                              : null,
-                          dueDate: dueDate,
-                          pointsPossible:
-                              int.tryParse(pointsCtrl.text) ?? 10,
+                    try {
+                      await ref.read(schoolServiceProvider).createSchoolWork(
+                            subjectId: selectedSubjectId,
+                            assignedToId: selectedMember!.id,
+                            title: titleCtrl.text,
+                            description: descCtrl.text.isNotEmpty
+                                ? descCtrl.text
+                                : null,
+                            dueDate: dueDate,
+                            pointsPossible:
+                                int.tryParse(pointsCtrl.text) ?? 10,
+                          );
+                      ref.invalidate(schoolWorkListProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text('Failed to create assignment: $e'),
+                            backgroundColor: Colors.red.shade700,
+                          ),
                         );
-                    ref.invalidate(schoolWorkListProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
+                      }
+                    }
                   },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
@@ -1614,7 +1626,7 @@ class _AssignmentsTab extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 final points = int.tryParse(pointsCtrl.text);
                 if (points == null || points < 0 || points > pointsPossible) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
@@ -1625,11 +1637,23 @@ class _AssignmentsTab extends ConsumerWidget {
                   );
                   return;
                 }
-                ref.read(schoolServiceProvider).gradeSchoolWork(
-                      assignmentId,
-                      pointsEarned: points,
+                try {
+                  await ref.read(schoolServiceProvider).gradeSchoolWork(
+                        assignmentId,
+                        pointsEarned: points,
+                      );
+                  ref.invalidate(schoolWorkListProvider);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                } catch (e) {
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to save grade: $e'),
+                        backgroundColor: Colors.red.shade700,
+                      ),
                     );
-                Navigator.pop(ctx);
+                  }
+                }
               },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
